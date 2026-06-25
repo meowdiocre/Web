@@ -1,0 +1,10 @@
+{
+  "// note": "Pins the Svelte language server to this folder so bare imports in svelte.config.js resolve through ./node_modules even when a parent folder is the VSCode workspace root.",
+  "svelte.language-server.runtime": "node",
+  "files.associations": {
+    "*.svelte": "svelte"
+  },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  }
+}
