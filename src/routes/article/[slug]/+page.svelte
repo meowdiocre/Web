@@ -1,7 +1,5 @@
 <script>
-  import { SITE }     from '$lib/config/site.js';
-  import { article } from '$lib/data/article.js';
-  import { related } from '$lib/data/related.js';
+  import { SITE } from '$lib/config/site.js';
 
   import Nav             from '$lib/components/Nav.svelte';
   import Footer          from '$lib/components/Footer.svelte';
@@ -11,14 +9,16 @@
   import ArticleHead     from '$lib/components/article/ArticleHead.svelte';
   import Essay           from '$lib/components/article/Essay.svelte';
   import RelatedGrid     from '$lib/components/article/RelatedGrid.svelte';
+
+  /** @type {{ data: { article: import('$lib/server/db/queries').PublicArticle, related: any[] } }} */
+  let { data } = $props();
+  const article = $derived(data.article);
+  const related = $derived(data.related ?? []);
 </script>
 
 <svelte:head>
   <title>{article.head.title.pre}{article.head.title.em}{article.head.title.post} — {SITE.brand}</title>
-  <meta
-    name="description"
-    content="A field guide to recovering original IR from a VMProtect 3.x dispatch trace, without instrumenting the protected binary."
-  />
+  <meta name="description" content={article.head.dek} />
 </svelte:head>
 
 <SkipLink target="#article-main" label="Skip to article" />
@@ -31,8 +31,10 @@
 
 <main id="article-main">
   <ArticleHead {...article.head} />
-  <Essay body={article.body} footnotes={article.footnotes} />
-  <RelatedGrid items={related} />
+  <Essay html={article.bodyHtml} footnotes={article.footnotes} />
+  {#if related.length}
+    <RelatedGrid items={related} />
+  {/if}
 </main>
 
 <Footer variant="article" />

@@ -8,6 +8,7 @@
   /** Map current pathname → data-page key (drives bg + atmosphere). */
   function pageKey(pathname) {
     if (pathname === '/' || pathname === '') return 'home';
+    if (pathname.startsWith('/admin'))   return 'admin';
     if (pathname.startsWith('/blog'))    return 'blog';
     if (pathname.startsWith('/about'))   return 'about';
     if (pathname.startsWith('/article')) return 'article';

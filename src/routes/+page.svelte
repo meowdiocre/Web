@@ -33,7 +33,6 @@
 
     <div class="body">
       <p class="eyebrow">
-        <span class="slash">//</span>
         {#each TAGS as tag, i}
           {#if i > 0}<span class="sep">·</span>{/if}<b>{tag}</b>
         {/each}

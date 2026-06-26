@@ -198,3 +198,186 @@ body[data-page='article']:not([data-theme='slate']) :focus-visible {
   }
   html { scroll-behavior: auto; }
 }
+
+/* ==========================================================
+ * Tooltip — styled singleton appended to <body> by the
+ * `use:tooltip` action in src/lib/actions/tooltip.js.
+ * Kept global (not admin-scoped) so it's reusable anywhere.
+ * ========================================================== */
+
+.tooltip {
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 9999;
+  padding: 5px 10px;
+  background: rgb(10 9 8 / 0.96);
+  color: var(--color-bone);
+  border: 1px solid rgb(232 156 146 / 0.35);
+  border-bottom: 2px dashed rgb(232 156 146 / 0.40);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%);
+  box-shadow: 0 8px 18px rgb(0 0 0 / 0.45);
+}
+.tooltip--show {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tooltip { transition: opacity 0.05s linear; transform: none; }
+}
+
+/* ==========================================================
+ * Admin chrome — form fields, buttons, nav links, table rows.
+ * Scoped to body[data-page='admin'] so utility-style class names
+ * (.field, .inp, .btn-primary, …) only collide inside /admin.
+ * Declared once here instead of being re-:global()-ed by every
+ * admin page.
+ * ========================================================== */
+
+body[data-page='admin'] {
+  /* Form fields ------------------------------------------------ */
+  .field { display: grid; gap: 8px; min-width: 0; }
+  .lbl {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-muted-warm);
+  }
+  .inp {
+    width: 100%;
+    background: var(--color-ink-2);
+    border: 1px solid var(--line-soft);
+    color: var(--color-paper);
+    padding: 10px 12px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    border-radius: 0;
+  }
+  .inp:focus { outline: 2px solid var(--color-rose); outline-offset: 2px; }
+  textarea.inp { resize: vertical; min-height: 80px; }
+
+  /* Buttons --------------------------------------------------- */
+  .btn-primary,
+  .btn-ghost,
+  .btn-danger {
+    display: inline-block;
+    padding: 10px 18px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+  .btn-primary {
+    background: var(--color-crimson);
+    color: var(--color-paper);
+  }
+  .btn-primary:hover { background: var(--color-crimson-deep); }
+  .btn-ghost {
+    border-color: var(--line-soft);
+    color: var(--color-paper);
+    background: transparent;
+  }
+  .btn-ghost:hover { border-color: var(--color-rose); color: var(--color-rose); }
+  .btn-danger {
+    border-color: var(--color-crimson-deep);
+    color: var(--color-crimson);
+    background: transparent;
+  }
+  .btn-danger:hover { background: var(--color-crimson-deep); color: var(--color-paper); }
+
+  /* Status pill ----------------------------------------------- */
+  .status {
+    display: inline-block;
+    padding: 2px 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid currentColor;
+  }
+  .status--draft     { color: var(--color-muted-warm); }
+  .status--published { color: var(--color-rose); }
+
+  /* Sidebar / dropdown nav — structured into sections, with an active
+     state that paints a rose left-accent bar + recolours the caret. */
+  .nav-section + .nav-section { margin-top: 18px; }
+  .nav-section__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-muted-warm);
+  }
+  .nav-section__label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line-soft);
+  }
+  .nav-section__list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 14px 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 10px 8px 12px;
+    color: var(--color-paper);
+    opacity: 0.65;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 0.12s, opacity 0.12s, background 0.12s;
+  }
+  .nav-item__caret {
+    color: var(--color-muted-warm);
+    font-family: var(--font-display);
+    font-size: 13px;
+    line-height: 1;
+  }
+  .nav-item:hover {
+    color: var(--color-rose);
+    opacity: 1;
+    background: rgb(232 156 146 / 0.04);
+  }
+  .nav-item:hover .nav-item__caret { color: var(--color-rose); }
+  .nav-item--active {
+    color: var(--color-rose);
+    opacity: 1;
+    background: rgb(232 156 146 / 0.06);
+  }
+  .nav-item--active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 4px; bottom: 4px;
+    width: 2px;
+    background: var(--color-crimson);
+  }
+  .nav-item--active .nav-item__caret { color: var(--color-crimson); }
+  .nav-item--ext { color: var(--color-muted-warm); }
+  .nav-item--ext:hover { color: var(--color-rose); }
+}

@@ -1,9 +1,43 @@
-node_modules
-.svelte-kit
-build
+# ─── dependencies ────────────────────────────────────────
+node_modules/
+
+# ─── build output ────────────────────────────────────────
+build/
+.svelte-kit/
+.vercel/
+.vite/
+
+# Vite leaves a timestamped pre-bundle when a dev start fails halfway.
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# ─── env / secrets ───────────────────────────────────────
 .env
 .env.*
 !.env.example
-.DS_Store
-.vite
+
+# ─── test artifacts ──────────────────────────────────────
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+
+# ─── logs ────────────────────────────────────────────────
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── editor / OS noise ───────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+*.swo
+*.tsbuildinfo
+
+# Keep shared VS Code config; ignore everything else under .vscode/.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json

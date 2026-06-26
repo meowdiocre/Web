@@ -11,3 +11,4 @@ export const facts = [
   { label: 'Practising since', value: '2018' },
   { label: 'Status',           value: 'One slot open · Q3 2026' }
 ];
+  

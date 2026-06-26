@@ -1,22 +1,55 @@
 {
   "name": "meowdiocre-portfolio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview --host",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json"
+    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx ./drizzle/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:reset": "tsx ./scripts/reset.ts",
+    "seed": "tsx ./scripts/seed.ts"
   },
   "devDependencies": {
-    "@sveltejs/adapter-static": "^3.0.6",
+    "@playwright/test": "^1.49.1",
+    "@sveltejs/adapter-vercel": "^5.6.0",
     "@sveltejs/kit": "^2.8.1",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tailwindcss/vite": "^4.3.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/svelte": "^5.2.6",
+    "@types/node": "^22.10.2",
+    "drizzle-kit": "^0.30.0",
+    "happy-dom": "^15.11.7",
     "svelte": "^5.1.16",
     "svelte-check": "^4.0.7",
     "tailwindcss": "^4.3.1",
-    "vite": "^5.4.11"
+    "tsx": "^4.19.2",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
+    "@tiptap/core": "^2.10.3",
+    "@tiptap/extension-image": "^2.10.3",
+    "@tiptap/extension-link": "^2.10.3",
+    "@tiptap/pm": "^2.10.3",
+    "@tiptap/starter-kit": "^2.10.3",
+    "@vercel/blob": "^0.27.0",
+    "arctic": "^2.3.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.36.4",
+    "postgres": "^3.4.5",
+    "shiki": "^1.24.2",
+    "zod": "^3.24.1"
   }
 }

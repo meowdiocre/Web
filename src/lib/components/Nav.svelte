@@ -70,7 +70,7 @@
         max-[460px]:hidden
       "
     >
-      <span class="at">@</span>{SITE.host}<span class="at">:</span><span class="path">{meta.hostPath}</span>
+      <span class="at">@</span>dev<span class="at">:</span><span class="path">{meta.hostPath}</span>
     </span>
   </a>
 

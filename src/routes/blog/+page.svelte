@@ -1,6 +1,5 @@
 <script>
   import { SITE }      from '$lib/config/site.js';
-  import { entryGroups } from '$lib/data/entries.js';
   import Nav           from '$lib/components/Nav.svelte';
   import Footer        from '$lib/components/Footer.svelte';
   import SkipLink      from '$lib/components/SkipLink.svelte';
@@ -10,6 +9,10 @@
   import Polaroid      from '$lib/components/Polaroid.svelte';
   import EntryItem     from '$lib/components/EntryItem.svelte';
   import EntriesYear   from '$lib/components/EntriesYear.svelte';
+
+  /** @type {{ data: { entryGroups: { year: number, entries: any[] }[] } }} */
+  let { data } = $props();
+  const entryGroups = $derived(data.entryGroups ?? []);
 </script>
 
 <svelte:head>
