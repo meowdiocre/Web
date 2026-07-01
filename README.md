@@ -148,6 +148,28 @@ Scheduled publishing is handled by `src/routes/admin/api/cron/publish/+server.js
 - Drafts with `publish_at <= now` are promoted to published
 - The route is protected by `CRON_SECRET`
 - Vercel cron can call it on a schedule
+- On Vercel Hobby, cron jobs are limited to once per day
+- This repo includes a GitHub Actions fallback in `.github/workflows/scheduled-publish.yml` that can call the same endpoint every 5 minutes
+
+### Hobby setup
+
+If you stay on Vercel Hobby:
+
+1. Keep the daily fallback cron in `vercel.json`
+2. Add these GitHub repository secrets:
+3. `CRON_BASE_URL`
+4. `CRON_SECRET`
+
+`CRON_BASE_URL` should be your deployed site origin, for example `https://your-site.example`.
+
+`CRON_SECRET` must match the `CRON_SECRET` environment variable configured in Vercel.
+
+The GitHub Actions workflow will call:
+
+```text
+POST /admin/api/cron/publish
+Authorization: Bearer <CRON_SECRET>
+```
 
 ## Testing
 

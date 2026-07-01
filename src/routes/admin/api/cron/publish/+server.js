@@ -7,9 +7,10 @@ import { revalidatePaths } from '$lib/server/publish';
 export const prerender = false;
 
 /**
- * `/admin/api/cron/publish` is the Vercel cron handler.
+ * `/admin/api/cron/publish` is the scheduled publish endpoint.
  *
- * Auth: Vercel sends `Authorization: Bearer ${CRON_SECRET}`. Use the
+ * Auth: the scheduler sends `Authorization: Bearer ${CRON_SECRET}`.
+ * Vercel Cron and GitHub Actions can both use the same secret. Use the
  * same header from `curl` in dev to trigger manually.
  *
  * Behaviour: for every draft whose `publish_at <= now`, flip status to

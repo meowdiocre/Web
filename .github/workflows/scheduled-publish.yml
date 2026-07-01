@@ -1,0 +1,28 @@
+name: Scheduled Publish
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      CRON_BASE_URL: ${{ secrets.CRON_BASE_URL }}
+      CRON_SECRET: ${{ secrets.CRON_SECRET }}
+    steps:
+      - name: Validate scheduler secrets
+        run: |
+          if [ -z "$CRON_BASE_URL" ] || [ -z "$CRON_SECRET" ]; then
+            echo "Missing CRON_BASE_URL or CRON_SECRET. Skipping scheduled publish."
+            exit 0
+          fi
+
+      - name: Trigger publish endpoint
+        run: |
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -H "User-Agent: github-actions-scheduled-publish" \
+            "$CRON_BASE_URL/admin/api/cron/publish"
