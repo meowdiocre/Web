@@ -64,7 +64,7 @@
       </p>
       <div class="cta">
         <BtnPrimary href="/blog">read the writing</BtnPrimary>
-        <CtaText href="/about">about this cool guy</CtaText>
+        <CtaText href="/about">about the author</CtaText>
       </div>
     </div>
   </section>
@@ -73,7 +73,7 @@
 <Footer variant="minimal" />
 
 <style>
-  /* Hero grid — 2-up on desktop, stacked on mobile. */
+  /* Hero grid, two-up on desktop, stacked on mobile. */
   .hero {
     position: relative;
     flex: 1;
@@ -113,7 +113,7 @@
     border-top: 1px solid var(--line);
   }
 
-  /* Eyebrow — terminal-style category line */
+  /* Eyebrow, terminal-style category line. */
   .eyebrow {
     display: inline-flex;
     flex-wrap: wrap;
@@ -126,7 +126,6 @@
     text-transform: lowercase;
     color: var(--color-muted);
   }
-  .eyebrow .slash { color: var(--color-rose);    opacity: 0.55; margin-right: 4px; }
   .eyebrow .sep   { color: var(--color-crimson); opacity: 0.88; }
   .eyebrow b      { color: var(--color-bone);    font-weight: 400; }
 

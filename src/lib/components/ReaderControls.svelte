@@ -3,7 +3,7 @@
   import { STORAGE_KEYS } from '$lib/config/site.js';
 
   /**
-   * ReaderControls — sticky right-edge panel for /article. Theme
+   * ReaderControls is the sticky right-edge panel for /article. Theme
    * (cream/slate) + reading size (S/M/L). Both persist to localStorage
    * and mirror onto `body[data-theme]` / `--read-size` so the article
    * page's CSS variables can swap.

@@ -8,9 +8,16 @@ import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
 
-let _db: ReturnType<typeof drizzleNeon> | null = null;
+function createDb(url: string) {
+  const client = neon(url);
+  return drizzleNeon(client, { schema, casing: 'snake_case' });
+}
 
-export function getDb() {
+type DbClient = ReturnType<typeof createDb>;
+
+let _db: DbClient | null = null;
+
+export function getDb(): DbClient {
   if (_db) return _db;
   const url = process.env.DATABASE_URL;
   if (!url) {
@@ -18,13 +25,12 @@ export function getDb() {
       'DATABASE_URL is not set. Copy .env.example to .env and configure your Neon connection string.'
     );
   }
-  const client = neon(url);
-  _db = drizzleNeon(client, { schema, casing: 'snake_case' });
+  _db = createDb(url);
   return _db;
 }
 
 /** Proxy export so callers can `import { db }` and still get lazy init. */
-export const db = new Proxy({} as ReturnType<typeof drizzleNeon>, {
+export const db = new Proxy({} as DbClient, {
   get(_target, prop) {
     return (getDb() as any)[prop];
   }

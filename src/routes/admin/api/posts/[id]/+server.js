@@ -1,8 +1,6 @@
 import { error, json } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
 
-import { db } from '$lib/server/db/client';
-import { posts } from '$lib/server/db/schema';
+import { savePostContent } from '$lib/server/db/admin-queries';
 import { renderPost } from '$lib/server/render-post';
 import { isDoc } from '$lib/editor/types';
 
@@ -24,15 +22,7 @@ export async function PATCH({ request, params, locals }) {
   }
 
   const { bodyHtml, doc } = await renderPost(payload.docJson);
-
-  await db
-    .update(posts)
-    .set({
-      docJson:  doc,
-      bodyHtml,
-      updatedAt: new Date()
-    })
-    .where(eq(posts.id, params.id));
+  await savePostContent(params.id, doc, bodyHtml);
 
   // Echo the rehighlighted doc so the editor can pull new codeBlock.html
   // attrs back in without a page reload.

@@ -1,6 +1,6 @@
 <script>
   /**
-   * SkipLink — first focusable element on every page. Hidden until
+   * SkipLink is the first focusable element on every page. Hidden until
    * focused; jumps the user past the nav into main content.
    *
    * @typedef {Object} Props

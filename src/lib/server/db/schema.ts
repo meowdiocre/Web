@@ -146,5 +146,7 @@ export type Post     = typeof posts.$inferSelect;
 export type NewPost  = typeof posts.$inferInsert;
 export type Category = typeof categories.$inferSelect;
 export type User     = typeof users.$inferSelect;
+export type NewUser  = typeof users.$inferInsert;
 export type Session  = typeof sessions.$inferSelect;
 export type MediaRow = typeof media.$inferSelect;
+export type NewMedia = typeof media.$inferInsert;

@@ -2,10 +2,10 @@
   import { SITE } from '$lib/config/site.js';
 
   /**
-   * Footer — three tonal variants:
-   *   'minimal' — single hairline strip on dark (home, about)
-   *   'paper'   — cream bg with dark slab footer (blog)
-   *   'article' — dark slab full-width with back-to-writing
+   * Footer with three variants:
+   *   `minimal` single hairline strip on dark pages
+   *   `paper` cream background with a dark slab footer
+   *   `article` dark slab footer with a back-to-writing link
    *
    * @typedef {'minimal'|'paper'|'article'} Variant
    * @typedef {{ variant?: Variant }} Props
@@ -14,7 +14,7 @@
   /** @type {Props} */
   let { variant = 'minimal' } = $props();
 
-  const copyright = `© ${SITE.copyrightYear} · ${SITE.brand}`;
+  const copyright = `© ${SITE.copyrightYear} ${SITE.brand}`;
 </script>
 
 {#if variant === 'minimal'}

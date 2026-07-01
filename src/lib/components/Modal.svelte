@@ -1,5 +1,5 @@
 <!--
-  Modal — thin wrapper around the native <dialog> element.
+  Modal is a thin wrapper around the native <dialog> element.
 
   Why <dialog>?
     - Built-in focus management: `.showModal()` moves focus to the first
@@ -48,8 +48,8 @@
 
   /**
    * The <dialog> itself fills the viewport (it's the backdrop surface),
-   * so a click on the dialog element directly — outside the inner panel
-   * — means the user clicked the backdrop.
+   * so a click on the dialog element directly, outside the inner panel,
+   * means the user clicked the backdrop.
    */
   function onBackdropClick(/** @type {MouseEvent} */ e) {
     if (e.target === dlg) onclose?.();
@@ -98,8 +98,8 @@
   /* The UA centres modal dialogs via `inset: 0; margin: auto` on a
      fit-content-sized dialog, but Tailwind v4's preflight zeroes
      margin, and our `width: 100%` makes the layout over-constrained
-     so auto margins collapse to 0. Pin via fixed + transform instead —
-     deterministic regardless of UA defaults or framework resets. */
+     so auto margins collapse to 0. Pin with fixed + transform instead.
+     That stays deterministic regardless of UA defaults or framework resets. */
   .modal {
     position: fixed;
     top: 50%;

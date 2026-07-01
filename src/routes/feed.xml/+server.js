@@ -59,7 +59,7 @@ export async function GET({ url, setHeaders }) {
      xmlns:dc="http://purl.org/dc/elements/1.1/"
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>${xml(SITE.brand)} — writing</title>
+    <title>${xml(SITE.brand)} - writing</title>
     <link>${attrXml(origin + '/blog')}</link>
     <description>Long-form essays and lab notes on reverse engineering, Windows internals, anti-cheat infrastructure, browser sandbox internals, and the strange behavior of large language models.</description>
     <language>en</language>

@@ -1,14 +1,13 @@
 import { json, error } from '@sveltejs/kit';
-import { and, eq, lte, isNotNull } from 'drizzle-orm';
 
-import { db }    from '$lib/server/db/client';
-import { posts } from '$lib/server/db/schema';
+import { loadDuePosts } from '$lib/server/db/queries';
+import { publishPost } from '$lib/server/db/admin-queries';
 import { revalidatePaths } from '$lib/server/publish';
 
 export const prerender = false;
 
 /**
- * /admin/api/cron/publish — Vercel cron handler.
+ * `/admin/api/cron/publish` is the Vercel cron handler.
  *
  * Auth: Vercel sends `Authorization: Bearer ${CRON_SECRET}`. Use the
  * same header from `curl` in dev to trigger manually.
@@ -26,23 +25,14 @@ export async function GET({ request }) {
   }
 
   const now = new Date();
-  const due = await db
-    .select({ id: posts.id, slug: posts.slug })
-    .from(posts)
-    .where(and(
-      eq(posts.status, 'draft'),
-      isNotNull(posts.publishAt),
-      lte(posts.publishAt, now)
-    ));
+  const due = await loadDuePosts(now);
 
   if (!due.length) {
     return json({ ok: true, flipped: 0 });
   }
 
   for (const p of due) {
-    await db.update(posts)
-      .set({ status: 'published', publishedAt: now, updatedAt: now })
-      .where(eq(posts.id, p.id));
+    await publishPost(p.id);
   }
 
   await revalidatePaths([

@@ -2,7 +2,7 @@
   import { SITE } from '$lib/config/site.js';
 
   /**
-   * NaviSigil — Wired-style HUD reticle with a small caption beneath.
+   * NaviSigil is a Wired-style HUD reticle with a small caption beneath.
    * Used in the right column of /about's head.
    *
    * @typedef {{ caption?: string, role?: string }} Props

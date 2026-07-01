@@ -12,6 +12,13 @@
   import SidenoteDialog  from '$lib/editor/dialogs/SidenoteDialog.svelte';
   import EndSlugDialog   from '$lib/editor/dialogs/EndSlugDialog.svelte';
 
+  import {
+    createDialogSpecs,
+    DEFAULT_CODE_BLOCK,
+    DEFAULT_END_SLUG,
+    DEFAULT_SIDENOTE,
+    resolveDialogState
+  } from '$lib/editor/dialog-specs.js';
   import { mergeRehighlightedHtml } from '$lib/editor/merge-rehighlight.js';
 
   /* Types */
@@ -79,7 +86,7 @@
         if (body?.doc && mergeRehighlightedHtml(editor, body.doc)) {
           suppressNextUpdate = true;
         }
-      } catch {/* tolerate missing/non-JSON body */}
+      } catch {/* tolerate missing or non-JSON body */}
       lastSavedAt = new Date();
       dirty = false;
     } catch (err) {
@@ -101,13 +108,7 @@
     save();
   }
 
-  /* Dialog plumbing
-   * --------------
-   * One spec per dialog so adding a new atom means adding one entry.
-   * `read(node)` collects initial state from the selected node (or null
-   * for marks like 'link'). `apply(value, mode)` writes back via the
-   * editor's command API.
-   */
+  /* Dialog plumbing */
 
   /** @type {DialogName|null} */
   let dialog        = $state(null);
@@ -116,116 +117,21 @@
   /** @type {any} */
   let dialogInitial = $state(null);
 
-  /**
-   * @typedef {Object} DialogSpec
-   * @property {string|null}                   nodeType   ProseMirror node name, or null for marks
-   * @property {() => any}                     defaults   factory for fresh "insert" state
-   * @property {(node: any) => any}            read       extract state from an existing node
-   * @property {(value: any, mode: 'insert'|'edit') => void} apply
-   */
-
-  /** @type {Record<DialogName, DialogSpec>} */
-  const DIALOG_SPECS = {
-    link: {
-      nodeType: null,
-      defaults: () => '',
-      read:     () => editor?.getAttributes('link')?.href ?? '',
-      apply: (href) => {
-        if (!editor) return;
-        const chain = editor.chain().focus().extendMarkRange('link');
-        if (href) chain.setLink({ href }).run();
-        else      chain.unsetLink().run();
-      }
-    },
-    codeBlock: {
-      nodeType: 'codeBlock',
-      defaults: () => ({ source: '', lang: 'plaintext', caption: '' }),
-      read: (n) => ({
-        source:  n.attrs.source  ?? '',
-        lang:    n.attrs.lang    ?? 'plaintext',
-        caption: n.attrs.caption ?? ''
-      }),
-      apply: (attrs, mode) => {
-        const c = editor?.chain().focus();
-        mode === 'edit'
-          ? c?.updateSelectedCodeBlock(attrs).run()
-          : c?.insertCodeBlock(attrs).run();
-      }
-    },
-    pullQuote: {
-      nodeType: 'pullQuote',
-      defaults: () => '',
-      read:     (n) => n.attrs.text ?? '',
-      apply: (text, mode) => {
-        const c = editor?.chain().focus();
-        mode === 'edit'
-          ? c?.updateSelectedPullQuote(text).run()
-          : c?.insertPullQuote(text).run();
-      }
-    },
-    sidenote: {
-      nodeType: 'sidenote',
-      defaults: () => ({ ref: '¹', bodyHtml: '' }),
-      read: (n) => ({ ref: n.attrs.ref ?? '¹', bodyHtml: n.attrs.bodyHtml ?? '' }),
-      apply: (attrs, mode) => {
-        const c = editor?.chain().focus();
-        mode === 'edit'
-          ? c?.updateSelectedSidenote(attrs).run()
-          : c?.insertSidenote(attrs).run();
-      }
-    },
-    endSlug: {
-      nodeType: 'endSlug',
-      defaults: () => '· · ·',
-      read:     (n) => n.attrs.text ?? '· · ·',
-      apply: (text, mode) => {
-        const c = editor?.chain().focus();
-        mode === 'edit'
-          ? c?.updateSelectedEndSlug(text).run()
-          : c?.insertEndSlug(text).run();
-      }
-    }
-  };
-
-  /**
-   * Return the node + position when the current selection is inside (or
-   * is) a node of the given type. Block atoms expose it as `$from.nodeAfter`;
-   * inline atoms expose it as `selection.node` on a NodeSelection.
-   * @param {string} type
-   */
-  function selectedNode(type) {
-    if (!editor) return null;
-    const sel = editor.state.selection;
-    const after = sel.$from.nodeAfter;
-    if (after && after.type.name === type) {
-      return { node: after, pos: sel.$from.pos };
-    }
-    const ns = /** @type {any} */ (sel);
-    if (ns.node && ns.node.type.name === type) {
-      return { node: ns.node, pos: sel.from };
-    }
-    return null;
-  }
+  const dialogSpecs = createDialogSpecs(() => editor);
 
   /** @param {DialogName} name */
   function openDialog(name) {
     if (!editor) return;
-    const spec = DIALOG_SPECS[name];
-    if (spec.nodeType) {
-      const sel = selectedNode(spec.nodeType);
-      dialogMode    = sel ? 'edit' : 'insert';
-      dialogInitial = sel ? spec.read(sel.node) : spec.defaults();
-    } else {
-      dialogMode    = 'insert';
-      dialogInitial = spec.read(null);
-    }
+    const state = resolveDialogState(editor, dialogSpecs[name]);
+    dialogMode = state.mode;
+    dialogInitial = state.initial;
     dialog = name;
   }
 
   /** @param {any} value */
   function applyDialog(value) {
     if (!dialog) return;
-    DIALOG_SPECS[dialog].apply(value, dialogMode);
+    dialogSpecs[dialog].apply(value, dialogMode);
     closeDialog();
   }
 
@@ -283,7 +189,7 @@
         recomputeStats();
       },
       onImageStatus(s) {
-        if (s.kind === 'uploading')     notify(`uploading ${s.file.name}…`,    'upload', '∅');
+        if (s.kind === 'uploading')     notify(`uploading ${s.file.name}...`,   'upload', '∅');
         else if (s.kind === 'uploaded') notify(`${s.file.name} uploaded`,      'upload', '∅');
         else                            notify(`upload failed: ${s.reason}`,   'error',  '!!');
       }
@@ -300,7 +206,7 @@
     editor?.destroy();
   });
 
-  /* Toolbar callbacks — thin wrappers so the toolbar API stays simple. */
+  /* Toolbar callbacks keep the toolbar API simple. */
   const openLink     = () => openDialog('link');
   const openCode     = () => openDialog('codeBlock');
   const openPull     = () => openDialog('pullQuote');
@@ -309,7 +215,7 @@
 </script>
 
 <svelte:window onkeydown={onKey} />
-<svelte:head><title>Edit — {post.titlePre}{post.titleEm}{post.titlePost}</title></svelte:head>
+<svelte:head><title>Edit | {post.titlePre}{post.titleEm}{post.titlePost}</title></svelte:head>
 
 <!-- Header -->
 <header class="flex items-baseline justify-between flex-wrap gap-x-6 gap-y-3 mb-4">
@@ -327,7 +233,7 @@
     {#if saveError}
       <span class="text-crimson">!! {saveError}</span>
     {:else if saving}
-      <span class="text-muted-warm">saving…</span>
+      <span class="text-muted-warm">saving...</span>
     {:else if dirty}
       <span class="text-muted-warm">unsaved</span>
     {:else if lastSavedAt}
@@ -353,10 +259,7 @@
   autosaveSeconds={AUTOSAVE_MS / 1000}
 />
 
-<!-- Dialogs.
-     Each dialog only reads its `initial*` prop while `open=true`, but we
-     still guard each prop with the discriminant so the values stay
-     type-correct and svelte-check is happy. -->
+<!-- Dialogs. Each one only reads its initial props while open=true. -->
 <LinkDialog
   open={dialog === 'link'}
   initialHref={dialog === 'link' ? /** @type {string} */ (dialogInitial) : ''}
@@ -369,7 +272,7 @@
   mode={dialogMode}
   initial={dialog === 'codeBlock'
     ? /** @type {CodeAttrs} */ (dialogInitial)
-    : { source: '', lang: 'plaintext', caption: '' }}
+    : DEFAULT_CODE_BLOCK}
   onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
@@ -389,7 +292,7 @@
   mode={dialogMode}
   initial={dialog === 'sidenote'
     ? /** @type {SidenoteAttrs} */ (dialogInitial)
-    : { ref: '¹', bodyHtml: '' }}
+    : DEFAULT_SIDENOTE}
   onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
@@ -398,7 +301,7 @@
 <EndSlugDialog
   open={dialog === 'endSlug'}
   mode={dialogMode}
-  initialText={dialog === 'endSlug' ? /** @type {string} */ (dialogInitial) : '· · ·'}
+  initialText={dialog === 'endSlug' ? /** @type {string} */ (dialogInitial) : DEFAULT_END_SLUG}
   onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}

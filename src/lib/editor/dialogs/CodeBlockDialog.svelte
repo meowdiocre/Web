@@ -1,5 +1,5 @@
 <!--
-  CodeBlockDialog — proper code-block authoring:
+  CodeBlockDialog handles code-block authoring:
     - language <select> populated from LANG_OPTIONS
     - "auto-detect" button runs the heuristic detector on the source
     - source <textarea> sized for a real listing
@@ -83,7 +83,7 @@
         rows="14"
         spellcheck="false"
         autocomplete="off"
-        placeholder="paste your code here…"
+        placeholder="paste your code here"
       ></textarea>
     </label>
 

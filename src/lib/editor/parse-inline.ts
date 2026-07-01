@@ -55,11 +55,11 @@ interface Tag {
   attrs: Record<string, string>;
 }
 
-/** Match `<tag …>` starting at `i`. Returns null if not a tag. */
+/** Match `<tag ...>` starting at `i`. Returns null if not a tag. */
 function readTag(s: string, i: number): Tag | null {
   if (s[i] !== '<') return null;
   const close = s[i + 1] === '/';
-  // Skip <!-- comments --> and <!DOCTYPE …> as opaque self-closing tokens.
+  // Skip <!-- comments --> and <!DOCTYPE ...> as opaque self-closing tokens.
   if (s[i + 1] === '!' || s[i + 1] === '?') {
     const end = s.indexOf('>', i + 1);
     if (end === -1) return null;

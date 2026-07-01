@@ -14,7 +14,7 @@ import type {
 } from './types';
 import { parseInline } from './parse-inline';
 
-type SrcBlock =
+export type SrcBlock =
   | { type: 'p';          html: string }
   | { type: 'h2';         text: string }
   | { type: 'h3';         text: string }
@@ -110,7 +110,7 @@ export function blocksToTiptap(blocks: SrcBlock[], opts: ConvertOptions = {}): D
         break;
       }
       default: {
-        // Unknown source block — skip so a schema bump doesn't break seed.
+        // Unknown source block. Skip it so a schema bump does not break seed.
         // eslint-disable-next-line no-console
         console.warn(`[blocks-to-tiptap] unknown block kind: ${(b as any).type}`);
       }

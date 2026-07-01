@@ -1,5 +1,5 @@
 <!--
-  DialogFooter — shared cancel | [delete] | confirm action row for the
+  DialogFooter is the shared cancel | [delete] | confirm action row for the
   atom-authoring dialogs. Goes inside a Modal's `{#snippet footer()}` slot.
 -->
 <script>

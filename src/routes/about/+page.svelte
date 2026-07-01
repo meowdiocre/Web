@@ -17,10 +17,10 @@
 </script>
 
 <svelte:head>
-  <title>About — {SITE.brand}</title>
+  <title>About | {SITE.brand}</title>
   <meta
     name="description"
-    content="About {SITE.brand} — independent researcher, Berlin. Windows internals, anti-cheat, browser sandboxes, large model behavior."
+    content="About {SITE.brand}, independent researcher in Berlin. Windows internals, anti-cheat, browser sandboxes, large model behavior."
   />
 </svelte:head>
 
@@ -121,7 +121,7 @@
   .meta { padding: clamp(20px, 3vw, 32px) var(--gutter); }
   .meta__inner { max-width: 720px; margin: 0 auto; }
 
-  /* Lede inline link styling — only meaningful on dark page */
+  /* Lede inline link styling, only meaningful on the dark page. */
   :global(body[data-page='about']) main :global(.lede a),
   main :global(p) > :global(a) {
     color: var(--color-rose);

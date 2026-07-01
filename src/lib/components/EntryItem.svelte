@@ -1,6 +1,6 @@
 <script>
   /**
-   * EntryItem — one row in the writing list.
+   * EntryItem is one row in the writing list.
    * @typedef {Object} Props
    * @property {string} href
    * @property {string} date
@@ -67,8 +67,8 @@
 </a>
 
 <style>
-  /* On hover the title needs to follow the parent's color shift —
-     easier expressed as a parent-child rule than via group-hover utility
+  /* On hover the title needs to follow the parent's color shift.
+     This is easier as a parent-child rule than via group-hover utility
      because the title <span> is also responsive. */
   .entry:hover .title { color: var(--color-crimson-deep); }
   .entry:focus-visible .title { color: var(--color-crimson-deep); }

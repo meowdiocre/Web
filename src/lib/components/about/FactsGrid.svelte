@@ -1,6 +1,6 @@
 <script>
   /**
-   * FactsGrid — 2×N quick-facts strip on /about.
+   * FactsGrid is the 2xN quick-facts strip on /about.
    *
    * Each fact's `value` may contain ' · ' separators; they get accent
    * colour automatically by splitting and re-joining with a styled span.

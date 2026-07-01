@@ -81,7 +81,7 @@ export function normaliseLang(slug: string | null | undefined): Lang {
 }
 
 /* -------------------------------------------------------------------- */
-/* detectLang() — cheap regex-only detection                            */
+/* detectLang(): cheap regex-only detection                             */
 /* Scores per-language; highest wins, ties break in declaration order.  */
 /* -------------------------------------------------------------------- */
 

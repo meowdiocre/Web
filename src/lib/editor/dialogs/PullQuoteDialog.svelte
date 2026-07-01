@@ -1,5 +1,5 @@
 <!--
-  PullQuoteDialog — capture or edit the text for a pull quote.
+  PullQuoteDialog captures or edits the text for a pull quote.
 -->
 <script>
   import Modal from '$lib/components/Modal.svelte';

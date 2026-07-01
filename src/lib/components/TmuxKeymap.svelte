@@ -8,7 +8,7 @@
   import Toast from './Toast.svelte';
 
   /**
-   * TmuxKeymap — global keyboard layer emulating tmux's prefix
+   * TmuxKeymap is a global keyboard layer that emulates tmux's prefix
    * (Ctrl+B) + key dispatch. Mounts once in +layout.svelte.
    *
    * Bindings:
@@ -121,7 +121,7 @@
 
 <svelte:window onkeydown={onKey} />
 
-<!-- Prefix-active chip — bottom-left, mirrors tmux's status flip. -->
+<!-- Prefix-active chip at the bottom left, mirroring tmux's status flip. -->
 {#if prefixActive}
   <div class="prefix" role="status" aria-live="polite" transition:fade={{ duration: 120 }}>
     <span class="key">C-b</span>
@@ -130,7 +130,7 @@
   </div>
 {/if}
 
-<!-- First-visit tip — auto-closes, also dismissable. -->
+<!-- First-visit tip. Auto-closes and can also be dismissed. -->
 <Toast
   open={hintOpen}
   tag="tmux"
@@ -145,7 +145,7 @@
   </ul>
 </Toast>
 
-<!-- Help (triggered by C-b ?) — auto-closes. -->
+<!-- Help dialog, triggered by C-b ?. Auto-closes. -->
 <Toast
   open={helpOpen}
   tag="bindings"

@@ -2,7 +2,7 @@
   import { SITE } from '$lib/config/site.js';
 
   /**
-   * PageKicker — small uppercase mono header above a page title.
+   * PageKicker is a small uppercase mono header above a page title.
    * Mirrors the "kind / brand" pattern used on /blog, /about, /article.
    *
    * @typedef {Object} Props

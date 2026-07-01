@@ -2,6 +2,7 @@
   import Field         from '$lib/components/Field.svelte';
   import StatusPill    from '$lib/components/StatusPill.svelte';
   import ConfirmDialog from '$lib/editor/dialogs/ConfirmDialog.svelte';
+  import { toDatetimeLocalValue } from '$lib/util/dates';
 
   /** @type {{
    *    data: {
@@ -23,15 +24,6 @@
 
   let confirmingDelete = $state(false);
 
-  /** Format a Date for <input type="datetime-local"> in UTC. @param {Date|null} d */
-  function asLocalInput(d) {
-    if (!d) return '';
-    const dt  = new Date(d);
-    const pad = (/** @type {number} */ n) => String(n).padStart(2, '0');
-    return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}` +
-           `T${pad(dt.getUTCHours())}:${pad(dt.getUTCMinutes())}`;
-  }
-
   /** Convenience accessor: prefer form values (post-failure repaint) over post values. */
   const v = $derived({
     /** @param {string} key @param {string} [fallback] */
@@ -49,7 +41,7 @@
   }
 </script>
 
-<svelte:head><title>{p.titlePre}{p.titleEm}{p.titlePost} — Admin</title></svelte:head>
+<svelte:head><title>{p.titlePre}{p.titleEm}{p.titlePost} | Admin</title></svelte:head>
 
 <header class="flex items-baseline justify-between flex-wrap gap-4 mb-8">
   <div class="min-w-0">
@@ -125,9 +117,9 @@
   </div>
 
   <div class="grid gap-4 md:grid-cols-[1fr_1.6fr_1fr]">
-    <Field name="titlePre"  label="title — pre"             value={v.get('titlePre',  p.titlePre)} />
-    <Field name="titleEm"   label="title — italic emphasis" value={v.get('titleEm',   p.titleEm)} />
-    <Field name="titlePost" label="title — post"            value={v.get('titlePost', p.titlePost)} />
+    <Field name="titlePre"  label="title pre"    value={v.get('titlePre',  p.titlePre)} />
+    <Field name="titleEm"   label="title italic" value={v.get('titleEm',   p.titleEm)} />
+    <Field name="titlePost" label="title post"   value={v.get('titlePost', p.titlePost)} />
   </div>
 
   <Field
@@ -149,22 +141,22 @@
     name="coverImageUrl"
     label="cover image url (optional)"
     value={v.get('coverImageUrl', p.coverImageUrl ?? '')}
-    placeholder="https://…"
+    placeholder="https://example.com/image.jpg"
   />
 
   <Field
     name="publishAt"
-    label="publish at (UTC, optional — used by scheduled publish)"
+    label="publish at (UTC, optional, used by scheduled publish)"
     kind="datetime"
-    value={v.get('publishAt', asLocalInput(p.publishAt))}
+    value={v.get('publishAt', toDatetimeLocalValue(p.publishAt))}
   />
 
-  <!-- Action bar: save / back / delete -->
+  <!-- Action bar: save, back, delete -->
   <div class="flex flex-wrap items-center gap-2 mt-2">
     <button class="btn-primary">save metadata</button>
     <a href="/admin" class="btn-ghost">back</a>
 
-    <!-- Hidden submitter — the visible "delete" button is type=button
+    <!-- Hidden submitter. The visible "delete" button is type=button
          so it opens the confirm modal; the modal then triggers a real
          submit via requestSubmit(deleteSubmitter), preserving formaction. -->
     <button

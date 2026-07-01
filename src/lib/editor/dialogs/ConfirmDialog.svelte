@@ -1,5 +1,5 @@
 <!--
-  ConfirmDialog — modal replacement for window.confirm().
+  ConfirmDialog is a modal replacement for `window.confirm()`.
   Caller owns the open flag and the two callbacks.
 -->
 <script>

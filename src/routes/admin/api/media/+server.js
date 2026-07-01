@@ -3,6 +3,7 @@ import { put } from '@vercel/blob';
 
 import { db } from '$lib/server/db/client';
 import { media } from '$lib/server/db/schema';
+import { asInsert } from '$lib/server/db/write';
 
 export const prerender = false;
 
@@ -30,17 +31,19 @@ export async function POST({ request, locals }) {
     contentType: file.type
   });
 
+  const values = {
+    url:      blob.url,
+    pathname: blob.pathname,
+    mime:     file.type,
+    bytes:    file.size,
+    width:    null,
+    height:   null,
+    uploadedBy: locals.user.id
+  };
+
   const [row] = await db
     .insert(media)
-    .values({
-      url:      blob.url,
-      pathname: blob.pathname,
-      mime:     file.type,
-      bytes:    file.size,
-      width:    null,
-      height:   null,
-      uploadedBy: locals.user.id
-    })
+    .values(asInsert(values))
     .returning();
 
   return json({

@@ -1,5 +1,5 @@
 <!--
-  EditorToolbar — formatting strip above the canvas. Marks, headings,
+  EditorToolbar is the formatting strip above the canvas. Marks, headings,
   lists, and link buttons mutate the editor in place. Atom buttons
   delegate to the parent which owns dialog state. The parent passes
   `editorTick` (bumped on every selection/transaction) so `isActive()`
@@ -81,7 +81,7 @@
       aria-busy={saving}
     >
       <span class="tb-save__g" aria-hidden="true">↳</span>
-      <span>{saving ? 'saving…' : 'save'}</span>
+      <span>{saving ? 'saving...' : 'save'}</span>
     </button>
   </div>
 {/if}

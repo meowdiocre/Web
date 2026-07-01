@@ -1,6 +1,6 @@
 <script>
   /**
-   * Bracket — decorative L-shaped bracket marker. Renders a positioned
+   * Bracket is a decorative L-shaped marker. It renders a positioned
    * <use> element pointing at the global #bracket symbol, which is
    * defined once by BracketDefs at the page root.
    *

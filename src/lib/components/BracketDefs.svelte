@@ -1,6 +1,6 @@
 <script>
   /**
-   * BracketDefs — declares the reusable #bracket SVG symbol. Render
+   * BracketDefs declares the reusable #bracket SVG symbol. Render
    * this once per page; <Bracket /> instances reference it by id.
    */
 </script>

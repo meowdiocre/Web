@@ -1,5 +1,5 @@
 <!--
-  AdminNav — responsive admin chrome. Desktop is a fixed sidebar with
+  AdminNav is the responsive admin chrome. Desktop uses a fixed sidebar with
   grouped sections and active-route highlight; mobile is a sticky top
   bar whose dropdown mirrors the same structure and auto-closes on
   navigation.
@@ -160,7 +160,7 @@
 </aside>
 
 <style>
-  /* Account chrome — pinned to the bottom of the sidebar / mobile menu. */
+  /* Account chrome pinned to the bottom of the sidebar or mobile menu. */
   :global(.account__handle) {
     font-family: var(--font-mono);
     font-size: 10px;

@@ -1,6 +1,6 @@
 <script>
   /**
-   * BtnPrimary — terminal-bracket CTA button, paper on ink with a
+   * BtnPrimary is a terminal-bracket CTA button, paper on ink with a
    * clip-path notch and offset hard shadow. Hover flips to crimson.
    *
    * @typedef {Object} Props

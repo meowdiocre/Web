@@ -1,7 +1,7 @@
 /**
  * Editor factory used by /admin/posts/[id]/edit. Loads TipTap with all
- * extensions and returns a ready-to-mount Editor. Browser-only — TipTap
- * touches `window`.
+ * extensions and returns a ready-to-mount editor. Browser-only because
+ * TipTap touches `window`.
  */
 
 import { Editor } from '@tiptap/core';
@@ -9,7 +9,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Link       from '@tiptap/extension-link';
 import Image      from '@tiptap/extension-image';
 
-// Custom command typings live in `commands.d.ts` — picked up by TS via
+// Custom command typings live in `commands.d.ts`, and TS picks them up via
 // `declare module` augmentation. No runtime import: .d.ts has no JS form.
 
 import { PullQuote }                       from './extensions/pull-quote';

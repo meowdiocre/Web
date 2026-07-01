@@ -1,6 +1,6 @@
 <script>
   /**
-   * EntriesYear — uppercase mono divider above a year's entry list
+   * EntriesYear is the uppercase mono divider above a year's entry list
    * on /blog. Shows the year on the left and the count on the right.
    *
    * @typedef {{ year: number|string, count: number }} Props

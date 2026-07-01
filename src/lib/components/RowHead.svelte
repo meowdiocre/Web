@@ -1,6 +1,6 @@
 <script>
   /**
-   * RowHead — uppercase mono section divider. Title on the left,
+   * RowHead is an uppercase mono section divider. Title on the left,
    * optional aside on the right, hairline rule below.
    *
    * @typedef {Object} Props

@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>Writing — {SITE.brand}</title>
+  <title>Writing | {SITE.brand}</title>
   <meta
     name="description"
     content="Long-form essays and lab notes on Windows internals, anti-cheat, browser sandboxes, and large model behavior."
@@ -44,7 +44,7 @@
       </div>
 
       <aside class="epigraph" role="note" aria-label="Epigraph">
-        <span class="mark" aria-hidden="true">∅—</span>
+        <span class="mark" aria-hidden="true">∅/</span>
         <p class="line">Learn the rules like an expert. <em>so you can break them like an artist
 .</em></p>
       </aside>

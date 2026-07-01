@@ -1,8 +1,7 @@
 <!--
-  EditorCanvas — paper canvas the TipTap editor mounts into. Owns the
+  EditorCanvas is the paper canvas TipTap mounts into. It owns the
   bleed-past-the-gutter `.paper-wrap` chrome and the ProseMirror
-  styling that mirrors the public Essay component (drop cap, headings,
-  code blocks, pull quotes, sidenote chip, end-slug).
+  styling that mirrors the public essay component.
 
   Exposes `element` via `$bindable()` so the page can mount TipTap into it:
 
@@ -43,8 +42,8 @@
   .paper { max-width: 760px; margin: 0 auto; background: transparent; padding: 0; }
   .canvas { outline: none; }
 
-  /* ProseMirror styles — mirror of the public Essay component so what
-     the author sees is exactly what ships. */
+  /* ProseMirror styles mirror the public essay component so what
+     the author sees is what ships. */
   .canvas :global(.ProseMirror) { outline: none; min-height: 60vh; }
   .canvas :global(.ProseMirror > * + *) { margin-top: 1.1em; }
 
@@ -133,8 +132,8 @@
   .canvas :global(.num) { color: var(--code-num); }
 
   /* codeBlock NodeView wrapper. `display: contents` lifts the inner
-     <pre> + <span.figure-cap> out of the wrapper so they act as siblings
-     under .ProseMirror — same flow as the public Essay component. */
+     <pre> and <span.figure-cap> out of the wrapper so they act as siblings
+     under .ProseMirror, matching the public essay component. */
   .canvas :global(.cb-view) { display: contents; }
   .canvas :global(.figure-cap) {
     display: block;

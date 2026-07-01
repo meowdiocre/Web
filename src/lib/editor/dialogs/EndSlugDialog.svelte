@@ -1,5 +1,5 @@
 <!--
-  EndSlugDialog — text for the article's terminal slug (· · ·).
+  EndSlugDialog edits the article's terminal slug (`· · ·`).
 -->
 <script>
   import Modal from '$lib/components/Modal.svelte';

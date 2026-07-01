@@ -1,5 +1,5 @@
 <!--
-  StatusPill — the small mono uppercase chip used to flag a post's
+  StatusPill is the small mono uppercase chip used to flag a post's
   workflow state. Renders `.status` + `.status--{value}` so colour
   comes from the admin-scoped CSS in app.css.
 

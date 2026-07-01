@@ -1,5 +1,5 @@
 <!--
-  Field — unified form field for admin forms. Wraps `.field` / `.lbl` /
+  Field is the unified form field for admin forms. It wraps `.field` / `.lbl` /
   `.inp` markup so every form gets the same label-on-top layout and
   consistent input/textarea/select/datetime variants.
 

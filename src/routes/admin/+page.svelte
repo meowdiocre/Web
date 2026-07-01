@@ -1,24 +1,13 @@
 <script>
   import StatusPill from '$lib/components/StatusPill.svelte';
+  import { formatRelativeAge } from '$lib/util/dates';
 
   /** @type {{ data: { posts: import('$lib/server/db/admin-queries').AdminPostListRow[] } }} */
   let { data } = $props();
   const posts = $derived(data.posts);
-
-  /** Relative-time pill, e.g. "3m", "12h", "4d", "—". @param {Date|null} d */
-  function ago(d) {
-    if (!d) return '—';
-    const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000);
-    if (s < 60)     return `${s}s`;
-    const m = Math.floor(s / 60);
-    if (m < 60)     return `${m}m`;
-    const h = Math.floor(m / 60);
-    if (h < 24)     return `${h}h`;
-    return `${Math.floor(h / 24)}d`;
-  }
 </script>
 
-<svelte:head><title>Posts — Admin</title></svelte:head>
+<svelte:head><title>Posts | Admin</title></svelte:head>
 
 <header class="flex items-baseline justify-between flex-wrap gap-4 mb-8">
   <div>
@@ -63,7 +52,7 @@
           </td>
           <td class="td"><StatusPill value={p.status} /></td>
           <td class="td font-mono text-[11px] tracking-[0.1em] uppercase">{p.category}</td>
-          <td class="td font-mono text-[11px] text-muted-warm">{ago(p.updatedAt)}</td>
+          <td class="td font-mono text-[11px] text-muted-warm">{formatRelativeAge(p.updatedAt)}</td>
           <td class="td text-right">
             <a
               href="/admin/posts/{p.id}/edit"
@@ -91,7 +80,7 @@
           <span class="font-mono text-[10px] tracking-[0.18em] uppercase text-muted-warm">
             {p.category}
           </span>
-          <span class="font-mono text-[10px] text-muted-warm">· {ago(p.updatedAt)}</span>
+          <span class="font-mono text-[10px] text-muted-warm">· {formatRelativeAge(p.updatedAt)}</span>
           <a
             href="/admin/posts/{p.id}/edit"
             class="ml-auto font-mono text-[10px] tracking-[0.18em] uppercase text-rose hover:text-crimson"
@@ -105,8 +94,7 @@
 {/if}
 
 <style>
-  /* Table-specific cosmetics (admin-scoped via body[data-page='admin']
-     in app.css would also work — these are only used here so keep local). */
+  /* Table-specific cosmetics. These styles are local to this page. */
   :global(.th) {
     padding: 12px 16px 12px 0;
     font-family: var(--font-mono);

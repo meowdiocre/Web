@@ -2,7 +2,7 @@
   import CopyButton from '../CopyButton.svelte';
 
   /**
-   * PgpBlock — dark fingerprint card with verification note + copy button.
+   * PgpBlock is a dark fingerprint card with a verification note and copy button.
    *
    * @typedef {Object} Props
    * @property {string}    fingerprint            full single-line fingerprint to copy

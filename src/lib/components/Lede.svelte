@@ -1,6 +1,6 @@
 <script>
   /**
-   * Lede — large serif intro paragraph used on /blog and /about.
+   * Lede is the large serif intro paragraph used on /blog and /about.
    *
    * @typedef {Object} Props
    * @property {'primary'|'secondary'} [tone]      primary = on-page text, secondary = muted continuation

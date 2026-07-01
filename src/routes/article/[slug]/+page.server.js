@@ -3,7 +3,7 @@ import { loadPublicArticle, loadRelated } from '$lib/server/db/queries';
 import { verifyPreviewToken } from '$lib/server/publish';
 
 /**
- * /article/[slug] — read one published post and its related list.
+ * `/article/[slug]` reads one published post and its related list.
  * 404s when the slug is unknown or the post is still a draft, UNLESS
  * the request carries a valid ?preview=<token>.
  *

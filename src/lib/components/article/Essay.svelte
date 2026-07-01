@@ -1,14 +1,12 @@
 <script>
-  import CodeBlock  from './CodeBlock.svelte';
-  import PullQuote  from './PullQuote.svelte';
-  import EndSlug    from './EndSlug.svelte';
-  import Footnotes  from './Footnotes.svelte';
+  import Footnotes from './Footnotes.svelte';
+  import LegacyBlocks from './LegacyBlocks.svelte';
 
   /**
-   * Essay — typographic shell for an article. Two render modes:
+   * Typographic shell for an article. Supports two inputs:
    *
-   *   `html`  server-rendered HTML from lib/server/render-post (DB path).
-   *   `body`  legacy structured block tree (article.js shape).
+   *   `html` server-rendered HTML from `lib/server/render-post`
+   *   `body` legacy structured block tree from `article.js`
    *
    * @typedef {Object} Footnote
    * @property {string} html
@@ -26,26 +24,11 @@
 <article class="essay relative px-[var(--gutter)] pt-4 pb-[clamp(48px,6vw,96px)]">
   <div class="essay__inner mx-auto max-w-[760px] relative">
     {#if html !== undefined}
-      <!-- Pre-rendered path: the html ships block-by-block markup
-           matching the legacy block-walker below — same CSS targets. -->
+      <!-- The pre-rendered path already matches the public block markup. -->
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html html}
     {:else if body}
-      {#each body as block}
-        {#if block.type === 'p'}          <p>{@html block.html}</p>
-        {:else if block.type === 'h2'}    <h2>{block.text}</h2>
-        {:else if block.type === 'h3'}    <h3>{block.text}</h3>
-        {:else if block.type === 'list'}
-          {#if block.kind === 'ol'}
-            <ol>{#each block.items as item}<li>{@html item}</li>{/each}</ol>
-          {:else}
-            <ul>{#each block.items as item}<li>{@html item}</li>{/each}</ul>
-          {/if}
-        {:else if block.type === 'code'}       <CodeBlock html={block.html} caption={block.caption} />
-        {:else if block.type === 'pull-quote'} <PullQuote text={block.text} />
-        {:else if block.type === 'end-slug'}   <EndSlug text={block.text} />
-        {/if}
-      {/each}
+      <LegacyBlocks {body} />
     {/if}
 
     {#if footnotes && footnotes.length}
@@ -116,8 +99,7 @@
   .essay :global(li) { margin-bottom: 8px; }
   .essay :global(li > p) { margin: 0; }
 
-  /* Block-level styling for the pre-rendered HTML path so we don't have
-     to ship the CodeBlock / PullQuote / EndSlug components on every page. */
+  /* Styles for pre-rendered block markup. */
   .essay :global(pre) {
     margin: 32px 0;
     padding: 22px;

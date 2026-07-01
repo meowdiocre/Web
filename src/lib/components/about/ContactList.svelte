@@ -1,6 +1,6 @@
 <script>
   /**
-   * ContactList — three-column rows on /about: key | value | arrow.
+   * ContactList renders three-column rows on /about: key | value | arrow.
    *
    * @typedef {Object} Contact
    * @property {string}  label

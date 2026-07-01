@@ -3,10 +3,10 @@
  * expects (read from `posts.body_html` and rendered via `{@html}`).
  *
  * Custom node mapping:
- *   pullQuote -> <blockquote class="pull">…</blockquote>
- *   codeBlock -> <pre><code>…</code></pre><span class="figure-cap">…</span>
- *   endSlug   -> <div class="end"><span class="glyph">∅</span><span>…</span></div>
- *   sidenote  -> <span class="sidenote-ref">…</span><span class="sidenote">…</span>
+ *   pullQuote -> <blockquote class="pull">...</blockquote>
+ *   codeBlock -> <pre><code>...</code></pre><span class="figure-cap">...</span>
+ *   endSlug   -> <div class="end"><span class="glyph">∅</span><span>...</span></div>
+ *   sidenote  -> <span class="sidenote-ref">...</span><span class="sidenote">...</span>
  */
 
 import type {
@@ -67,7 +67,7 @@ function renderInline(content: InlineNode[] | undefined): string {
 }
 
 function renderListItem(item: ListItemNode): string {
-  // Drop the <p> wrapper so <li>…</li> matches the public Essay shape.
+  // Drop the <p> wrapper so <li>...</li> matches the public essay shape.
   const inner = (item.content ?? []).map((p) => renderInline(p.content)).join('');
   return `<li>${inner}</li>`;
 }

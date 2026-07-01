@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/** endSlug — block-level atom; one per document by convention. */
+/** EndSlug is a block-level atom. By convention there is one per document. */
 export const EndSlug = Node.create({
   name: 'endSlug',
   group: 'block',

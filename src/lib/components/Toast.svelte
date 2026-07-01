@@ -3,7 +3,7 @@
   import { onDestroy } from 'svelte';
 
   /**
-   * Toast — terminal-styled notification chip. Parent owns the open
+   * Toast is a terminal-style notification chip. Parent owns the open
    * state and reacts to `onclose` (fired by × click or auto-close).
    *
    * @typedef {Object} Props

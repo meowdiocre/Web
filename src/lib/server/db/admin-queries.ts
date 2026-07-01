@@ -7,6 +7,8 @@
 import { and, desc, eq, ne } from 'drizzle-orm';
 import { db } from './client';
 import { categories, posts } from './schema';
+import type { Doc } from '$lib/editor/types';
+import { asInsert, asUpdate } from './write';
 
 export interface AdminPostListRow {
   id:          string;
@@ -77,22 +79,24 @@ export interface CreateDraftInput {
 }
 
 export async function createDraft(input: CreateDraftInput) {
+  const values = {
+    slug:      input.slug,
+    titlePre:  input.titlePre,
+    titleEm:   input.titleEm,
+    titlePost: input.titlePost,
+    category:  input.category,
+    dek:       input.dek,
+    readTime:  input.readTime,
+    author:    input.author,
+    status:    'draft',
+    docJson:   { type: 'doc', content: [] },
+    bodyHtml:  '',
+    footnotesJson: []
+  };
+
   const [row] = await db
     .insert(posts)
-    .values({
-      slug:      input.slug,
-      titlePre:  input.titlePre,
-      titleEm:   input.titleEm,
-      titlePost: input.titlePost,
-      category:  input.category,
-      dek:       input.dek,
-      readTime:  input.readTime,
-      author:    input.author,
-      status:    'draft',
-      docJson:   { type: 'doc', content: [] },
-      bodyHtml:  '',
-      footnotesJson: []
-    })
+    .values(asInsert(values))
     .returning({ id: posts.id, slug: posts.slug });
   return row;
 }
@@ -111,21 +115,23 @@ export interface UpdateMetadataInput {
 }
 
 export async function updatePostMetadata(id: string, input: UpdateMetadataInput) {
+  const changes = {
+    slug:          input.slug,
+    titlePre:      input.titlePre,
+    titleEm:       input.titleEm,
+    titlePost:     input.titlePost,
+    category:      input.category,
+    dek:           input.dek,
+    readTime:      input.readTime,
+    author:        input.author,
+    coverImageUrl: input.coverImageUrl,
+    publishAt:     input.publishAt,
+    updatedAt:     new Date()
+  };
+
   await db
     .update(posts)
-    .set({
-      slug:          input.slug,
-      titlePre:      input.titlePre,
-      titleEm:       input.titleEm,
-      titlePost:     input.titlePost,
-      category:      input.category,
-      dek:           input.dek,
-      readTime:      input.readTime,
-      author:        input.author,
-      coverImageUrl: input.coverImageUrl,
-      publishAt:     input.publishAt,
-      updatedAt:     new Date()
-    })
+    .set(asUpdate(changes))
     .where(eq(posts.id, id));
 }
 
@@ -135,9 +141,10 @@ export async function deletePost(id: string) {
 
 export async function publishPost(id: string) {
   const now = new Date();
+  const changes = { status: 'published', publishedAt: now, updatedAt: now };
   const [row] = await db
     .update(posts)
-    .set({ status: 'published', publishedAt: now, updatedAt: now })
+    .set(asUpdate(changes))
     .where(eq(posts.id, id))
     .returning({ slug: posts.slug });
   return row;
@@ -145,10 +152,24 @@ export async function publishPost(id: string) {
 
 export async function unpublishPost(id: string) {
   const now = new Date();
+  const changes = { status: 'draft', updatedAt: now };
   const [row] = await db
     .update(posts)
-    .set({ status: 'draft', updatedAt: now })
+    .set(asUpdate(changes))
     .where(eq(posts.id, id))
     .returning({ slug: posts.slug });
   return row;
+}
+
+export async function savePostContent(id: string, doc: Doc, bodyHtml: string) {
+  const changes = {
+    docJson: doc,
+    bodyHtml,
+    updatedAt: new Date()
+  };
+
+  await db
+    .update(posts)
+    .set(asUpdate(changes))
+    .where(eq(posts.id, id));
 }

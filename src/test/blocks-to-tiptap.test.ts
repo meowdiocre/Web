@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { blocksToTiptap } from '../lib/editor/blocks-to-tiptap';
+import type { SrcBlock } from '../lib/editor/blocks-to-tiptap';
 import { tiptapToHtml } from '../lib/editor/tiptap-to-html';
 import type { Doc } from '../lib/editor/types';
 
@@ -108,7 +109,7 @@ describe('blocksToTiptap', () => {
 
 describe('tiptapToHtml — round trip', () => {
   it('serialises every block kind back to the public HTML shape', () => {
-    const blocks = [
+    const blocks: SrcBlock[] = [
       { type: 'p',  html: 'A paragraph with <em>italic</em> and <strong>bold</strong>.' },
       { type: 'h2', text: 'Heading two' },
       { type: 'list', kind: 'ol' as const, items: ['one', '<em>two</em>'] },

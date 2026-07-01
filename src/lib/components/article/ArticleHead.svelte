@@ -1,6 +1,6 @@
 <script>
   /**
-   * ArticleHead — breadcrumb, kicker chip, italic h1 with em emphasis,
+   * ArticleHead renders the breadcrumb, kicker chip, and italic h1 emphasis,
    * dek, and mono meta row above the essay body.
    *
    * @typedef {Object} TitleParts

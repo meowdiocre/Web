@@ -17,7 +17,7 @@
 </script>
 
 <svelte:head>
-  <title>{article.head.title.pre}{article.head.title.em}{article.head.title.post} — {SITE.brand}</title>
+  <title>{article.head.title.pre}{article.head.title.em}{article.head.title.post} | {SITE.brand}</title>
   <meta name="description" content={article.head.dek} />
 </svelte:head>
 

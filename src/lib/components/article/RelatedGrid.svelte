@@ -2,7 +2,7 @@
   import RelatedCard from '../RelatedCard.svelte';
 
   /**
-   * RelatedGrid — bottom-of-article heading + 3-up grid collapsing to
+   * RelatedGrid renders the bottom-of-article heading and responsive card grid
    * one column under 900 px.
    *
    * @typedef {Object} Item

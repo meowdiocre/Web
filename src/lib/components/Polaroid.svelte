@@ -1,6 +1,6 @@
 <script>
   /**
-   * Polaroid — tilted polaroid frame with a CRT-scanlined caption strip.
+   * Polaroid is a tilted frame with a CRT-scanlined caption strip.
    * @typedef {Object} Props
    * @property {string} src
    * @property {string} [alt]
@@ -50,7 +50,7 @@
 
 <style>
   /* The frame's tilt + clipped corners + drop-shadow + the scanline
-     overlay over the caption are the "design soul" — kept here so that
+     overlay over the caption are the "design soul", kept here so that
      all the visual moves stay in one obvious place. */
   .polaroid {
     transform: rotate(var(--rot, -2.6deg));

@@ -1,5 +1,5 @@
 <!--
-  EditorStatusBar — thin footer that hugs the bottom of the canvas and
+  EditorStatusBar is the thin footer that hugs the bottom of the canvas and
   shows word/char counts + autosave cadence. Keyboard hint hides on
   narrow viewports.
 -->

@@ -1,6 +1,6 @@
 <script>
   /**
-   * CodeBlock — clipped `<pre><code>` with a mono caption beneath.
+   * CodeBlock is a clipped `<pre><code>` block with a mono caption beneath.
    * Accepts pre-highlighted HTML so the data layer ships colour spans.
    *
    * @typedef {Object} Props

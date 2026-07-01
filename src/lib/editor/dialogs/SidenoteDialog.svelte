@@ -1,5 +1,5 @@
 <!--
-  SidenoteDialog — set the ref glyph and the body HTML for a sidenote.
+  SidenoteDialog sets the ref glyph and body HTML for a sidenote.
 -->
 <script>
   import Modal from '$lib/components/Modal.svelte';
@@ -46,7 +46,7 @@
 <Modal {open} {onclose} title={mode === 'edit' ? 'edit sidenote' : 'insert sidenote'}>
   <form onsubmit={(e) => { e.preventDefault(); commit(); }} class="grid gap-3">
     <label class="field">
-      <span class="lbl">ref glyph (¹ ² ³ …)</span>
+      <span class="lbl">ref glyph (¹ ² ³ ...)</span>
       <input bind:value={ref} class="inp" maxlength="3" />
     </label>
 

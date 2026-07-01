@@ -3,7 +3,7 @@
  * `attrs.html` on every codeBlock. This walks the live editor doc and
  * the returned doc in positional order; for each codeBlock pair whose
  * `source/lang/caption` still agree, copies the server's `html` onto
- * the editor's node. A single ProseMirror transaction, marked
+ * the editor's node. A single ProseMirror transaction is marked
  * non-undoable and flagged so the host can suppress the resulting
  * onUpdate (otherwise it would re-trigger autosave and loop forever).
  *
@@ -36,7 +36,7 @@ export function mergeRehighlightedHtml(editor, rehighlighted) {
       tr.setNodeMarkup(pos, undefined, { ...node.attrs, html: r.attrs.html });
       touched = true;
     }
-    return false; // codeBlock is an atom — don't descend
+    return false; // codeBlock is an atom, so this walk should not descend
   });
 
   if (!touched) return false;

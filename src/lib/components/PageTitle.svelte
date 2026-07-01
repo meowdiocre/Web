@@ -1,6 +1,6 @@
 <script>
   /**
-   * PageTitle — large display headline with a coloured terminator dot
+   * PageTitle is a large display headline with a coloured terminator dot
    * (the "writing." / "about." flourish).
    *
    * @typedef {Object} Props

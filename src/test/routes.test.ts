@@ -35,6 +35,7 @@ describe('/article/[slug] load', () => {
     (queries.loadRelated as any).mockResolvedValue([{ href: '/article/bar', category: 'Reverse', readTime: '1', title: 't', blurb: 'b' }]);
 
     const out = await articleLoad(ev('foo'));
+    if (!out) throw new Error('expected article load result');
     expect(out.article.slug).toBe('foo');
     expect(out.related).toHaveLength(1);
     expect(queries.loadRelated).toHaveBeenCalledWith('foo', 'reverse');
@@ -57,6 +58,7 @@ describe('/blog load', () => {
     (queries.loadPublicEntries as any).mockResolvedValue(groups);
 
     const out = await blogLoad({ setHeaders: vi.fn() } as any);
+    if (!out) throw new Error('expected blog load result');
     expect(out.entryGroups).toBe(groups);
   });
 });

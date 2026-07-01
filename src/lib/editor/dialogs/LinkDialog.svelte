@@ -1,5 +1,5 @@
 <!--
-  LinkDialog — set or update an <a> mark. Pre-fills the current href
+  LinkDialog sets or updates an `<a>` mark. It pre-fills the current href
   when the cursor is inside an existing link. Callers should open this
   dialog only when there's a selection (or cursor in a link).
 -->
@@ -40,7 +40,7 @@
         bind:value={href}
         class="inp"
         type="url"
-        placeholder="https://…"
+        placeholder="https://example.com"
         autocomplete="off"
         spellcheck="false"
       />

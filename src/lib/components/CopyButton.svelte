@@ -1,6 +1,6 @@
 <script>
   /**
-   * CopyButton — clipboard copy with transient "Copied ✓" state.
+   * CopyButton handles clipboard copy with transient "Copied ✓" state.
    * @typedef {Object} Props
    * @property {string} value
    * @property {string} [label]

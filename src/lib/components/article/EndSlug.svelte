@@ -1,6 +1,6 @@
 <script>
   /**
-   * EndSlug — closing strip below the final paragraph. Rotated ∅ glyph
+   * EndSlug is the closing strip below the final paragraph. Rotated ∅ glyph
    * + mono signoff (e.g. "4,720 words · 2026 · 03 · 14").
    *
    * @typedef {Object} Props

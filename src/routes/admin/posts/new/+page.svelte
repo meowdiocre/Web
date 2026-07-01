@@ -8,7 +8,7 @@
   let { data, form } = $props();
 </script>
 
-<svelte:head><title>New post — Admin</title></svelte:head>
+<svelte:head><title>New Post | Admin</title></svelte:head>
 
 <header class="mb-8">
   <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-muted-warm mb-1">
@@ -35,7 +35,7 @@
   />
 
   <Field name="category" label="category" kind="select" required>
-    <option value="">— pick one —</option>
+    <option value="">pick a category</option>
     {#each data.categories as c (c.slug)}
       <option value={c.slug} selected={form?.values?.category === c.slug}>{c.label}</option>
     {/each}
