@@ -11,6 +11,7 @@
   import PullQuoteDialog from '$lib/editor/dialogs/PullQuoteDialog.svelte';
   import SidenoteDialog  from '$lib/editor/dialogs/SidenoteDialog.svelte';
   import EndSlugDialog   from '$lib/editor/dialogs/EndSlugDialog.svelte';
+  import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   import {
     createDialogSpecs,
@@ -148,7 +149,7 @@
   let toast = $state(null);
 
   /** @param {string} message  @param {string} [tag]  @param {string} [glyph] */
-  const notify = (message, tag = 'tip', glyph = '∅') => { toast = { tag, glyph, message }; };
+  const notify = (message, tag = 'tip', glyph = BRAND_GLYPH) => { toast = { tag, glyph, message }; };
 
   /* Keyboard shortcuts */
 
@@ -189,8 +190,8 @@
         recomputeStats();
       },
       onImageStatus(s) {
-        if (s.kind === 'uploading')     notify(`uploading ${s.file.name}...`,   'upload', '∅');
-        else if (s.kind === 'uploaded') notify(`${s.file.name} uploaded`,      'upload', '∅');
+        if (s.kind === 'uploading')     notify(`uploading ${s.file.name}...`,   'upload', BRAND_GLYPH);
+        else if (s.kind === 'uploaded') notify(`${s.file.name} uploaded`,      'upload', BRAND_GLYPH);
         else                            notify(`upload failed: ${s.reason}`,   'error',  '!!');
       }
     });
@@ -310,7 +311,7 @@
 <Toast
   open={toast !== null}
   tag={toast?.tag ?? 'tip'}
-  glyph={toast?.glyph ?? '∅'}
+  glyph={toast?.glyph ?? BRAND_GLYPH}
   autoCloseMs={3500}
   onclose={() => (toast = null)}
 >

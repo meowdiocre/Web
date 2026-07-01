@@ -42,6 +42,11 @@
           href: '/admin/posts/new',
           label: 'new post',
           match: (p) => p === '/admin/posts/new'
+        },
+        {
+          href: '/admin/categories',
+          label: 'categories',
+          match: (p) => p === '/admin/categories'
         }
       ]
     },
@@ -71,6 +76,8 @@
           <li>
             <a
               href={link.href}
+              data-sveltekit-preload-data="tap"
+              data-sveltekit-preload-code="hover"
               class="nav-item"
               class:nav-item--active={active}
               class:nav-item--ext={link.external}
@@ -89,7 +96,12 @@
 {/snippet}
 
 {#snippet brand(small = false)}
-  <a href="/admin" class="block leading-tight no-underline">
+  <a
+    href="/admin"
+    data-sveltekit-preload-data="tap"
+    data-sveltekit-preload-code="hover"
+    class="block leading-tight no-underline"
+  >
     <p class="font-mono tracking-[0.22em] uppercase text-muted-warm
               {small ? 'text-[9px]' : 'text-[10px] mb-1'}">~/admin</p>
     <h2 class="font-display uppercase tracking-[-0.01em] text-paper

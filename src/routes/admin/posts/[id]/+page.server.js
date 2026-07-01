@@ -71,7 +71,10 @@ export const actions = {
 
   delete: async ({ params, locals }) => {
     if (!locals.user) return fail(401, { error: 'Not signed in.' });
-    await deletePost(params.id);
+    const row = await deletePost(params.id);
+    if (row?.status === 'published') {
+      await revalidatePaths(['/blog', `/article/${row.slug}`, '/feed.xml']);
+    }
     redirect(303, '/admin');
   },
 

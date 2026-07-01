@@ -1,6 +1,7 @@
 <script>
   import { fly } from 'svelte/transition';
   import { onDestroy } from 'svelte';
+  import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   /**
    * Toast is a terminal-style notification chip. Parent owns the open
@@ -19,7 +20,7 @@
   let {
     open = false,
     tag = 'tip',
-    glyph = '∅',
+    glyph = BRAND_GLYPH,
     autoCloseMs = 0,
     onclose,
     children

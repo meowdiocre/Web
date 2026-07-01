@@ -36,14 +36,16 @@ describe('/article/[slug] load', () => {
 
     const out = await articleLoad(ev('foo'));
     if (!out) throw new Error('expected article load result');
-    expect(out.article.slug).toBe('foo');
-    expect(out.related).toHaveLength(1);
+    await expect(out.article).resolves.toMatchObject({ slug: 'foo' });
+    await expect(out.related).resolves.toHaveLength(1);
     expect(queries.loadRelated).toHaveBeenCalledWith('foo', 'reverse');
   });
 
   it('404s when slug is missing or unpublished', async () => {
     (queries.loadPublicArticle as any).mockResolvedValue(null);
-    await expect(articleLoad(ev('nope'))).rejects.toMatchObject({ status: 404 });
+    const out = await articleLoad(ev('nope'));
+    if (!out) throw new Error('expected article load result');
+    await expect(out.article).rejects.toMatchObject({ status: 404 });
   });
 });
 
@@ -59,6 +61,6 @@ describe('/blog load', () => {
 
     const out = await blogLoad({ setHeaders: vi.fn() } as any);
     if (!out) throw new Error('expected blog load result');
-    expect(out.entryGroups).toBe(groups);
+    await expect(out.entryGroups).resolves.toBe(groups);
   });
 });

@@ -46,7 +46,7 @@ describe('article.js → TipTap → HTML', () => {
 
   it('emits the end-slug exactly', () => {
     expect(html).toContain(
-      '<div class="end"><span class="glyph" aria-hidden="true">∅</span><span>4,720 words · 2026 · 03 · 14</span></div>'
+      '<div class="end"><span class="glyph" aria-hidden="true">◎</span><span>4,720 words · 2026 · 03 · 14</span></div>'
     );
   });
 

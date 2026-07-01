@@ -1,0 +1,111 @@
+<script>
+  import BlogSearchBar from './BlogSearchBar.svelte';
+  import BlogCategoryFilters from './BlogCategoryFilters.svelte';
+  import BlogEntryFeed from './BlogEntryFeed.svelte';
+  import {
+    buildCategorySummaries,
+    categoryKey,
+    filterEntries,
+    flattenEntryGroups,
+    groupEntriesByYear
+  } from '$lib/blog/entries';
+
+  /** @typedef {{ year: number, entries: any[] }} EntryGroup */
+  /** @typedef {{ entryGroups?: EntryGroup[], query?: string, selectedCategory?: string }} Props */
+
+  const PAGE_SIZE = 12;
+
+  /** @type {Props} */
+  let {
+    entryGroups = [],
+    query = $bindable(''),
+    selectedCategory = $bindable('all')
+  } = $props();
+
+  let visibleCount = $state(PAGE_SIZE);
+  let lastFilterKey = '';
+
+  const entries = $derived(flattenEntryGroups(entryGroups));
+  const categories = $derived(buildCategorySummaries(entries));
+  const totalCount = $derived(entries.length);
+  const normalizedCategory = $derived(categoryKey(selectedCategory || 'all') || 'all');
+  const categoryIsValid = $derived(
+    normalizedCategory === 'all' || categories.some((category) => category.key === normalizedCategory)
+  );
+  const activeCategory = $derived(categoryIsValid ? normalizedCategory : 'all');
+  const filteredEntries = $derived(filterEntries(entries, query, activeCategory));
+  const visibleEntries = $derived(filteredEntries.slice(0, visibleCount));
+  const visibleGroups = $derived(groupEntriesByYear(visibleEntries));
+  const filteredCount = $derived(filteredEntries.length);
+  const remainingCount = $derived(Math.max(filteredCount - visibleEntries.length, 0));
+  const selectedCategoryLabel = $derived(
+    activeCategory === 'all'
+      ? 'All categories'
+      : categories.find((category) => category.key === activeCategory)?.label ?? 'All categories'
+  );
+  const filterKey = $derived(`${activeCategory}::${query.trim().toLowerCase()}`);
+
+  $effect(() => {
+    if (!categoryIsValid) selectedCategory = 'all';
+  });
+
+  $effect(() => {
+    if (filterKey === lastFilterKey) return;
+    lastFilterKey = filterKey;
+    visibleCount = PAGE_SIZE;
+  });
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+
+    const url = new URL(window.location.href);
+    const nextQuery = query.trim();
+
+    if (nextQuery) url.searchParams.set('q', nextQuery);
+    else url.searchParams.delete('q');
+
+    if (activeCategory !== 'all') url.searchParams.set('category', activeCategory);
+    else url.searchParams.delete('category');
+
+    window.history.replaceState(window.history.state, '', url);
+  });
+
+  function showMore() {
+    visibleCount += PAGE_SIZE;
+  }
+</script>
+
+<section class="browse" aria-label="Browse tools">
+  <div class="browse__inner">
+    <BlogSearchBar
+      bind:query
+      resultCount={filteredCount}
+      {totalCount}
+      visibleCount={visibleEntries.length}
+      {selectedCategoryLabel}
+    />
+
+    <BlogCategoryFilters bind:selected={selectedCategory} {categories} />
+  </div>
+</section>
+
+<BlogEntryFeed
+  entryGroups={visibleGroups}
+  {filteredCount}
+  visibleCount={visibleEntries.length}
+  {remainingCount}
+  onShowMore={showMore}
+/>
+
+<style>
+  .browse {
+    padding: 10px var(--gutter) 0;
+  }
+
+  .browse__inner {
+    max-width: 880px;
+    margin: 0 auto;
+    display: grid;
+    gap: 10px;
+  }
+</style>

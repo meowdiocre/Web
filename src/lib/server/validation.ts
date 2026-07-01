@@ -34,5 +34,16 @@ export function normalisePublishAt(raw: string | null | undefined): Date | null 
 
 export const newPostSchema = z.object({
   title:    z.string().min(1).max(256),
+  slug:     z.union([slugSchema, z.string().length(0)]).default(''),
   category: z.string().min(1).max(64)
+});
+
+export const categorySlugSchema = z.string()
+  .min(1)
+  .max(64)
+  .regex(/^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/, 'Category slugs must be lowercase letters, digits and hyphens.');
+
+export const newCategorySchema = z.object({
+  label: z.string().min(1).max(64),
+  slug:  z.union([categorySlugSchema, z.string().length(0)]).default('')
 });

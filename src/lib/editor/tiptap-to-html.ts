@@ -5,9 +5,11 @@
  * Custom node mapping:
  *   pullQuote -> <blockquote class="pull">...</blockquote>
  *   codeBlock -> <pre><code>...</code></pre><span class="figure-cap">...</span>
- *   endSlug   -> <div class="end"><span class="glyph">∅</span><span>...</span></div>
+ *   endSlug   -> <div class="end"><span class="glyph">◎</span><span>...</span></div>
  *   sidenote  -> <span class="sidenote-ref">...</span><span class="sidenote">...</span>
  */
+
+import { BRAND_GLYPH } from '../config/motif.js';
 
 import type {
   BlockNode,
@@ -99,7 +101,7 @@ function renderBlock(node: BlockNode): string {
       return `<pre><code>${inner}</code></pre>${caption}`;
     }
     case 'endSlug':
-      return `<div class="end"><span class="glyph" aria-hidden="true">∅</span><span>${escapeHtml(node.attrs.text)}</span></div>`;
+      return `<div class="end"><span class="glyph" aria-hidden="true">${BRAND_GLYPH}</span><span>${escapeHtml(node.attrs.text)}</span></div>`;
     case 'image': {
       const src   = escapeAttr(node.attrs.src);
       const alt   = escapeAttr(node.attrs.alt ?? '');

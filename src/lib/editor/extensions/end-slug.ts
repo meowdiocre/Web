@@ -1,4 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
+import { BRAND_GLYPH } from '../../config/motif.js';
 
 /** EndSlug is a block-level atom. By convention there is one per document. */
 export const EndSlug = Node.create({
@@ -24,7 +25,7 @@ export const EndSlug = Node.create({
 
   renderHTML({ HTMLAttributes, node }) {
     return ['div', mergeAttributes(HTMLAttributes, { class: 'end' }),
-      ['span', { class: 'glyph', 'aria-hidden': 'true' }, '∅'],
+      ['span', { class: 'glyph', 'aria-hidden': 'true' }, BRAND_GLYPH],
       ['span', {}, node.attrs.text ?? '']
     ];
   },

@@ -9,17 +9,22 @@ import { verifyPreviewToken } from '$lib/server/publish';
  *
  * @type {import('./$types').PageServerLoad}
  */
-export async function load({ params, url, setHeaders }) {
+export function load({ params, url, setHeaders }) {
   const slug = params.slug;
   if (!slug) error(404, 'Not found.');
 
   const previewToken = url.searchParams.get('preview') ?? '';
   const allowDraft = previewToken ? verifyPreviewToken(previewToken, slug) : false;
 
-  const article = await loadPublicArticle(slug, { allowDraft });
-  if (!article) error(404, 'Not found.');
+  const article = loadPublicArticle(slug, { allowDraft }).then((result) => {
+    if (!result) error(404, 'Not found.');
+    return result;
+  });
 
-  const related = await loadRelated(article.slug, article.category);
+  const related = article.then(
+    (entry) => loadRelated(entry.slug, entry.category),
+    () => []
+  );
 
   setHeaders({
     // Preview pages must never be cached at the edge.

@@ -125,7 +125,7 @@ describe('tiptapToHtml — round trip', () => {
     expect(html).toContain('<blockquote class="pull">A quote</blockquote>');
     expect(html).toContain('<pre><code><span class="kw">mov</span> rax,1</code></pre>');
     expect(html).toContain('<span class="figure-cap">cap</span>');
-    expect(html).toContain('<div class="end"><span class="glyph" aria-hidden="true">∅</span><span>done</span></div>');
+    expect(html).toContain('<div class="end"><span class="glyph" aria-hidden="true">◎</span><span>done</span></div>');
   });
 
   it('renders a sidenote with the existing twin-span shape', () => {

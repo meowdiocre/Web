@@ -1,5 +1,6 @@
 <script>
   import { SITE } from '$lib/config/site.js';
+  import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   /** @type {{ meta: { hostPath: string } }} */
   let { meta } = $props();
@@ -13,6 +14,8 @@
     pl-[clamp(14px,2vw,28px)] max-[900px]:pl-[clamp(10px,3vw,14px)]
   "
   href="/"
+  data-sveltekit-preload-data="tap"
+  data-sveltekit-preload-code="hover"
   aria-label={ariaLabel}
 >
   <span
@@ -22,7 +25,7 @@
       max-[900px]:h-[26px] max-[460px]:text-[11.5px]
     "
   >
-    <span class="text-crimson mr-1 font-display text-[14px] translate-y-[0.5px]">∅</span>{SITE.session}
+    <span class="text-crimson mr-1 font-display text-[14px] translate-y-[0.5px]">{BRAND_GLYPH}</span>{SITE.session}
   </span>
   <span
     class="

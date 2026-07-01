@@ -6,13 +6,12 @@
  *   npm run db:reset
  *   npm run db:reset -- --force
  */
-import 'dotenv/config';
 import { stdin as input, stdout as output } from 'node:process';
 import { createInterface } from 'node:readline/promises';
-import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { sql } from 'drizzle-orm';
+import { getDatabaseUrl, MIGRATIONS_DIR, openSqlClient, redactUrl } from './lib/runtime';
 
 async function main() {
   const args  = new Set(process.argv.slice(2));
@@ -22,7 +21,7 @@ async function main() {
     throw new Error('Refusing to db:reset in production. Pass --force if you really mean it.');
   }
 
-  const url = process.env.DATABASE_URL_UNPOOLED ?? process.env.DATABASE_URL;
+  const url = getDatabaseUrl();
   if (!url) throw new Error('DATABASE_URL_UNPOOLED or DATABASE_URL must be set.');
 
   const rl = createInterface({ input, output });
@@ -34,7 +33,7 @@ async function main() {
     return;
   }
 
-  const sqlClient = postgres(url, { max: 1, prepare: false });
+  const sqlClient = openSqlClient(url);
   const db = drizzle(sqlClient);
 
   try {
@@ -44,16 +43,12 @@ async function main() {
     await db.execute(sql`CREATE SCHEMA public`);
     // eslint-disable-next-line no-console
     console.log('▷ applying migrations');
-    await migrate(db, { migrationsFolder: './drizzle/migrations' });
+    await migrate(db, { migrationsFolder: MIGRATIONS_DIR });
     // eslint-disable-next-line no-console
     console.log('✓ reset complete');
   } finally {
     await sqlClient.end({ timeout: 5 });
   }
-}
-
-function redact(url: string): string {
-  return url.replace(/:[^:@]+@/, ':***@');
 }
 
 main().catch((err) => {

@@ -47,6 +47,6 @@ describe('tiptap-to-html — editor-shaped docs', () => {
     expect(html).toContain('<pre><code>print(1)</code></pre><span class="figure-cap">L2.</span>');
     expect(html).toContain('<ol><li>one</li></ol>');
     expect(html).toContain('<figure class="essay-image"><img src="https://example.com/a.png" alt="A"');
-    expect(html).toContain('<div class="end"><span class="glyph" aria-hidden="true">∅</span><span>fin</span></div>');
+    expect(html).toContain('<div class="end"><span class="glyph" aria-hidden="true">◎</span><span>fin</span></div>');
   });
 });

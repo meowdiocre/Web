@@ -64,6 +64,11 @@ body {
 }
 ::selection { background: var(--color-crimson); color: var(--color-paper); }
 
+body[data-nav-pending='true'] .layer {
+  opacity: 0.88;
+  transition: opacity 0.12s ease;
+}
+
 body[data-page='home'],
 body[data-page='about']                       { background: var(--color-ink);   color: var(--color-paper); }
 body[data-page='blog']                        { background: var(--color-paper); color: #2a1c14; }
@@ -232,6 +237,13 @@ body[data-page='admin'] {
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--color-muted-warm);
+  }
+  .field-help {
+    margin-top: -2px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--color-muted);
   }
   .inp {
     width: 100%;

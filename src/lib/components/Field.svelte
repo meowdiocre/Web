@@ -19,6 +19,7 @@
    * @property {number}                    [rows]         <textarea rows>
    * @property {boolean}                   [required]
    * @property {string}                    [placeholder]
+   * @property {string}                    [help]
    * @property {import('svelte').Snippet}  [children]     <option>s for kind='select'
    */
 
@@ -32,6 +33,7 @@
     rows  = 3,
     required    = false,
     placeholder = '',
+    help = '',
     children
   } = $props();
 </script>
@@ -54,3 +56,7 @@
     <input class="inp" {name} {value} {type} {required} {placeholder} />
   {/if}
 </label>
+
+{#if help}
+  <p class="field-help">{help}</p>
+{/if}

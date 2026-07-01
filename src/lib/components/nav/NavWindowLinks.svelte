@@ -18,6 +18,8 @@
     class:nav-window-desktop={!mobile}
     class:is-current={current === window.key}
     href={window.path}
+    data-sveltekit-preload-data="tap"
+    data-sveltekit-preload-code="hover"
     aria-current={current === window.key ? 'page' : undefined}
     onclick={close}
   >

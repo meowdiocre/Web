@@ -18,7 +18,8 @@ export interface AdminPostListRow {
   publishAt:   Date | null;
   publishedAt: Date | null;
   updatedAt:   Date;
-  category:    string;
+  categorySlug: string;
+  categoryLabel: string;
 }
 
 export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
@@ -33,9 +34,11 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
       publishAt:   posts.publishAt,
       publishedAt: posts.publishedAt,
       updatedAt: posts.updatedAt,
-      category:  posts.category
+      categorySlug: posts.category,
+      categoryLabel: categories.label
     })
     .from(posts)
+    .leftJoin(categories, eq(posts.category, categories.slug))
     .orderBy(desc(posts.updatedAt));
 
   return rows.map((r) => ({
@@ -46,7 +49,8 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
     publishAt:   r.publishAt,
     publishedAt: r.publishedAt,
     updatedAt:   r.updatedAt,
-    category:    r.category
+    categorySlug: r.categorySlug,
+    categoryLabel: r.categoryLabel ?? r.categorySlug
   }));
 }
 
@@ -57,6 +61,26 @@ export async function getPostById(id: string) {
 
 export async function listCategories() {
   return db.select().from(categories).orderBy(categories.label);
+}
+
+export async function isCategorySlugTaken(slug: string): Promise<boolean> {
+  const rows = await db.select({ slug: categories.slug }).from(categories).where(eq(categories.slug, slug)).limit(1);
+  return rows.length > 0;
+}
+
+export async function createCategory(input: { slug: string; label: string; tone?: string }) {
+  const values = {
+    slug: input.slug,
+    label: input.label,
+    tone: input.tone ?? 'crimson-deep'
+  };
+
+  const [row] = await db
+    .insert(categories)
+    .values(asInsert(values))
+    .returning({ slug: categories.slug, label: categories.label });
+
+  return row;
 }
 
 export async function isSlugTaken(slug: string, exceptPostId?: string): Promise<boolean> {
@@ -136,7 +160,11 @@ export async function updatePostMetadata(id: string, input: UpdateMetadataInput)
 }
 
 export async function deletePost(id: string) {
-  await db.delete(posts).where(eq(posts.id, id));
+  const [row] = await db
+    .delete(posts)
+    .where(eq(posts.id, id))
+    .returning({ slug: posts.slug, status: posts.status });
+  return row ?? null;
 }
 
 export async function publishPost(id: string) {

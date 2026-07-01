@@ -1,7 +1,7 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
 
+import { createCategoryFromForm } from '$lib/server/admin/workflows';
 import { listCategories } from '$lib/server/db/admin-queries';
-import { createDraftFromForm } from '$lib/server/admin/workflows';
 
 export const prerender = false;
 
@@ -15,17 +15,17 @@ export async function load() {
 export const actions = {
   default: async ({ request, locals }) => {
     if (!locals.user) return fail(401, { error: 'Not signed in.' });
+
     const form = await request.formData();
-    const result = await createDraftFromForm({
-      title: String(form.get('title') ?? ''),
-      slug: String(form.get('slug') ?? ''),
-      category: String(form.get('category') ?? '')
-    }, locals.user.githubLogin);
+    const result = await createCategoryFromForm({
+      label: String(form.get('label') ?? ''),
+      slug: String(form.get('slug') ?? '')
+    });
 
     if (!result.ok) {
       return fail(400, result);
     }
 
-    redirect(303, `/admin/posts/${result.row.id}/edit`);
+    return { success: true };
   }
 };

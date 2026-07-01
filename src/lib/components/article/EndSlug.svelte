@@ -1,6 +1,8 @@
 <script>
+  import { BRAND_GLYPH } from '$lib/config/motif.js';
+
   /**
-   * EndSlug is the closing strip below the final paragraph. Rotated ∅ glyph
+   * EndSlug is the closing strip below the final paragraph. Rotated motif glyph
    * + mono signoff (e.g. "4,720 words · 2026 · 03 · 14").
    *
    * @typedef {Object} Props
@@ -12,7 +14,7 @@
 </script>
 
 <div class="end">
-  <span class="glyph" aria-hidden="true">∅</span>
+  <span class="glyph" aria-hidden="true">{BRAND_GLYPH}</span>
   <span>{text}</span>
 </div>
 

@@ -1,5 +1,6 @@
 <script>
-  import Field from '$lib/components/Field.svelte';
+  import PageHeader from '$lib/components/admin/PageHeader.svelte';
+  import PostDraftForm from '$lib/components/admin/PostDraftForm.svelte';
 
   /** @type {{
    *    data: { categories: { slug: string, label: string }[] },
@@ -10,39 +11,21 @@
 
 <svelte:head><title>New Post | Admin</title></svelte:head>
 
-<header class="mb-8">
-  <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-muted-warm mb-1">
-    ~/admin/posts/new
-  </p>
-  <h1 class="font-display text-[clamp(28px,4vw,48px)] uppercase tracking-[-0.015em]">
-    new post
-  </h1>
-</header>
+<PageHeader
+  eyebrow="~/admin/posts/new"
+  title="new post"
+  description="Create a draft and jump straight into the editor. You can finish metadata later."
+/>
 
-<form method="POST" class="grid gap-5 max-w-[640px]">
-  {#if form?.error}
-    <p class="border border-crimson px-3 py-2 text-crimson font-mono text-[12px]">
-      {form.error}
-    </p>
-  {/if}
-
-  <Field
-    name="title"
-    label="title"
-    value={form?.values?.title ?? ''}
-    placeholder="The title as it should appear on /blog"
-    required
-  />
-
-  <Field name="category" label="category" kind="select" required>
-    <option value="">pick a category</option>
-    {#each data.categories as c (c.slug)}
-      <option value={c.slug} selected={form?.values?.category === c.slug}>{c.label}</option>
-    {/each}
-  </Field>
-
-  <div class="flex flex-wrap gap-2 mt-2">
-    <button class="btn-primary">create draft</button>
-    <a href="/admin" class="btn-ghost">cancel</a>
-  </div>
-</form>
+<div class="max-w-[640px]">
+  <PostDraftForm
+    categories={data.categories}
+    values={form?.values ?? {}}
+    error={form?.error ?? ''}
+  >
+    {#snippet footer()}
+      <a href="/admin" class="btn-ghost">cancel</a>
+      <a href="/admin/categories" class="btn-ghost">manage categories</a>
+    {/snippet}
+  </PostDraftForm>
+</div>

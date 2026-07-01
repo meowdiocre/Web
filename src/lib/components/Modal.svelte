@@ -17,6 +17,8 @@
       to `aria-labelledby` so screen readers announce the dialog.
 -->
 <script>
+  import { BRAND_GLYPH } from '$lib/config/motif.js';
+
   /**
    * @typedef {Object} Props
    * @property {boolean}                   open        Parent-owned visibility.
@@ -70,7 +72,7 @@
     {#if title}
       <header class="head">
         <span class="tag">
-          <span class="g" aria-hidden="true">∅</span>dialog
+          <span class="g" aria-hidden="true">{BRAND_GLYPH}</span>dialog
         </span>
         <h2 id={titleId} class="title">{title}</h2>
         <button
