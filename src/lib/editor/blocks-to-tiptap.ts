@@ -1,15 +1,7 @@
 /**
- * blocks-to-tiptap.ts -- one-way adapter from the structured block tree
- * used in src/lib/data/article.js into a TipTap (ProseMirror) document.
- *
- * The adapter is loss-aware:
- *   - paragraph/h2/h3/list HTML is parsed by parse-inline.ts.
- *   - pull-quote is wrapped in a `pullQuote` atom.
- *   - code is wrapped in a `codeBlock` atom whose attrs.html is taken
- *     verbatim (the data layer already ships pre-spanned tokens). lang
- *     is inferred from the caption when possible so a future re-highlight
- *     pass can run Shiki idempotently.
- *   - end-slug is wrapped in `endSlug`.
+ * One-way adapter from the structured block tree in src/lib/data/article.js
+ * into a TipTap document. Lossy by design: hand-spanned code highlights
+ * are stripped to plain `source`, then re-applied by Shiki on next save.
  */
 
 import type {
@@ -32,28 +24,23 @@ type SrcBlock =
   | { type: 'end-slug';   text: string };
 
 export interface ConvertOptions {
-  /** Override automatic language sniffing for `code` blocks. */
+  /** Override the automatic language sniff for `code` blocks. */
   langFor?: (caption: string, html: string, idx: number) => string;
 }
 
 function sniffLang(caption: string, html: string): string {
   const c = caption.toLowerCase();
-  if (/\.py($|\b)/.test(c) || /python/.test(c))         return 'python';
-  if (/\.ts($|\b)/.test(c) || /typescript/.test(c))     return 'typescript';
-  if (/\.js($|\b)/.test(c) || /javascript/.test(c))     return 'javascript';
-  if (/\.rs($|\b)/.test(c) || /rust/.test(c))           return 'rust';
-  if (/dispatch|x86|asm|assembly|listing/.test(c))      return 'asm';
-  if (/\bdef\s+\w+\(/.test(html))                       return 'python';
-  if (/\bmov\s+r[abcd]x/.test(html))                    return 'asm';
+  if (/\.py($|\b)/.test(c) || /python/.test(c))     return 'python';
+  if (/\.ts($|\b)/.test(c) || /typescript/.test(c)) return 'typescript';
+  if (/\.js($|\b)/.test(c) || /javascript/.test(c)) return 'javascript';
+  if (/\.rs($|\b)/.test(c) || /rust/.test(c))       return 'rust';
+  if (/dispatch|x86|asm|assembly|listing/.test(c))  return 'asm';
+  if (/\bdef\s+\w+\(/.test(html))                   return 'python';
+  if (/\bmov\s+r[abcd]x/.test(html))                return 'asm';
   return 'plaintext';
 }
 
-/**
- * Strip the existing prerendered `<span class="…">` wrappers so we have
- * a half-decent `source` to show in the editor. Not round-trippable, but
- * good enough for v1 — the seeded post is editable, just without exotic
- * single-glyph highlights until the author saves and Shiki re-runs.
- */
+/** Strip prerendered class spans so the editor has a clean `source`. */
 function stripCodeSpans(html: string): string {
   return html
     .replace(/<span class="(kw|fn|str|com|num)">/g, '')
@@ -123,8 +110,7 @@ export function blocksToTiptap(blocks: SrcBlock[], opts: ConvertOptions = {}): D
         break;
       }
       default: {
-        // Unknown source block kind — skip rather than throw so a future
-        // schema-evolution doesn't take down `npm run seed`.
+        // Unknown source block — skip so a schema bump doesn't break seed.
         // eslint-disable-next-line no-console
         console.warn(`[blocks-to-tiptap] unknown block kind: ${(b as any).type}`);
       }

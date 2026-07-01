@@ -1,22 +1,18 @@
 <!--
-  AdminNav — responsive admin chrome.
-
-  Desktop (≥ md): fixed-width sidebar with grouped sections (workspace
-                   / external), active-route highlight (rose accent +
-                   caret), sign-out pinned to the bottom.
-  Mobile (< md):   sticky top bar with hamburger; the dropdown mirrors
-                   the desktop section structure so visual hierarchy
-                   stays consistent. Auto-closes on navigation.
+  AdminNav — responsive admin chrome. Desktop is a fixed sidebar with
+  grouped sections and active-route highlight; mobile is a sticky top
+  bar whose dropdown mirrors the same structure and auto-closes on
+  navigation.
 -->
 <script>
   import { page } from '$app/stores';
 
   /**
    * @typedef {Object} NavLink
-   * @property {string}                href
-   * @property {string}                label
-   * @property {boolean}               [external]   external/site link
-   * @property {(path: string)=>boolean} [match]    custom active matcher
+   * @property {string}                  href
+   * @property {string}                  label
+   * @property {boolean}                 [external]   external/site link
+   * @property {(path: string)=>boolean} [match]      custom active matcher
    *
    * @typedef {Object} NavSection
    * @property {string}    label
@@ -39,7 +35,7 @@
         {
           href: '/admin',
           label: 'posts',
-          // /admin or any /admin/posts/* except /admin/posts/new.
+          // /admin or any /admin/posts/*, but not /admin/posts/new.
           match: (p) => p === '/admin' || (p.startsWith('/admin/posts/') && p !== '/admin/posts/new')
         },
         {
@@ -112,7 +108,7 @@
   {/if}
 {/snippet}
 
-<!-- ===== Mobile top bar =================================== -->
+<!-- Mobile top bar -->
 <header
   class="md:hidden sticky top-0 z-30 flex items-center justify-between
          border-b border-[var(--line-soft)] bg-ink-2 px-5 py-3"
@@ -145,7 +141,7 @@
   </div>
 {/if}
 
-<!-- ===== Desktop sidebar ================================== -->
+<!-- Desktop sidebar -->
 <aside
   class="hidden md:flex md:flex-col relative
          border-r border-[var(--line-soft)] bg-ink-2"
@@ -164,8 +160,7 @@
 </aside>
 
 <style>
-  /* Account chrome — pinned at the bottom of the sidebar (and inside
-     the mobile dropdown). Visually subordinate to the nav items. */
+  /* Account chrome — pinned to the bottom of the sidebar / mobile menu. */
   :global(.account__handle) {
     font-family: var(--font-mono);
     font-size: 10px;

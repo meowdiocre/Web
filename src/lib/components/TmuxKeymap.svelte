@@ -8,14 +8,14 @@
   import Toast from './Toast.svelte';
 
   /**
-   * TmuxKeymap — global keyboard layer that emulates tmux's
-   * prefix (C-b) + key dispatch. Mounts once in +layout.svelte.
+   * TmuxKeymap — global keyboard layer emulating tmux's prefix
+   * (Ctrl+B) + key dispatch. Mounts once in +layout.svelte.
    *
    * Bindings:
-   *   0 / 1 / 2  jump to index / writing / about
-   *   n / p      next / previous window (cyclical)
-   *   ?          show all bindings
-   *   Esc        cancel prefix
+   *   0 / 1 / 2   jump to index / writing / about
+   *   n / p       next / previous window (cyclical)
+   *   ?           show all bindings
+   *   Esc         cancel prefix
    */
 
   const PREFIX_TIMEOUT_MS = 2000;
@@ -103,14 +103,20 @@
     endPrefix();
   }
 
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let hintTimer;
+
   onMount(() => {
     if (!hasSeenHint()) {
       // Defer a beat so the page paints first.
-      setTimeout(() => { hintOpen = true; }, 700);
+      hintTimer = setTimeout(() => { hintOpen = true; }, 700);
     }
   });
 
-  onDestroy(() => clearTimeout(prefixTimer));
+  onDestroy(() => {
+    clearTimeout(prefixTimer);
+    clearTimeout(hintTimer);
+  });
 </script>
 
 <svelte:window onkeydown={onKey} />

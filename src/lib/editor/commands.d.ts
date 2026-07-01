@@ -1,11 +1,7 @@
 /**
  * Module augmentation so `editor.commands.insertPullQuote(...)` and the
- * other custom commands are properly typed without `as any` casts.
- *
- * Lives here (not next to each extension) so TipTap's existing
- * `Commands<ReturnType>` interface is augmented in a single place.
- *
- * Imported for its side effects from src/lib/editor/index.ts.
+ * other custom commands type-check without `as any` casts. Imported for
+ * side effects from src/lib/editor/index.ts.
  */
 
 import '@tiptap/core';
@@ -13,9 +9,7 @@ import '@tiptap/core';
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     pullQuote: {
-      /** Insert a new pull quote at the current selection. */
-      insertPullQuote: (text: string) => ReturnType;
-      /** Replace the currently-selected pullQuote node's text. */
+      insertPullQuote:         (text: string) => ReturnType;
       updateSelectedPullQuote: (text: string) => ReturnType;
     };
 
@@ -26,7 +20,6 @@ declare module '@tiptap/core' {
         lang:    string;
         caption: string;
       }) => ReturnType;
-      /** Replace attrs of the currently-selected codeBlock node. */
       updateSelectedCodeBlock: (attrs: {
         source:  string;
         lang:    string;
@@ -35,12 +28,12 @@ declare module '@tiptap/core' {
     };
 
     sidenote: {
-      insertSidenote: (attrs: { ref: string; bodyHtml: string }) => ReturnType;
+      insertSidenote:         (attrs: { ref: string; bodyHtml: string }) => ReturnType;
       updateSelectedSidenote: (attrs: { ref: string; bodyHtml: string }) => ReturnType;
     };
 
     endSlug: {
-      insertEndSlug: (text: string) => ReturnType;
+      insertEndSlug:         (text: string) => ReturnType;
       updateSelectedEndSlug: (text: string) => ReturnType;
     };
   }

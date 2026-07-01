@@ -1,10 +1,8 @@
 /**
- * imageUpload — drag/drop + paste handler that uploads images to
+ * imageUpload — drag/drop + paste handler that POSTs images to
  * /admin/api/media and inserts an `image` node at the drop position.
- *
- * Exposes an `onStatus` callback through `Extension.configure(...)` so
- * the page can surface "uploading…", "uploaded", or error messages to
- * the user instead of writing to the console.
+ * Surfaces progress via an `onStatus` callback so the page can show
+ * toasts instead of writing to the console.
  */
 
 import { Extension } from '@tiptap/core';
@@ -32,7 +30,6 @@ async function uploadFile(file: File): Promise<{ url: string; pathname: string }
   return await res.json();
 }
 
-/** Pluck image File objects out of a clipboard/drag DataTransferItemList. */
 function imageFilesFromItems(items: DataTransferItemList | null | undefined): File[] {
   if (!items) return [];
   const out: File[] = [];
@@ -45,7 +42,6 @@ function imageFilesFromItems(items: DataTransferItemList | null | undefined): Fi
   return out;
 }
 
-/** Pluck image File objects out of a drop's FileList. */
 function imageFilesFromList(files: FileList | null | undefined): File[] {
   if (!files) return [];
   const out: File[] = [];
@@ -67,7 +63,6 @@ export const ImageUpload = Extension.create<ImageUploadOptions>({
     const editor   = this.editor;
     const onStatus = this.options.onStatus;
 
-    /** Fire-and-forget uploader that streams status callbacks. */
     const uploadAndInsert = async (files: File[]) => {
       for (const f of files) {
         onStatus?.({ kind: 'uploading', file: f });

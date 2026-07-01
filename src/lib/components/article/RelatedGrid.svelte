@@ -2,8 +2,8 @@
   import RelatedCard from '../RelatedCard.svelte';
 
   /**
-   * RelatedGrid - bottom-of-article block: heading + 3-up grid that
-   * collapses to one column under 900 px.
+   * RelatedGrid — bottom-of-article heading + 3-up grid collapsing to
+   * one column under 900 px.
    *
    * @typedef {Object} Item
    * @property {string} href

@@ -1,18 +1,12 @@
 /**
- * tiptap-to-html.ts -- serialise a TipTap doc back into the HTML the
- * public Essay component emits. The two paths to be reasonable:
+ * Serialise a TipTap doc into the HTML the public Essay component
+ * expects (read from `posts.body_html` and rendered via `{@html}`).
  *
- *  - Public route reads `posts.body_html` and feeds it to <Essay html=...>
- *    which just does `{@html html}` inside the same .essay container.
- *  - Therefore the HTML this function produces MUST match what
- *    src/lib/components/article/Essay.svelte would render block-by-block
- *    for an equivalent block tree.
- *
- * Custom nodes:
- *   pullQuote  -> <blockquote class="pull">…</blockquote>      (PullQuote.svelte)
- *   codeBlock  -> <pre><code>{html}</code></pre><span class="figure-cap">…</span> (CodeBlock.svelte)
- *   endSlug    -> <div class="end"><span class="glyph">∅</span><span>…</span></div> (EndSlug.svelte)
- *   sidenote   -> <span class="sidenote-ref">ref</span><span class="sidenote">ref body</span>
+ * Custom node mapping:
+ *   pullQuote -> <blockquote class="pull">…</blockquote>
+ *   codeBlock -> <pre><code>…</code></pre><span class="figure-cap">…</span>
+ *   endSlug   -> <div class="end"><span class="glyph">∅</span><span>…</span></div>
+ *   sidenote  -> <span class="sidenote-ref">…</span><span class="sidenote">…</span>
  */
 
 import type {
@@ -38,21 +32,18 @@ function escapeAttr(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-/** Render a single inline node (text + marks, or atom). */
 function renderInlineNode(node: InlineNode): string {
   if (node.type === 'sidenote') {
     const ref      = escapeHtml(node.attrs.ref ?? '');
     const bodyHtml = node.attrs.bodyHtml ?? '';
-    // bodyHtml is trusted (the editor sanitises on save). Allowing it
-    // raw preserves <em>, <strong>, <code>, <a> inside footnotes.
+    // bodyHtml is editor-sanitised; pass through raw so inline marks
+    // (<em>, <strong>, <code>, <a>) inside footnotes survive.
     return `<span class="sidenote-ref">${ref}</span>` +
            `<span class="sidenote">${ref}${bodyHtml ? ' ' + bodyHtml : ''}</span>`;
   }
-  // text
   let html = escapeHtml(node.text ?? '');
   const marks = node.marks ?? [];
-  // Apply marks innermost-first so the resulting nesting matches the
-  // order TipTap returned (which is also how editors usually serialise).
+  // Apply innermost-first so the resulting nesting matches TipTap's order.
   for (let i = marks.length - 1; i >= 0; i--) {
     html = wrapMark(html, marks[i]);
   }
@@ -76,9 +67,7 @@ function renderInline(content: InlineNode[] | undefined): string {
 }
 
 function renderListItem(item: ListItemNode): string {
-  // Essay renders <li>{@html item}</li> where item is HTML — to keep parity
-  // we serialise the contained paragraphs as inline content (drop the <p>
-  // wrapper) so the literal <li>...</li> looks like the original.
+  // Drop the <p> wrapper so <li>…</li> matches the public Essay shape.
   const inner = (item.content ?? []).map((p) => renderInline(p.content)).join('');
   return `<li>${inner}</li>`;
 }
@@ -98,10 +87,9 @@ function renderBlock(node: BlockNode): string {
     case 'pullQuote':
       return `<blockquote class="pull">${escapeHtml(node.attrs.text)}</blockquote>`;
     case 'codeBlock': {
-      // attrs.html is server-trusted: it's produced by Shiki on save (or
-      // shipped pre-spanned from the seed). Do NOT escape it.
-      // If html is empty (newly inserted block, awaiting first save),
-      // fall back to escaping `source` so SOMETHING renders.
+      // attrs.html is server-trusted (Shiki on save, or pre-spanned seed).
+      // Fall back to escaping `source` when html is empty so newly-inserted
+      // blocks still render something before their first save.
       const inner = node.attrs.html && node.attrs.html.length > 0
         ? node.attrs.html
         : escapeHtml(node.attrs.source ?? '');
@@ -115,19 +103,18 @@ function renderBlock(node: BlockNode): string {
     case 'image': {
       const src   = escapeAttr(node.attrs.src);
       const alt   = escapeAttr(node.attrs.alt ?? '');
-      const title = node.attrs.title ? ` title="${escapeAttr(node.attrs.title)}"` : '';
+      const title = node.attrs.title  ? ` title="${escapeAttr(node.attrs.title)}"` : '';
       const w     = node.attrs.width  ? ` width="${node.attrs.width}"`   : '';
       const h     = node.attrs.height ? ` height="${node.attrs.height}"` : '';
       return `<figure class="essay-image"><img src="${src}" alt="${alt}"${title}${w}${h} loading="lazy" /></figure>`;
     }
     default:
-      // Unknown future block kinds: emit nothing rather than break the page.
       return '';
   }
 }
 
 export interface RenderOutput {
-  /** Concatenated block HTML. Each block on its own line for diffing. */
+  /** Concatenated block HTML, one block per line for diffability. */
   html: string;
 }
 

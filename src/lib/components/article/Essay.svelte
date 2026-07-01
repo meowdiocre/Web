@@ -5,19 +5,17 @@
   import Footnotes  from './Footnotes.svelte';
 
   /**
-   * Essay - typographic shell for an article. Two modes:
+   * Essay — typographic shell for an article. Two render modes:
    *
-   *   1. `html` — server-rendered HTML produced by lib/server/render-post.
-   *      This is what the DB-backed /article/[slug] route uses.
-   *   2. `body` — legacy structured block tree (article.js shape). Still
-   *      used by any caller that hasn't migrated to the DB.
+   *   `html`  server-rendered HTML from lib/server/render-post (DB path).
+   *   `body`  legacy structured block tree (article.js shape).
    *
    * @typedef {Object} Footnote
    * @property {string} html
    *
    * @typedef {Object} Props
-   * @property {string|undefined}   [html]        pre-rendered HTML body
-   * @property {any[]|undefined}    [body]        legacy block array
+   * @property {string|undefined}     [html]      pre-rendered HTML body
+   * @property {any[]|undefined}      [body]      legacy block array
    * @property {Footnote[]|undefined} [footnotes] rendered after the body
    */
 
@@ -28,9 +26,8 @@
 <article class="essay relative px-[var(--gutter)] pt-4 pb-[clamp(48px,6vw,96px)]">
   <div class="essay__inner mx-auto max-w-[760px] relative">
     {#if html !== undefined}
-      <!-- Pre-rendered path. The html string ships block-by-block markup
-           matching what the legacy block-walker below produces — same
-           CSS targets apply unchanged. -->
+      <!-- Pre-rendered path: the html ships block-by-block markup
+           matching the legacy block-walker below — same CSS targets. -->
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html html}
     {:else if body}
@@ -105,8 +102,19 @@
   }
   .essay :global(a:hover) { background: rgb(181 29 42 / 0.08); }
   .essay :global(ol),
-  .essay :global(ul) { margin-left: 1.6em; }
+  .essay :global(ul) {
+    margin-left: 1.6em;
+    padding-left: 0;
+    list-style-position: outside;
+  }
+  .essay :global(ul)       { list-style-type: disc; }
+  .essay :global(ul ul)    { list-style-type: circle; }
+  .essay :global(ul ul ul) { list-style-type: square; }
+  .essay :global(ol)       { list-style-type: decimal; }
+  .essay :global(ol ol)    { list-style-type: lower-alpha; }
+  .essay :global(ol ol ol) { list-style-type: lower-roman; }
   .essay :global(li) { margin-bottom: 8px; }
+  .essay :global(li > p) { margin: 0; }
 
   /* Block-level styling for the pre-rendered HTML path so we don't have
      to ship the CodeBlock / PullQuote / EndSlug components on every page. */

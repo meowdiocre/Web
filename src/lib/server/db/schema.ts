@@ -1,14 +1,13 @@
 /**
  * meowdiocre database schema (Postgres / Drizzle).
  *
- * - posts        : every essay, draft or published. Canonical content is
- *                  doc_json (TipTap JSON); body_html is a cached render
- *                  served by the public route.
- * - categories   : controlled vocabulary, seeded from existing tags.
- * - users        : exactly one row in production (the admin), keyed by
- *                  GitHub id; allowlist still enforced at OAuth callback.
- * - sessions     : signed-cookie session ids -> users.
- * - media        : Vercel Blob uploads referenced from the editor.
+ *   posts       canonical content is doc_json (TipTap); body_html is the
+ *               cached server-rendered version served to the public.
+ *   categories  controlled vocabulary referenced by posts.
+ *   users       one row in production (the admin), keyed by GitHub id;
+ *               the allow-list is still enforced at OAuth callback.
+ *   sessions    SHA-256(cookie token) -> users.
+ *   media       Vercel Blob uploads referenced from the editor.
  */
 
 import {
@@ -26,15 +25,7 @@ import {
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
-/* -------------------------------------------------------------------------- */
-/* Enums                                                                       */
-/* -------------------------------------------------------------------------- */
-
 export const postStatus = pgEnum('post_status', ['draft', 'published']);
-
-/* -------------------------------------------------------------------------- */
-/* categories                                                                  */
-/* -------------------------------------------------------------------------- */
 
 export const categories = pgTable(
   'categories',
@@ -42,15 +33,9 @@ export const categories = pgTable(
     slug:  varchar('slug', { length: 64 }).primaryKey(),
     label: varchar('label', { length: 64 }).notNull(),
     tone:  varchar('tone', { length: 32 }).notNull().default('crimson-deep'),
-    createdAt: timestamp('created_at', { withTimezone: true })
-      .notNull()
-      .defaultNow()
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
   }
 );
-
-/* -------------------------------------------------------------------------- */
-/* users                                                                       */
-/* -------------------------------------------------------------------------- */
 
 export const users = pgTable(
   'users',
@@ -68,14 +53,10 @@ export const users = pgTable(
   })
 );
 
-/* -------------------------------------------------------------------------- */
-/* sessions                                                                    */
-/* -------------------------------------------------------------------------- */
-
 export const sessions = pgTable(
   'sessions',
   {
-    // SHA-256 of the cookie value; the cookie holds the raw token.
+    // SHA-256 of the cookie value; the cookie itself carries the raw token.
     id:        varchar('id', { length: 64 }).primaryKey(),
     userId:    uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
@@ -86,58 +67,50 @@ export const sessions = pgTable(
   })
 );
 
-/* -------------------------------------------------------------------------- */
-/* posts                                                                       */
-/* -------------------------------------------------------------------------- */
-
 export const posts = pgTable(
   'posts',
   {
-    id:        uuid('id').primaryKey().defaultRandom(),
-    slug:      varchar('slug', { length: 128 }).notNull(),
+    id:   uuid('id').primaryKey().defaultRandom(),
+    slug: varchar('slug', { length: 128 }).notNull(),
 
-    // Title is split into three parts so the public h1 can italicise
-    // the middle slice exactly like the original demo article.
+    // Title is split so the public h1 can italicise the middle slice
+    // exactly like the original demo article.
     titlePre:  varchar('title_pre',  { length: 256 }).notNull().default(''),
     titleEm:   varchar('title_em',   { length: 256 }).notNull().default(''),
     titlePost: varchar('title_post', { length: 256 }).notNull().default(''),
 
-    dek:       text('dek').notNull().default(''),
-    category:  varchar('category', { length: 64 })
-                 .notNull()
-                 .references(() => categories.slug, { onUpdate: 'cascade' }),
-    readTime:  varchar('read_time', { length: 24 }).notNull().default(''),
-    author:    varchar('author', { length: 64 }).notNull().default('meowdiocre'),
+    dek:      text('dek').notNull().default(''),
+    category: varchar('category', { length: 64 })
+                .notNull()
+                .references(() => categories.slug, { onUpdate: 'cascade' }),
+    readTime: varchar('read_time', { length: 24 }).notNull().default(''),
+    author:   varchar('author', { length: 64 }).notNull().default('meowdiocre'),
 
-    status:    postStatus('status').notNull().default('draft'),
+    status: postStatus('status').notNull().default('draft'),
 
-    // Optional future-dated publish trigger (used by cron).
+    /** Optional future-dated publish trigger (used by the publish cron). */
     publishAt:   timestamp('publish_at',   { withTimezone: true }),
     publishedAt: timestamp('published_at', { withTimezone: true }),
 
     coverImageUrl: text('cover_image_url'),
 
-    // Canonical content: TipTap (ProseMirror) document.
-    docJson:    jsonb('doc_json').notNull().default(sql`'{}'::jsonb`),
-    // Cached server-rendered HTML (re-built every save).
-    bodyHtml:   text('body_html').notNull().default(''),
-    // Footnotes are a flat list of { html }.
+    /** Canonical content (TipTap / ProseMirror JSON). */
+    docJson:  jsonb('doc_json').notNull().default(sql`'{}'::jsonb`),
+    /** Cached server-rendered HTML; rebuilt every save. */
+    bodyHtml: text('body_html').notNull().default(''),
+    /** Flat list of `{ html }` rendered after the body. */
     footnotesJson: jsonb('footnotes_json').notNull().default(sql`'[]'::jsonb`),
 
-    createdAt:  timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt:  timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
   },
   (t) => ({
-    slugUnique:    uniqueIndex('posts_slug_unique').on(t.slug),
-    statusIdx:     index('posts_status_idx').on(t.status),
-    publishedIdx:  index('posts_published_at_idx').on(t.publishedAt),
-    publishAtIdx:  index('posts_publish_at_idx').on(t.publishAt)
+    slugUnique:   uniqueIndex('posts_slug_unique').on(t.slug),
+    statusIdx:    index('posts_status_idx').on(t.status),
+    publishedIdx: index('posts_published_at_idx').on(t.publishedAt),
+    publishAtIdx: index('posts_publish_at_idx').on(t.publishAt)
   })
 );
-
-/* -------------------------------------------------------------------------- */
-/* media                                                                       */
-/* -------------------------------------------------------------------------- */
 
 export const media = pgTable(
   'media',
@@ -157,10 +130,6 @@ export const media = pgTable(
   })
 );
 
-/* -------------------------------------------------------------------------- */
-/* relations                                                                   */
-/* -------------------------------------------------------------------------- */
-
 export const postsRelations = relations(posts, ({ one }) => ({
   category: one(categories, { fields: [posts.category], references: [categories.slug] })
 }));
@@ -173,13 +142,9 @@ export const mediaRelations = relations(media, ({ one }) => ({
   uploader: one(users, { fields: [media.uploadedBy], references: [users.id] })
 }));
 
-/* -------------------------------------------------------------------------- */
-/* exported types                                                              */
-/* -------------------------------------------------------------------------- */
-
-export type Post       = typeof posts.$inferSelect;
-export type NewPost    = typeof posts.$inferInsert;
-export type Category   = typeof categories.$inferSelect;
-export type User       = typeof users.$inferSelect;
-export type Session    = typeof sessions.$inferSelect;
-export type MediaRow   = typeof media.$inferSelect;
+export type Post     = typeof posts.$inferSelect;
+export type NewPost  = typeof posts.$inferInsert;
+export type Category = typeof categories.$inferSelect;
+export type User     = typeof users.$inferSelect;
+export type Session  = typeof sessions.$inferSelect;
+export type MediaRow = typeof media.$inferSelect;

@@ -10,11 +10,10 @@ export const prerender = false;
 /**
  * /admin/api/cron/publish — Vercel cron handler.
  *
- * Auth model:
- *  - Vercel cron jobs send `Authorization: Bearer ${CRON_SECRET}`.
- *  - In dev you can hit this manually with the same header to verify.
+ * Auth: Vercel sends `Authorization: Bearer ${CRON_SECRET}`. Use the
+ * same header from `curl` in dev to trigger manually.
  *
- * Behavior: for every draft whose `publish_at` <= now, flip status to
+ * Behaviour: for every draft whose `publish_at <= now`, flip status to
  * 'published', stamp `published_at`, and queue a revalidation.
  *
  * @type {import('./$types').RequestHandler}
@@ -55,5 +54,5 @@ export async function GET({ request }) {
   return json({ ok: true, flipped: due.length, slugs: due.map((p) => p.slug) });
 }
 
-/** POST mirror so the manual trigger from a curl works with either verb. */
+/** Mirror as POST so manual curl works with either verb. */
 export const POST = GET;

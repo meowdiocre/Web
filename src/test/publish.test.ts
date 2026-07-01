@@ -28,9 +28,21 @@ describe('preview tokens', () => {
     expect(verifyPreviewToken('not-a-token', 'foo')).toBe(false);
     expect(verifyPreviewToken('', 'foo')).toBe(false);
   });
+
+  it('survives 500 round-trips (sigs containing 0x2e do not confuse the parser)', () => {
+    // Regression test for a delimiter-scan bug: HMAC-SHA256 output is
+    // 32 random bytes, ~12% of which contain 0x2e ('.'). A naive
+    // `txt.lastIndexOf('.')` split picks the wrong dot and verification
+    // spuriously fails. Looping at scale forces hundreds of dirty sigs.
+    for (let i = 0; i < 500; i++) {
+      const slug = `post-${i}-${Math.random().toString(36).slice(2, 8)}`;
+      const t    = signPreviewToken(slug, 600);
+      expect(verifyPreviewToken(t, slug)).toBe(true);
+    }
+  });
 });
 
-/* ----------------------------------------------------------------- */
+/* Cron handler auth ----------------------------------------------- */
 
 vi.mock('$lib/server/db/client', () => ({
   db: {

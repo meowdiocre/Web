@@ -1,19 +1,16 @@
 /**
  * Server hook chain:
  *
- *   1. data-page transform   — fill in %body-page% so the SSR'd <body>
- *                              gets the right data-page attribute.
- *   2. auth                  — populate event.locals.{user,session} from
- *                              the auth_session cookie.
- *   3. admin gate            — reject /admin/* requests without a valid
- *                              session. /admin/login + /admin/callback
- *                              are exempt (they ARE the login flow).
+ *   1. data-page transform — fills %body-page% so SSR'd <body> gets the
+ *                            right data-page attribute.
+ *   2. auth                — populate event.locals.{user,session} from
+ *                            the auth_session cookie.
+ *   3. admin gate          — reject /admin/* without a valid session
+ *                            (except /admin/login + /admin/callback).
  */
 
-// Load .env into process.env at server boot so server code that reads
-// `process.env.DATABASE_URL` etc. works in dev. SvelteKit's own
-// `$env/*` helpers don't populate process.env; the scripts under
-// scripts/ + drizzle/ already do this same import themselves.
+// Load .env into process.env so server code reading process.env.DATABASE_URL
+// works in dev. SvelteKit's `$env/*` helpers don't populate process.env.
 import 'dotenv/config';
 
 import { redirect } from '@sveltejs/kit';
@@ -33,7 +30,7 @@ function pageKey(pathname) {
   return 'home';
 }
 
-/** Routes under /admin that must work without a session. */
+/** /admin routes exempt from the auth gate — they ARE the login flow. */
 const ADMIN_PUBLIC = new Set([
   '/admin/login',
   '/admin/callback'
@@ -41,7 +38,6 @@ const ADMIN_PUBLIC = new Set([
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
-  // ----- auth ---------------------------------------------------------
   const token = event.cookies.get(SESSION_COOKIE);
   if (token) {
     try {
@@ -49,12 +45,12 @@ export async function handle({ event, resolve }) {
       event.locals.user    = user;
       event.locals.session = session;
       if (session) {
-        // refresh cookie expiry whenever we extended the session
+        // Refresh cookie expiry whenever the session was extended.
         event.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(session.expiresAt));
       } else {
         event.cookies.set(SESSION_COOKIE, '', expiredCookieOptions());
       }
-    } catch (err) {
+    } catch {
       // DB unreachable: deny rather than crash. Public pages still work.
       event.locals.user    = null;
       event.locals.session = null;
@@ -64,13 +60,9 @@ export async function handle({ event, resolve }) {
     event.locals.session = null;
   }
 
-  // ----- admin gate ---------------------------------------------------
   const path = event.url.pathname;
-  if (path.startsWith('/admin')) {
-    const isPublic = ADMIN_PUBLIC.has(path);
-    if (!isPublic && !event.locals.user) {
-      throw redirect(302, '/admin/login');
-    }
+  if (path.startsWith('/admin') && !ADMIN_PUBLIC.has(path) && !event.locals.user) {
+    throw redirect(302, '/admin/login');
   }
 
   const key = pageKey(path);

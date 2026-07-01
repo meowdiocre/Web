@@ -1,10 +1,10 @@
 /**
- * scripts/reset.ts -- DROP every table from `drizzle/migrations` and
- * re-run them. DEV ONLY. Refuses to run when NODE_ENV === 'production'.
+ * scripts/reset.ts — DROP every table from drizzle/migrations and re-run
+ * them. DEV ONLY. Refuses to run when NODE_ENV === 'production' unless
+ * --force is passed (and even then requires explicit confirmation).
  *
  *   npm run db:reset
- *   npm run db:reset -- --force   # bypass the env check (still requires
- *                                 # explicit confirmation)
+ *   npm run db:reset -- --force
  */
 import 'dotenv/config';
 import { stdin as input, stdout as output } from 'node:process';

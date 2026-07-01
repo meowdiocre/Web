@@ -39,10 +39,9 @@
   });
 
   /**
-   * Submit the metadata form against the `?/delete` action by
-   * triggering the hidden submitter. `requestSubmit(submitter)`
-   * preserves the submitter's `formaction` so SvelteKit routes to
-   * the correct named action.
+   * Trigger the form's `?/delete` action via the hidden submitter so
+   * `requestSubmit(submitter)` preserves its `formaction`, routing
+   * SvelteKit to the named action.
    */
   function runDelete() {
     confirmingDelete = false;
@@ -74,7 +73,7 @@
   </a>
 </header>
 
-<!-- Workflow actions ---------------------------------------------- -->
+<!-- Workflow actions -->
 <div class="flex items-center flex-wrap gap-2 mb-6">
   {#if p.status === 'draft'}
     <form method="POST" action="?/publish">
@@ -103,7 +102,7 @@
   {/if}
 </div>
 
-<!-- Metadata form -------------------------------------------------- -->
+<!-- Metadata form -->
 <form bind:this={formEl} method="POST" action="?/update" class="grid gap-5 max-w-[720px]">
   {#if form?.saved}
     <p class="border border-rose text-rose px-3 py-2 font-mono text-[12px]">saved.</p>
@@ -160,14 +159,14 @@
     value={v.get('publishAt', asLocalInput(p.publishAt))}
   />
 
-  <!-- Action bar: save | back ............... delete -->
+  <!-- Action bar: save / back / delete -->
   <div class="flex flex-wrap items-center gap-2 mt-2">
     <button class="btn-primary">save metadata</button>
     <a href="/admin" class="btn-ghost">back</a>
 
-    <!-- Hidden submitter — visible "delete" is type=button so it opens
-         the confirm modal instead of submitting. The modal then calls
-         formEl.requestSubmit(deleteSubmitter), preserving formaction. -->
+    <!-- Hidden submitter — the visible "delete" button is type=button
+         so it opens the confirm modal; the modal then triggers a real
+         submit via requestSubmit(deleteSubmitter), preserving formaction. -->
     <button
       type="submit"
       formaction="?/delete"

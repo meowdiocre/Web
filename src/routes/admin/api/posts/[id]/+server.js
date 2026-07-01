@@ -34,5 +34,7 @@ export async function PATCH({ request, params, locals }) {
     })
     .where(eq(posts.id, params.id));
 
-  return json({ ok: true, bytes: bodyHtml.length });
+  // Echo the rehighlighted doc so the editor can pull new codeBlock.html
+  // attrs back in without a page reload.
+  return json({ ok: true, bytes: bodyHtml.length, doc });
 }

@@ -3,19 +3,15 @@
   import { onDestroy } from 'svelte';
 
   /**
-   * Toast — terminal/tmux-styled notification chip.
-   *
-   * Parent owns the open state. Toast just renders when `open` is
-   * true and fires `onclose` whenever it wants to be closed (× click
-   * OR auto-close timeout). The parent can then flip its state and
-   * persist anything it likes.
+   * Toast — terminal-styled notification chip. Parent owns the open
+   * state and reacts to `onclose` (fired by × click or auto-close).
    *
    * @typedef {Object} Props
    * @property {boolean}             open                 visible flag (parent-owned)
    * @property {string}              [tag]                tmux-style tag label
    * @property {string}              [glyph]              single-char glyph in the tag
    * @property {number}              [autoCloseMs]        if > 0, fire onclose after N ms
-   * @property {() => void}          [onclose]            fired on dismiss (× or auto-close)
+   * @property {() => void}          [onclose]
    * @property {import('svelte').Snippet} [children]
    */
 

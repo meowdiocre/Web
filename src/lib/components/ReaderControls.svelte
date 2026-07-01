@@ -3,10 +3,10 @@
   import { STORAGE_KEYS } from '$lib/config/site.js';
 
   /**
-   * ReaderControls — sticky right-edge panel for /article: paper theme
-   * (cream/slate) + reading size (S/M/L). Both settings persist to
-   * localStorage and are mirrored to body/html so the article page's
-   * CSS variables can swap.
+   * ReaderControls — sticky right-edge panel for /article. Theme
+   * (cream/slate) + reading size (S/M/L). Both persist to localStorage
+   * and mirror onto `body[data-theme]` / `--read-size` so the article
+   * page's CSS variables can swap.
    */
 
   const SIZES        = ['16px', '18px', '20px'];

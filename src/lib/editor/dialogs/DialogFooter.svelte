@@ -1,36 +1,19 @@
 <!--
-  DialogFooter — shared cancel | [delete] | confirm action row for
-  every atom-authoring dialog (Link, Code, PullQuote, Sidenote, EndSlug).
-
-  Used inside a Modal's `{#snippet footer()}` slot:
-
-  ```svelte
-  <Modal {open} {onclose} title="…">
-    <form>…</form>
-    {#snippet footer()}
-      <DialogFooter
-        mode={dialogMode}
-        canSubmit={!!text.trim()}
-        onCancel={onclose}
-        onRemove={onremove}
-        onSubmit={apply}
-      />
-    {/snippet}
-  </Modal>
-  ```
+  DialogFooter — shared cancel | [delete] | confirm action row for the
+  atom-authoring dialogs. Goes inside a Modal's `{#snippet footer()}` slot.
 -->
 <script>
   /**
    * @typedef {Object} Props
    * @property {'insert'|'edit'}      [mode]          drives the confirm label
-   * @property {string}               [insertLabel]   override 'insert'
-   * @property {string}               [saveLabel]     override 'save'
-   * @property {string}               [removeLabel]   override 'delete'
-   * @property {string}               [cancelLabel]   override 'cancel'
+   * @property {string}               [insertLabel]
+   * @property {string}               [saveLabel]
+   * @property {string}               [removeLabel]
+   * @property {string}               [cancelLabel]
    * @property {boolean}              [canSubmit]     gates the confirm button
    * @property {() => void}           onCancel
    * @property {() => void}           onSubmit
-   * @property {() => void}           [onRemove]      shown only when mode==='edit'
+   * @property {() => void}           [onRemove]      shown only when mode === 'edit'
    */
 
   /** @type {Props} */

@@ -1,13 +1,12 @@
 <script>
   /**
-   * ArticleHead — head block for /article: breadcrumb, kicker chip,
-   * italic h1 with em emphasis, dek, and a mono meta row above the
-   * essay body.
+   * ArticleHead — breadcrumb, kicker chip, italic h1 with em emphasis,
+   * dek, and mono meta row above the essay body.
    *
    * @typedef {Object} TitleParts
-   * @property {string} pre    leading words ('Devirtualizing ')
-   * @property {string} em     italicised emphasis ('VMProtect 3.x')
-   * @property {string} post   trailing words (' without a VM.')
+   * @property {string} pre    leading words
+   * @property {string} em     italicised emphasis
+   * @property {string} post   trailing words
    *
    * @typedef {Object} Meta
    * @property {string} author

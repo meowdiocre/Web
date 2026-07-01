@@ -12,23 +12,21 @@
   import SidenoteDialog  from '$lib/editor/dialogs/SidenoteDialog.svelte';
   import EndSlugDialog   from '$lib/editor/dialogs/EndSlugDialog.svelte';
 
-  /* -----------------------------------------------------------------
-   * Types
-   * --------------------------------------------------------------- */
+  import { mergeRehighlightedHtml } from '$lib/editor/merge-rehighlight.js';
+
+  /* Types */
 
   /** @typedef {import('@tiptap/core').Editor} TiptapEditor */
   /** @typedef {{ source: string; lang: string; caption: string }} CodeAttrs */
   /** @typedef {{ ref: string; bodyHtml: string }} SidenoteAttrs */
-  /** @typedef {null | 'link' | 'codeBlock' | 'pullQuote' | 'sidenote' | 'endSlug'} DialogName */
+  /** @typedef {'link'|'codeBlock'|'pullQuote'|'sidenote'|'endSlug'} DialogName */
   /** @typedef {{ tag: string; glyph: string; message: string }} ToastPayload */
 
   /** @type {{ data: { post: any } }} */
   let { data } = $props();
   const post = $derived(data.post);
 
-  /* -----------------------------------------------------------------
-   * Editor state
-   * --------------------------------------------------------------- */
+  /* Editor state */
 
   /** @type {HTMLDivElement|undefined} */
   let canvas = $state();
@@ -40,9 +38,7 @@
   let wordCount = $state(0);
   let charCount = $state(0);
 
-  /* -----------------------------------------------------------------
-   * Save state (autosave + Ctrl-S)
-   * --------------------------------------------------------------- */
+  /* Save state (autosave + Ctrl-S) */
 
   const AUTOSAVE_MS = 3000;
 
@@ -51,11 +47,21 @@
   let lastSavedAt = $state(/** @type {Date|null} */(null));
   let saveError   = $state(/** @type {string|null} */(null));
 
+  /** Coalesce a follow-up save that arrives while one is in flight. */
+  let pendingSave = false;
+
+  /** Set during the rehighlight merge so onUpdate doesn't treat the
+   *  synthetic transaction as a user edit (would re-schedule autosave
+   *  and loop forever). */
+  let suppressNextUpdate = false;
+
   /** @type {ReturnType<typeof setTimeout>|null} */
   let saveTimer = null;
 
   async function save() {
     if (!editor) return;
+    if (saving) { pendingSave = true; return; }
+
     saving = true;
     saveError = null;
     try {
@@ -68,12 +74,19 @@
         saveError = `${res.status} ${(await res.text()).slice(0, 180)}`.trim();
         return;
       }
+      try {
+        const body = await res.json();
+        if (body?.doc && mergeRehighlightedHtml(editor, body.doc)) {
+          suppressNextUpdate = true;
+        }
+      } catch {/* tolerate missing/non-JSON body */}
       lastSavedAt = new Date();
       dirty = false;
     } catch (err) {
       saveError = (err instanceof Error ? err.message : String(err)).slice(0, 200);
     } finally {
       saving = false;
+      if (pendingSave) { pendingSave = false; save(); }
     }
   }
 
@@ -88,40 +101,96 @@
     save();
   }
 
-  /* -----------------------------------------------------------------
-   * Dialog state
-   * --------------------------------------------------------------- */
+  /* Dialog plumbing
+   * --------------
+   * One spec per dialog so adding a new atom means adding one entry.
+   * `read(node)` collects initial state from the selected node (or null
+   * for marks like 'link'). `apply(value, mode)` writes back via the
+   * editor's command API.
+   */
 
-  /** @type {DialogName} */                 let dialog          = $state(null);
-  /** @type {'insert'|'edit'} */             let dialogMode      = $state('insert');
-  /** @type {string} */                      let linkInitial     = $state('');
-  /** @type {CodeAttrs} */                   let codeInitial     = $state({ source: '', lang: 'plaintext', caption: '' });
-  /** @type {string} */                      let pullInitial     = $state('');
-  /** @type {SidenoteAttrs} */               let sidenoteInitial = $state({ ref: '¹', bodyHtml: '' });
-  /** @type {string} */                      let endInitial      = $state('· · ·');
+  /** @type {DialogName|null} */
+  let dialog        = $state(null);
+  /** @type {'insert'|'edit'} */
+  let dialogMode    = $state('insert');
+  /** @type {any} */
+  let dialogInitial = $state(null);
 
-  const closeDialog = () => (dialog = null);
+  /**
+   * @typedef {Object} DialogSpec
+   * @property {string|null}                   nodeType   ProseMirror node name, or null for marks
+   * @property {() => any}                     defaults   factory for fresh "insert" state
+   * @property {(node: any) => any}            read       extract state from an existing node
+   * @property {(value: any, mode: 'insert'|'edit') => void} apply
+   */
 
-  /* -----------------------------------------------------------------
-   * Toast (image upload + general feedback)
-   * --------------------------------------------------------------- */
-
-  /** @type {ToastPayload|null} */
-  let toast = $state(null);
-
-  /** @param {string} message  @param {string} [tag]  @param {string} [glyph] */
-  const notify = (message, tag = 'tip', glyph = '∅') => { toast = { tag, glyph, message }; };
-
-  /* -----------------------------------------------------------------
-   * Selection helpers
-   * --------------------------------------------------------------- */
+  /** @type {Record<DialogName, DialogSpec>} */
+  const DIALOG_SPECS = {
+    link: {
+      nodeType: null,
+      defaults: () => '',
+      read:     () => editor?.getAttributes('link')?.href ?? '',
+      apply: (href) => {
+        if (!editor) return;
+        const chain = editor.chain().focus().extendMarkRange('link');
+        if (href) chain.setLink({ href }).run();
+        else      chain.unsetLink().run();
+      }
+    },
+    codeBlock: {
+      nodeType: 'codeBlock',
+      defaults: () => ({ source: '', lang: 'plaintext', caption: '' }),
+      read: (n) => ({
+        source:  n.attrs.source  ?? '',
+        lang:    n.attrs.lang    ?? 'plaintext',
+        caption: n.attrs.caption ?? ''
+      }),
+      apply: (attrs, mode) => {
+        const c = editor?.chain().focus();
+        mode === 'edit'
+          ? c?.updateSelectedCodeBlock(attrs).run()
+          : c?.insertCodeBlock(attrs).run();
+      }
+    },
+    pullQuote: {
+      nodeType: 'pullQuote',
+      defaults: () => '',
+      read:     (n) => n.attrs.text ?? '',
+      apply: (text, mode) => {
+        const c = editor?.chain().focus();
+        mode === 'edit'
+          ? c?.updateSelectedPullQuote(text).run()
+          : c?.insertPullQuote(text).run();
+      }
+    },
+    sidenote: {
+      nodeType: 'sidenote',
+      defaults: () => ({ ref: '¹', bodyHtml: '' }),
+      read: (n) => ({ ref: n.attrs.ref ?? '¹', bodyHtml: n.attrs.bodyHtml ?? '' }),
+      apply: (attrs, mode) => {
+        const c = editor?.chain().focus();
+        mode === 'edit'
+          ? c?.updateSelectedSidenote(attrs).run()
+          : c?.insertSidenote(attrs).run();
+      }
+    },
+    endSlug: {
+      nodeType: 'endSlug',
+      defaults: () => '· · ·',
+      read:     (n) => n.attrs.text ?? '· · ·',
+      apply: (text, mode) => {
+        const c = editor?.chain().focus();
+        mode === 'edit'
+          ? c?.updateSelectedEndSlug(text).run()
+          : c?.insertEndSlug(text).run();
+      }
+    }
+  };
 
   /**
    * Return the node + position when the current selection is inside (or
-   * is) a node of the given type — block-atoms expose it as the next
-   * node from `$from`, inline atoms expose it as `selection.node` on a
-   * NodeSelection.
-   *
+   * is) a node of the given type. Block atoms expose it as `$from.nodeAfter`;
+   * inline atoms expose it as `selection.node` on a NodeSelection.
    * @param {string} type
    */
   function selectedNode(type) {
@@ -138,98 +207,25 @@
     return null;
   }
 
-  /* -----------------------------------------------------------------
-   * Atom-dialog openers — pre-fill from the current selection when
-   * the cursor is on an existing atom; otherwise open in 'insert' mode.
-   * --------------------------------------------------------------- */
-
-  function openLink() {
+  /** @param {DialogName} name */
+  function openDialog(name) {
     if (!editor) return;
-    linkInitial = editor.getAttributes('link')?.href ?? '';
-    dialog = 'link';
-  }
-
-  function openCode() {
-    const sel = selectedNode('codeBlock');
-    if (sel) {
-      dialogMode = 'edit';
-      codeInitial = {
-        source:  sel.node.attrs.source  ?? '',
-        lang:    sel.node.attrs.lang    ?? 'plaintext',
-        caption: sel.node.attrs.caption ?? ''
-      };
+    const spec = DIALOG_SPECS[name];
+    if (spec.nodeType) {
+      const sel = selectedNode(spec.nodeType);
+      dialogMode    = sel ? 'edit' : 'insert';
+      dialogInitial = sel ? spec.read(sel.node) : spec.defaults();
     } else {
-      dialogMode = 'insert';
-      codeInitial = { source: '', lang: 'plaintext', caption: '' };
+      dialogMode    = 'insert';
+      dialogInitial = spec.read(null);
     }
-    dialog = 'codeBlock';
+    dialog = name;
   }
 
-  function openPull() {
-    const sel = selectedNode('pullQuote');
-    dialogMode  = sel ? 'edit' : 'insert';
-    pullInitial = sel ? (sel.node.attrs.text ?? '') : '';
-    dialog = 'pullQuote';
-  }
-
-  function openSidenote() {
-    const sel = selectedNode('sidenote');
-    dialogMode = sel ? 'edit' : 'insert';
-    sidenoteInitial = sel
-      ? { ref: sel.node.attrs.ref ?? '¹', bodyHtml: sel.node.attrs.bodyHtml ?? '' }
-      : { ref: '¹', bodyHtml: '' };
-    dialog = 'sidenote';
-  }
-
-  function openEnd() {
-    const sel = selectedNode('endSlug');
-    dialogMode = sel ? 'edit' : 'insert';
-    endInitial = sel ? (sel.node.attrs.text ?? '· · ·') : '· · ·';
-    dialog = 'endSlug';
-  }
-
-  /* -----------------------------------------------------------------
-   * Apply / remove
-   * --------------------------------------------------------------- */
-
-  /** @param {string|null} href */
-  function applyLink(href) {
-    if (!editor) return;
-    const chain = editor.chain().focus().extendMarkRange('link');
-    if (href) chain.setLink({ href }).run();
-    else      chain.unsetLink().run();
-    closeDialog();
-  }
-
-  /** @param {CodeAttrs} attrs */
-  function applyCode(attrs) {
-    if (!editor) return;
-    if (dialogMode === 'edit') editor.chain().focus().updateSelectedCodeBlock(attrs).run();
-    else                       editor.chain().focus().insertCodeBlock(attrs).run();
-    closeDialog();
-  }
-
-  /** @param {string} text */
-  function applyPull(text) {
-    if (!editor) return;
-    if (dialogMode === 'edit') editor.chain().focus().updateSelectedPullQuote(text).run();
-    else                       editor.chain().focus().insertPullQuote(text).run();
-    closeDialog();
-  }
-
-  /** @param {SidenoteAttrs} attrs */
-  function applySidenote(attrs) {
-    if (!editor) return;
-    if (dialogMode === 'edit') editor.chain().focus().updateSelectedSidenote(attrs).run();
-    else                       editor.chain().focus().insertSidenote(attrs).run();
-    closeDialog();
-  }
-
-  /** @param {string} text */
-  function applyEnd(text) {
-    if (!editor) return;
-    if (dialogMode === 'edit') editor.chain().focus().updateSelectedEndSlug(text).run();
-    else                       editor.chain().focus().insertEndSlug(text).run();
+  /** @param {any} value */
+  function applyDialog(value) {
+    if (!dialog) return;
+    DIALOG_SPECS[dialog].apply(value, dialogMode);
     closeDialog();
   }
 
@@ -238,24 +234,30 @@
     closeDialog();
   }
 
-  /* -----------------------------------------------------------------
-   * Keyboard shortcuts
-   * --------------------------------------------------------------- */
+  const closeDialog = () => (dialog = null);
+
+  /* Toast (image upload + general feedback) */
+
+  /** @type {ToastPayload|null} */
+  let toast = $state(null);
+
+  /** @param {string} message  @param {string} [tag]  @param {string} [glyph] */
+  const notify = (message, tag = 'tip', glyph = '∅') => { toast = { tag, glyph, message }; };
+
+  /* Keyboard shortcuts */
 
   /** @param {KeyboardEvent} e */
   function onKey(e) {
     const mod = e.ctrlKey || e.metaKey;
     if (!mod) return;
     const k = e.key.toLowerCase();
-    if (k === 's')                     { e.preventDefault(); saveNow(); }
-    else if (k === 'k' && !e.shiftKey) { e.preventDefault(); openLink(); }
-    else if (k === 'k' &&  e.shiftKey) { e.preventDefault(); openCode(); }
-    else if (k === 'q' &&  e.shiftKey) { e.preventDefault(); openPull(); }
+    if      (k === 's')                { e.preventDefault(); saveNow(); }
+    else if (k === 'k' && !e.shiftKey) { e.preventDefault(); openDialog('link'); }
+    else if (k === 'k' &&  e.shiftKey) { e.preventDefault(); openDialog('codeBlock'); }
+    else if (k === 'q' &&  e.shiftKey) { e.preventDefault(); openDialog('pullQuote'); }
   }
 
-  /* -----------------------------------------------------------------
-   * Editor lifecycle
-   * --------------------------------------------------------------- */
+  /* Editor lifecycle */
 
   function recomputeStats() {
     if (!editor) { wordCount = 0; charCount = 0; return; }
@@ -274,11 +276,16 @@
     editor = createEditor({
       element:  canvas,
       content:  initialDoc,
-      onUpdate: () => { scheduleSave(); editorTick++; recomputeStats(); },
+      onUpdate: () => {
+        if (suppressNextUpdate) { suppressNextUpdate = false; return; }
+        scheduleSave();
+        editorTick++;
+        recomputeStats();
+      },
       onImageStatus(s) {
-        if (s.kind === 'uploading')      notify(`uploading ${s.file.name}…`, 'upload', '∅');
-        else if (s.kind === 'uploaded')  notify(`${s.file.name} uploaded`,   'upload', '∅');
-        else                              notify(`upload failed: ${s.reason}`, 'error',  '!!');
+        if (s.kind === 'uploading')     notify(`uploading ${s.file.name}…`,    'upload', '∅');
+        else if (s.kind === 'uploaded') notify(`${s.file.name} uploaded`,      'upload', '∅');
+        else                            notify(`upload failed: ${s.reason}`,   'error',  '!!');
       }
     });
 
@@ -292,12 +299,19 @@
     if (saveTimer) clearTimeout(saveTimer);
     editor?.destroy();
   });
+
+  /* Toolbar callbacks — thin wrappers so the toolbar API stays simple. */
+  const openLink     = () => openDialog('link');
+  const openCode     = () => openDialog('codeBlock');
+  const openPull     = () => openDialog('pullQuote');
+  const openSidenote = () => openDialog('sidenote');
+  const openEnd      = () => openDialog('endSlug');
 </script>
 
 <svelte:window onkeydown={onKey} />
 <svelte:head><title>Edit — {post.titlePre}{post.titleEm}{post.titlePost}</title></svelte:head>
 
-<!-- ===== Header ============================================ -->
+<!-- Header -->
 <header class="flex items-baseline justify-between flex-wrap gap-x-6 gap-y-3 mb-4">
   <div class="min-w-0">
     <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-muted-warm mb-1 truncate">
@@ -339,19 +353,24 @@
   autosaveSeconds={AUTOSAVE_MS / 1000}
 />
 
-<!-- ===== Dialogs =========================================== -->
+<!-- Dialogs.
+     Each dialog only reads its `initial*` prop while `open=true`, but we
+     still guard each prop with the discriminant so the values stay
+     type-correct and svelte-check is happy. -->
 <LinkDialog
   open={dialog === 'link'}
-  initialHref={linkInitial}
-  onsubmit={applyLink}
+  initialHref={dialog === 'link' ? /** @type {string} */ (dialogInitial) : ''}
+  onsubmit={applyDialog}
   onclose={closeDialog}
 />
 
 <CodeBlockDialog
   open={dialog === 'codeBlock'}
   mode={dialogMode}
-  initial={codeInitial}
-  onsubmit={applyCode}
+  initial={dialog === 'codeBlock'
+    ? /** @type {CodeAttrs} */ (dialogInitial)
+    : { source: '', lang: 'plaintext', caption: '' }}
+  onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
 />
@@ -359,8 +378,8 @@
 <PullQuoteDialog
   open={dialog === 'pullQuote'}
   mode={dialogMode}
-  initialText={pullInitial}
-  onsubmit={applyPull}
+  initialText={dialog === 'pullQuote' ? /** @type {string} */ (dialogInitial) : ''}
+  onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
 />
@@ -368,8 +387,10 @@
 <SidenoteDialog
   open={dialog === 'sidenote'}
   mode={dialogMode}
-  initial={sidenoteInitial}
-  onsubmit={applySidenote}
+  initial={dialog === 'sidenote'
+    ? /** @type {SidenoteAttrs} */ (dialogInitial)
+    : { ref: '¹', bodyHtml: '' }}
+  onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
 />
@@ -377,8 +398,8 @@
 <EndSlugDialog
   open={dialog === 'endSlug'}
   mode={dialogMode}
-  initialText={endInitial}
-  onsubmit={applyEnd}
+  initialText={dialog === 'endSlug' ? /** @type {string} */ (dialogInitial) : '· · ·'}
+  onsubmit={applyDialog}
   onremove={deleteSelectedNode}
   onclose={closeDialog}
 />

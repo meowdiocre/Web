@@ -1,20 +1,18 @@
 /**
- * High-level query helpers around the `posts` and `categories` tables.
- * Imported by SvelteKit `+page.server.js` files and the admin actions.
+ * Public query helpers around the `posts` and `categories` tables.
+ * Consumed by SvelteKit `+page.server.js` loads and the feed handler.
  */
 
-import { and, asc, desc, eq, lte, ne, or, sql } from 'drizzle-orm';
+import { and, desc, eq, lte, ne } from 'drizzle-orm';
 import { db } from './client';
 import { posts, categories } from './schema';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/** Format a Date as `Mar 14`. */
 function shortDate(d: Date): string {
   return `${MONTH_SHORT[d.getUTCMonth()]} ${String(d.getUTCDate()).padStart(1, '0')}`;
 }
 
-/** Format a Date as `2026 · 03 · 14`. */
 function metaDate(d: Date): string {
   const y = d.getUTCFullYear();
   const m = String(d.getUTCMonth() + 1).padStart(2, '0');
@@ -24,10 +22,10 @@ function metaDate(d: Date): string {
 
 export interface PublicEntry {
   href:     string;
-  date:     string;      // "Mar 14"
+  date:     string;
   title:    string;
   desc:     string;
-  category: string;      // human label
+  category: string;
   readTime: string;
 }
 
@@ -36,7 +34,7 @@ export interface EntryGroup {
   entries: PublicEntry[];
 }
 
-/** Load all published posts, grouped by published-year (descending). */
+/** Published posts grouped by year, newest year first. */
 export async function loadPublicEntries(): Promise<EntryGroup[]> {
   const rows = await db
     .select({
@@ -56,8 +54,8 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
 
   const byYear = new Map<number, PublicEntry[]>();
   for (const r of rows) {
-    const when = r.publishedAt ?? new Date(0);
-    const year = when.getUTCFullYear();
+    const when  = r.publishedAt ?? new Date(0);
+    const year  = when.getUTCFullYear();
     const entry: PublicEntry = {
       href:     `/article/${r.slug}`,
       date:     shortDate(when),
@@ -85,15 +83,17 @@ export interface PublicArticle {
   };
   bodyHtml:  string;
   footnotes: Array<{ html: string }>;
-  category:  string;      // category slug, for "related" query
+  category:  string;
 }
 
 /**
- * Look up one post by slug. Returns null if missing.
- * By default also returns null for unpublished posts; pass
- * `{ allowDraft: true }` to bypass that filter for signed previews.
+ * Load one post by slug. Returns null if missing or unpublished;
+ * pass `{ allowDraft: true }` to bypass the status filter (signed previews).
  */
-export async function loadPublicArticle(slug: string, opts: { allowDraft?: boolean } = {}): Promise<PublicArticle | null> {
+export async function loadPublicArticle(
+  slug: string,
+  opts: { allowDraft?: boolean } = {}
+): Promise<PublicArticle | null> {
   const rows = await db
     .select({
       slug:        posts.slug,
@@ -123,7 +123,7 @@ export async function loadPublicArticle(slug: string, opts: { allowDraft?: boole
   const fns  = Array.isArray(r.footnotes) ? r.footnotes as Array<{ html: string }> : [];
 
   return {
-    slug:     r.slug,
+    slug: r.slug,
     head: {
       category: r.categoryLabel ?? r.category,
       title:    { pre: r.titlePre, em: r.titleEm, post: r.titlePost },
@@ -136,7 +136,7 @@ export async function loadPublicArticle(slug: string, opts: { allowDraft?: boole
   };
 }
 
-/** "Same category, newest first, skipping the current slug, capped at 3". */
+/** Up to 3 same-category posts, newest first, excluding the given slug. */
 export async function loadRelated(slug: string, categorySlug: string) {
   const rows = await db
     .select({
@@ -188,7 +188,7 @@ export async function loadFeedPosts(limit = 20) {
     .limit(limit);
 }
 
-/** Posts due for scheduled publish (Task 11 cron). */
+/** Drafts whose `publishAt` is due — consumed by the publish cron. */
 export async function loadDuePosts(now: Date) {
   return db
     .select()

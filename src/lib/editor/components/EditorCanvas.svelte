@@ -1,24 +1,19 @@
 <!--
-  EditorCanvas — paper canvas the Tiptap editor mounts into. Owns:
+  EditorCanvas — paper canvas the TipTap editor mounts into. Owns the
+  bleed-past-the-gutter `.paper-wrap` chrome and the ProseMirror
+  styling that mirrors the public Essay component (drop cap, headings,
+  code blocks, pull quotes, sidenote chip, end-slug).
 
-    - The bleed-past-the-gutter `.paper-wrap` chrome (cream theme
-      via data-page="article" → app.css variables).
-    - All ~150 lines of ProseMirror styling that mirrors the public
-      Essay component (drop cap, headings, code blocks, pull quotes,
-      sidenote chip, end-slug …).
-    - Exposes `element` via `$bindable()` so the page can mount the
-      Tiptap Editor into it:
+  Exposes `element` via `$bindable()` so the page can mount TipTap into it:
 
   ```svelte
   <EditorCanvas bind:element={canvas} />
   ```
-
-  Tiptap then attaches a `.ProseMirror` div as a child of the canvas.
 -->
 <script>
   /**
    * @typedef {Object} Props
-   * @property {HTMLDivElement} [element]    $bindable mount target
+   * @property {HTMLDivElement} [element]   $bindable mount target
    */
 
   /** @type {Props} */
@@ -63,7 +58,22 @@
     text-wrap: pretty;
     hyphens: auto;
   }
-  .canvas :global(p:first-child::first-letter),
+
+  .canvas :global(ul),
+  .canvas :global(ol) {
+    padding-left: 1.6em;
+    list-style-position: outside;
+  }
+  .canvas :global(ul)       { list-style-type: disc; }
+  .canvas :global(ul ul)    { list-style-type: circle; }
+  .canvas :global(ul ul ul) { list-style-type: square; }
+  .canvas :global(ol)       { list-style-type: decimal; }
+  .canvas :global(ol ol)    { list-style-type: lower-alpha; }
+  .canvas :global(ol ol ol) { list-style-type: lower-roman; }
+  .canvas :global(li)       { margin-bottom: 6px; }
+  /* TipTap wraps each <li>'s content in a <p>; collapse the default
+     margin so list items don't gain a blank line above each row. */
+  .canvas :global(li > p) { margin: 0; }
   .canvas :global(.ProseMirror > p:first-of-type::first-letter) {
     font-family: var(--font-display);
     font-size: 4em;
@@ -121,6 +131,20 @@
   .canvas :global(.str) { color: var(--code-str); }
   .canvas :global(.com) { color: var(--code-com); font-style: italic; }
   .canvas :global(.num) { color: var(--code-num); }
+
+  /* codeBlock NodeView wrapper. `display: contents` lifts the inner
+     <pre> + <span.figure-cap> out of the wrapper so they act as siblings
+     under .ProseMirror — same flow as the public Essay component. */
+  .canvas :global(.cb-view) { display: contents; }
+  .canvas :global(.figure-cap) {
+    display: block;
+    margin: -16px 0 28px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+    text-transform: uppercase;
+  }
 
   .canvas :global(blockquote.pull) {
     margin: 36px 0;

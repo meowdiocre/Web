@@ -1,13 +1,10 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
 /**
- * sidenote — inline atom that round-trips through tiptap-to-html as
- *
- *   <span class="sidenote-ref">¹</span><span class="sidenote">¹ body…</span>
- *
- * In the editor it appears as a single inline chip so the cursor moves
- * over it like a single character. Toolbar opens a dialog that supplies
- * the attrs.
+ * sidenote — inline atom. Round-trips through tiptap-to-html as a pair:
+ *   `<span class="sidenote-ref">¹</span><span class="sidenote">¹ body</span>`
+ * In the editor it appears as a single chip so the cursor moves over it
+ * like one character.
  */
 export const Sidenote = Node.create({
   name: 'sidenote',
@@ -39,13 +36,11 @@ export const Sidenote = Node.create({
   },
 
   renderHTML({ HTMLAttributes, node }) {
-    // Editor side: render a SINGLE compact chip; server emits the twin-
-    // span shape from tiptap-to-html.ts.
     const ref = node.attrs.ref ?? '';
     return ['span',
       mergeAttributes(HTMLAttributes, {
-        class: 'sidenote-chip',
-        title: stripTags(node.attrs.bodyHtml ?? ''),
+        class:       'sidenote-chip',
+        title:       stripTags(node.attrs.bodyHtml ?? ''),
         'data-ref':  ref,
         'data-body': node.attrs.bodyHtml ?? ''
       }),

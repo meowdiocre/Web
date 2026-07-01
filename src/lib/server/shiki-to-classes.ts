@@ -1,17 +1,14 @@
 /**
- * shiki-to-classes.ts -- server-side syntax highlighting that emits the
- * existing `<span class="kw|fn|str|com|num">` markup CodeBlock.svelte
- * already styles. This lets us swap Shiki in without changing a single
- * line of public CSS.
+ * Server-side syntax highlighting. Maps Shiki TextMate scopes onto the
+ * fixed class set the public CSS already styles:
  *
- * We bucket Shiki's TextMate token scopes into five buckets:
- *   kw  - keyword.*, storage.*, support.type.*, support.class.*
- *   fn  - entity.name.function.*, support.function.*
- *   str - string.*, constant.character.*
- *   com - comment.*
- *   num - constant.numeric.*, constant.language.*
+ *   kw  — keyword.*, storage.*, support.type.*, support.class.*
+ *   fn  — entity.name.function.*, support.function.*, variable.function.*
+ *   str — string.*, constant.character.*
+ *   com — comment.*
+ *   num — constant.numeric.*, constant.language.*
  *
- * Anything else is emitted as a plain (unspanned) text node.
+ * Anything else is emitted as plain (unspanned) escaped text.
  */
 
 import type { BundledLanguage, ThemedToken } from 'shiki';
@@ -24,7 +21,7 @@ function getHighlighter(): Promise<Highlighter> {
   if (_hl) return _hl;
   _hl = createHighlighter({
     themes: ['github-light'],
-    langs: SAFE_LANGS.filter((l) => l !== 'plaintext')
+    langs:  SAFE_LANGS.filter((l) => l !== 'plaintext')
   }) as unknown as Promise<Highlighter>;
   return _hl;
 }
@@ -37,25 +34,22 @@ function escapeHtml(s: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function classFor(scopes: string[] | undefined, fallback: string): string | null {
+function classFor(scopes: string[] | undefined, _fallback: string): string | null {
   if (!scopes) return null;
   const s = scopes.join(' ');
-  if (/\bcomment\b/.test(s))                                            return 'com';
-  if (/\bconstant\.numeric\b|\bconstant\.language\b/.test(s))           return 'num';
-  if (/\bstring\b|\bconstant\.character\b/.test(s))                     return 'str';
-  if (/\bentity\.name\.function\b|\bsupport\.function\b/.test(s))       return 'fn';
+  if (/\bcomment\b/.test(s))                                                  return 'com';
+  if (/\bconstant\.numeric\b|\bconstant\.language\b/.test(s))                 return 'num';
+  if (/\bstring\b|\bconstant\.character\b/.test(s))                           return 'str';
+  if (/\bentity\.name\.function\b|\bsupport\.function\b/.test(s))             return 'fn';
   if (/\bkeyword\b|\bstorage\b|\bsupport\.type\b|\bsupport\.class\b/.test(s)) return 'kw';
-  // explicit fallback for token roles we recognise as "function-like".
-  if (/\bvariable\.function\b/.test(s)) return 'fn';
+  if (/\bvariable\.function\b/.test(s))                                       return 'fn';
   return null;
 }
 
 /**
- * Highlight `source` as `lang`. Returns HTML safe for direct
- * `{@html}` injection inside CodeBlock.svelte's <pre><code>.
- *
- * Falls back to a plain escape when `lang === 'plaintext'` or the
- * lang isn't in our allow-list.
+ * Highlight `source` as `lang`. Returns HTML safe to splice into a
+ * <pre><code> via `{@html}`. Falls back to plain escape for plaintext
+ * or any lang not in the allow-list.
  */
 export async function highlightToClasses(source: string, lang: string): Promise<string> {
   const l = normaliseLang(lang);
@@ -69,33 +63,43 @@ export async function highlightToClasses(source: string, lang: string): Promise<
   } catch {
     return escapeHtml(source);
   }
+
   let tokens: ThemedToken[][];
   try {
-    tokens = hl.codeToTokensBase(source, { lang: l as BundledLanguage, theme: 'github-light' });
+    // `includeExplanation: 'scopeName'` populates each token with
+    // `explanation[0].scopes` so classFor() can bucket by TextMate scope.
+    // Without it, codeToTokensBase only fills colour/fontStyle metadata
+    // and every token comes out unspanned (= no syntax colour).
+    tokens = hl.codeToTokensBase(source, {
+      lang:  l as BundledLanguage,
+      theme: 'github-light',
+      includeExplanation: 'scopeName'
+    });
   } catch {
     return escapeHtml(source);
   }
 
-  const lines = tokens.map((line) => {
-    return line
+  const lines = tokens.map((line) =>
+    line
       .map((tk) => {
-        const cls = classFor((tk as any).explanation?.[0]?.scopes?.map((s: any) => s.scopeName) ?? scopesOf(tk), 'kw');
+        // A single ThemedToken may bundle several sub-spans (Shiki merges
+        // by colour). Pick the first explanation entry as representative.
+        const scopes = (tk as any).explanation?.[0]?.scopes
+          ?.map((s: any) => s.scopeName) ?? scopesOf(tk);
+        const cls = classFor(scopes, 'kw');
         const esc = escapeHtml(tk.content);
         return cls ? `<span class="${cls}">${esc}</span>` : esc;
       })
-      .join('');
-  });
+      .join('')
+  );
   return lines.join('\n');
 }
 
 function scopesOf(tk: ThemedToken): string[] {
-  // codeToTokensBase exposes scopes via `(tk as any).explanation` when
-  // includeExplanation: true, but we keep that off for perf. Fall back to
-  // the tokens' fontStyle/color-derived metadata when available.
   return ((tk as any).scopes as string[]) ?? [];
 }
 
-/** Sync, no-Shiki passthrough for the seed (which keeps existing spans). */
+/** Sync passthrough for the seed (which keeps its existing spans). */
 export function passthroughHtml(html: string): string {
   return html;
 }

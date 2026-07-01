@@ -38,10 +38,9 @@ export interface GithubUser {
   id:         number;
   login:      string;
   name?:      string | null;
-  avatar_url?:string | null;
+  avatar_url?: string | null;
 }
 
-/** Fetch the authenticated GitHub user with a freshly-issued access token. */
 export async function fetchGithubUser(accessToken: string): Promise<GithubUser> {
   const res = await fetch('https://api.github.com/user', {
     headers: {

@@ -1,7 +1,4 @@
-/**
- * Site-wide configuration. Keep all "magic strings" (brand names,
- * paths, storage keys, etc.) here so they can be changed in one place.
- */
+/** Site-wide configuration. Centralise brand strings, paths, storage keys. */
 
 export const SITE = Object.freeze({
   brand:           'meowdiocre',
@@ -19,13 +16,13 @@ export const SITE = Object.freeze({
  * @property {number} idx        tmux window index (0-based)
  * @property {string} path       SvelteKit route path
  * @property {'home'|'writing'|'about'} key   logical identifier
- * @property {string} name       window label shown in nav (`writing`)
+ * @property {string} name       window label shown in nav
  * @property {string} crumb      mobile crumb text
- * @property {string} hostPath   tmux session host suffix (`~/writing`)
+ * @property {string} hostPath   tmux session host suffix
  */
 
 /**
- * Order matters — tmux indexes 0/1/2 + n/p cycle follow this list.
+ * Declaration order drives the tmux 0/1/2 + n/p cycle.
  * @type {readonly NavWindow[]}
  */
 export const NAV_WINDOWS = Object.freeze([
@@ -34,13 +31,12 @@ export const NAV_WINDOWS = Object.freeze([
   { idx: 2, path: '/about', key: 'about',   name: 'about',   crumb: 'about',   hostPath: '~/about'   }
 ]);
 
-/** Lookup helpers — small, dependency-free, used by Nav + TmuxKeymap. */
 export function findWindowByKey(key) {
   return NAV_WINDOWS.find((w) => w.key === key) ?? NAV_WINDOWS[0];
 }
 
 export function findWindowByPath(path) {
-  // /article belongs under /blog ("writing") for navigation purposes.
+  // /article belongs under /blog ("writing") for nav purposes.
   if (path?.startsWith('/article')) return NAV_WINDOWS[1];
   return NAV_WINDOWS.find((w) => w.path === path) ?? NAV_WINDOWS[0];
 }

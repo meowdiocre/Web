@@ -149,9 +149,7 @@
   .session .at   { color: var(--color-muted); }
   .session .path { color: var(--color-rose); }
 
-  /* ============================================================
-   * Window list — desktop reverse-video for active link
-   * ============================================================ */
+  /* Window list — desktop reverse-video for active link. */
   .windows a {
     display: inline-flex; align-items: baseline;
     height: 24px; padding: 0 7px;
@@ -174,9 +172,7 @@
   .toggle[aria-expanded='true']  .glyph::before { content: '\00d7'; }
   .toggle[aria-expanded='false'] .glyph::before { content: '\2261'; }
 
-  /* ============================================================
-   * Mobile drawer — slim tmux command palette
-   * ============================================================ */
+  /* Mobile drawer — slim tmux command palette. */
   @media (max-width: 900px) {
     .windows.is-open {
       display: flex;

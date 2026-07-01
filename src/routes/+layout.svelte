@@ -5,7 +5,7 @@
 
   let { children } = $props();
 
-  /** Map current pathname → data-page key (drives bg + atmosphere). */
+  /** Map current pathname to data-page key (drives bg + atmosphere). */
   function pageKey(pathname) {
     if (pathname === '/' || pathname === '') return 'home';
     if (pathname.startsWith('/admin'))   return 'admin';
@@ -17,9 +17,9 @@
 
   let dataPage = $derived(pageKey($page.url.pathname));
 
-  // Mirror to <body> on the client so global selectors in app.css work.
-  // SSR is handled by hooks.server.js's transformPageChunk, this $effect
-  // keeps it in sync across client-side navigations.
+  // Mirror onto <body> client-side so global selectors in app.css match.
+  // SSR is handled by hooks.server.js's transformPageChunk; this effect
+  // keeps it in sync across client navigations.
   $effect(() => {
     if (typeof document !== 'undefined') {
       document.body.setAttribute('data-page', dataPage);

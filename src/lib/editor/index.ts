@@ -1,7 +1,7 @@
 /**
- * Editor factory used by /admin/posts/[id]/edit. Loads TipTap + all
- * extensions and returns a ready-to-mount Editor instance. Browser-only
- * by construction (TipTap touches `window`).
+ * Editor factory used by /admin/posts/[id]/edit. Loads TipTap with all
+ * extensions and returns a ready-to-mount Editor. Browser-only — TipTap
+ * touches `window`.
  */
 
 import { Editor } from '@tiptap/core';
@@ -9,16 +9,13 @@ import StarterKit from '@tiptap/starter-kit';
 import Link       from '@tiptap/extension-link';
 import Image      from '@tiptap/extension-image';
 
-// Custom Tiptap command typings live next to this file in
-// `commands.d.ts`. They augment the `Commands<ReturnType>` interface
-// from @tiptap/core via a `declare module` block; TypeScript picks
-// them up automatically — no runtime import needed (and indeed, .d.ts
-// files have no runtime form, so importing them would break Vite).
+// Custom command typings live in `commands.d.ts` — picked up by TS via
+// `declare module` augmentation. No runtime import: .d.ts has no JS form.
 
-import { PullQuote }   from './extensions/pull-quote';
-import { CodeBlock as CustomCodeBlock } from './extensions/code-block';
-import { Sidenote }    from './extensions/sidenote';
-import { EndSlug }     from './extensions/end-slug';
+import { PullQuote }                       from './extensions/pull-quote';
+import { CodeBlock as CustomCodeBlock }    from './extensions/code-block';
+import { Sidenote }                        from './extensions/sidenote';
+import { EndSlug }                         from './extensions/end-slug';
 import { ImageUpload, type ImageUploadStatus } from './extensions/image-upload';
 
 import type { Doc } from './types';
@@ -26,15 +23,10 @@ import type { Doc } from './types';
 export type { ImageUploadStatus };
 
 export interface CreateEditorArgs {
-  /** DOM element to mount into. */
   element:  HTMLElement;
-  /** Initial document content. */
   content?: Doc;
-  /** Fired whenever the user edits. */
   onUpdate?: (doc: Doc) => void;
-  /** Fired when the editor regains focus. */
   onFocus?: () => void;
-  /** Drag/drop/paste image upload progress. */
   onImageStatus?: (status: ImageUploadStatus) => void;
 }
 
@@ -49,8 +41,8 @@ export function createEditor({
     element,
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // replaced by our custom one
-        heading:  { levels: [2, 3] }
+        codeBlock: false,                  // replaced by our custom node
+        heading:   { levels: [2, 3] }
       }),
       Link.configure({
         openOnClick: false,

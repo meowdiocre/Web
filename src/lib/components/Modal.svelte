@@ -95,17 +95,29 @@
 </dialog>
 
 <style>
-  /* The dialog itself is the backdrop trigger surface. */
+  /* The UA centres modal dialogs via `inset: 0; margin: auto` on a
+     fit-content-sized dialog, but Tailwind v4's preflight zeroes
+     margin, and our `width: 100%` makes the layout over-constrained
+     so auto margins collapse to 0. Pin via fixed + transform instead —
+     deterministic regardless of UA defaults or framework resets. */
   .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    margin: 0;
+    transform: translate(-50%, -50%);
+
     padding: 0;
     border: 0;
     background: transparent;
     color: var(--color-paper);
-    max-width: min(640px, calc(100vw - 32px));
-    width: 100%;
+    width: min(640px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
   }
-  .modal--sm { max-width: min(420px, calc(100vw - 32px)); }
-  .modal--lg { max-width: min(820px, calc(100vw - 32px)); }
+  .modal--sm { width: min(420px, calc(100vw - 32px)); }
+  .modal--lg { width: min(820px, calc(100vw - 32px)); }
 
   .modal::backdrop {
     background: rgb(0 0 0 / 0.55);
@@ -194,8 +206,10 @@
   }
 
   @media (max-width: 520px) {
-    .modal { max-width: calc(100vw - 16px); }
-    .panel { max-height: calc(100vh - 16px); }
+    .modal      { width: calc(100vw - 16px); }
+    .modal--sm  { width: calc(100vw - 16px); }
+    .modal--lg  { width: calc(100vw - 16px); }
+    .panel      { max-height: calc(100vh - 16px); }
   }
   @media (prefers-reduced-motion: reduce) {
     .modal::backdrop { backdrop-filter: none; }

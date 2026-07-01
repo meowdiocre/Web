@@ -1,25 +1,10 @@
 <!--
-  Field — unified form field for the admin forms.
-
-  Wraps the `.field` / `.lbl` / `.inp` markup so every admin form gets
-  the same label-on-top layout, the same focus ring, and the same
-  consistent textarea/select/datetime variants without re-typing the
-  boilerplate.
+  Field — unified form field for admin forms. Wraps `.field` / `.lbl` /
+  `.inp` markup so every form gets the same label-on-top layout and
+  consistent input/textarea/select/datetime variants.
 
   Inputs are uncontrolled (plain `name` + `value`) because SvelteKit's
-  form actions read FormData straight off the submitted form — no JS
-  binding required.
-
-  ```svelte
-  <Field name="slug" label="slug" value={p.slug} required />
-  <Field name="dek"  label="dek (subtitle)" kind="textarea" rows={3} value={p.dek} />
-  <Field name="category" label="category" kind="select" required>
-    {#each categories as c}
-      <option value={c.slug} selected={c.slug === current}>{c.label}</option>
-    {/each}
-  </Field>
-  <Field name="publishAt" label="publish at (UTC)" kind="datetime" value={…} />
-  ```
+  form actions read FormData straight off the submitted form.
 -->
 <script>
   /**
@@ -29,7 +14,7 @@
    * @property {string}                    name
    * @property {string}                    label
    * @property {string}                    [value]
-   * @property {FieldKind}                 [kind]         default 'input'
+   * @property {FieldKind}                 [kind]
    * @property {string}                    [type]         <input type> when kind='input'
    * @property {number}                    [rows]         <textarea rows>
    * @property {boolean}                   [required]

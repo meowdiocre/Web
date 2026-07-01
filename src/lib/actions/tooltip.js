@@ -1,23 +1,16 @@
 /**
- * tooltip — Svelte action that replaces the native browser `title`
- * tooltip with a single styled floating one shared across all triggers.
+ * tooltip — Svelte action that replaces the native browser tooltip with
+ * a single styled floating one shared across all triggers.
  *
- * Usage:
- *   <button use:tooltip={'Bold · Ctrl+B'}>B</button>
+ * Usage: `<button use:tooltip={'Bold · Ctrl+B'}>B</button>`
  *
- * Behaviour:
- *   - Suppresses the native title attribute (removes it from the node).
- *   - Mirrors the label as `aria-label` when one isn't already set, so
- *     assistive tech still announces it.
- *   - Shows on `mouseenter` / `focus` after SHOW_DELAY_MS; hides on
- *     `mouseleave` / `blur` after a short HIDE_DELAY_MS.
- *   - Closes on Escape and on `scroll` (kept anchored, but cheap to hide).
- *   - One singleton DOM node is appended on first use, reused thereafter.
- *   - Placement: prefer above the trigger, flip below if there isn't room.
- *     Clamped to the viewport with an 8px gutter.
+ * - Removes the native `title` attribute so it doesn't double-show.
+ * - Mirrors the label as `aria-label` when one isn't already set.
+ * - Show/hide on hover + focus, with `Escape` and scroll dismissal.
+ * - One singleton DOM node appended on first use, reused thereafter.
+ * - Placement: above the trigger; flip below if the gutter runs out.
  *
- * Styling lives in src/app.css under `.tooltip` (so the action stays
- * portable and themable).
+ * Styling lives in app.css under `.tooltip` so the action stays portable.
  *
  * @typedef {string} TooltipParam
  */
@@ -28,7 +21,7 @@ const GUTTER_PX     = 8;
 
 /** @type {HTMLDivElement|null} */
 let singleton = null;
-/** Trigger currently owning the tooltip (so Escape on one trigger doesn't blank a different one). */
+/** Trigger currently owning the tooltip; lets Escape target the right one. */
 /** @type {HTMLElement|null} */
 let owner = null;
 
@@ -51,11 +44,11 @@ function showFor(trigger, label) {
   el.setAttribute('aria-hidden', 'false');
   owner = trigger;
 
-  // Measure after content is set; place above the trigger with flip-below fallback.
+  // Place above with flip-below fallback. Measure after textContent set.
   const t   = trigger.getBoundingClientRect();
   const tip = el.getBoundingClientRect();
 
-  let top  = t.top - tip.height - GUTTER_PX;
+  let top = t.top - tip.height - GUTTER_PX;
   if (top < GUTTER_PX) top = t.bottom + GUTTER_PX;
 
   let left = t.left + (t.width - tip.width) / 2;
@@ -112,9 +105,7 @@ export function tooltip(node, label) {
     /** @param {TooltipParam} next */
     update(next) {
       label = next;
-      if (node.getAttribute('aria-label') === undefined || node.getAttribute('aria-label') === null) {
-        node.setAttribute('aria-label', next);
-      }
+      if (!node.hasAttribute('aria-label')) node.setAttribute('aria-label', next);
       if (owner === node && singleton) singleton.textContent = next;
     },
     destroy() {

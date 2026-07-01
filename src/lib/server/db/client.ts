@@ -1,15 +1,7 @@
 /**
- * Drizzle client. Picks a driver based on how it was imported:
- *
- *  - `db`         : runtime client. Uses `@neondatabase/serverless`
- *                   over HTTP, which is the right shape for Vercel
- *                   serverless functions (no socket pooling required).
- *  - `migrationDb`: TCP client via `postgres` (DATABASE_URL_UNPOOLED),
- *                   used by drizzle-kit and the seed script.
- *
- * If DATABASE_URL is missing we throw on first use, not at import time,
- * so unrelated dev tasks (e.g. running the public site without a DB)
- * can still boot.
+ * Drizzle client. `db` is the runtime client via @neondatabase/serverless
+ * (HTTP, ideal for Vercel functions). Throws on first use rather than at
+ * import time so the public site can boot without a DATABASE_URL.
  */
 
 import { drizzle as drizzleNeon } from 'drizzle-orm/neon-http';
@@ -31,10 +23,7 @@ export function getDb() {
   return _db;
 }
 
-/**
- * Proxy export so callers can `import { db } from '$db/client'` and get
- * lazy initialisation without a function call.
- */
+/** Proxy export so callers can `import { db }` and still get lazy init. */
 export const db = new Proxy({} as ReturnType<typeof drizzleNeon>, {
   get(_target, prop) {
     return (getDb() as any)[prop];

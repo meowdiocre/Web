@@ -1,6 +1,4 @@
-/**
- * Validation helpers shared by admin form actions.
- */
+/** Validation helpers shared by admin form actions. */
 
 import { z } from 'zod';
 
@@ -26,10 +24,9 @@ export const postMetadataSchema = z.object({
 
 export type PostMetadataInput = z.infer<typeof postMetadataSchema>;
 
-/** Coerce the empty-string publishAt to null and other string -> Date. */
+/** Coerce string -> Date; treat trailing-Z-less values from <input> as UTC. */
 export function normalisePublishAt(raw: string | null | undefined): Date | null {
   if (!raw) return null;
-  // datetime-local values from <input> arrive without a TZ suffix; treat as UTC.
   const candidate = /[zZ]$|[+-]\d\d:?\d\d$/.test(raw) ? raw : `${raw}:00Z`.replace(/::00Z$/, ':00Z');
   const d = new Date(candidate);
   return Number.isFinite(d.getTime()) ? d : null;

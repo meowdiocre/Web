@@ -1,7 +1,4 @@
-/**
- * Tiny string + date helpers. Kept zero-dep so they can be used from
- * both browser, server, and scripts.
- */
+/** Tiny zero-dep string + date helpers, safe for browser, server, and scripts. */
 
 const MONTHS: Record<string, number> = {
   Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5,
@@ -12,7 +9,7 @@ const MONTHS: Record<string, number> = {
  * Turn a free-form title into a lowercase, hyphenated, URL-safe slug.
  *
  *   slugify("Devirtualizing VMProtect 3.x without a VM.")
- *     => "devirtualizing-vmprotect-3-x-without-a-vm"
+ *     -> "devirtualizing-vmprotect-3-x-without-a-vm"
  */
 export function slugify(input: string): string {
   return input
@@ -25,10 +22,7 @@ export function slugify(input: string): string {
     .slice(0, 96);
 }
 
-/**
- * Parse a "Mar 14" entry date plus a known year into a UTC Date.
- * Returns the start of that day (00:00 UTC).
- */
+/** Parse a "Mar 14" + year into a UTC Date at 00:00. */
 export function parseEntryDate(short: string, year: number): Date | null {
   const m = short.trim().match(/^([A-Z][a-z]{2})\s+(\d{1,2})$/);
   if (!m) return null;
@@ -39,7 +33,7 @@ export function parseEntryDate(short: string, year: number): Date | null {
   return new Date(Date.UTC(year, month, day, 0, 0, 0));
 }
 
-/** Format a Date as `YYYY · MM · DD` (matching article.head.meta.date). */
+/** Format a Date as `YYYY · MM · DD` (matches article.head.meta.date). */
 export function formatMetaDate(d: Date): string {
   const y = d.getUTCFullYear();
   const m = String(d.getUTCMonth() + 1).padStart(2, '0');

@@ -8,7 +8,7 @@
    *  }} */
   let { data, children } = $props();
 
-  // The <body data-page="admin"> attribute is already set server-side by
+  // The body[data-page="admin"] attribute is set server-side by
   // hooks.server.js → pageKey(), so no client mirror is needed here.
 </script>
 
@@ -33,6 +33,6 @@
     color: var(--color-paper);
     font-family: var(--font-sans);
   }
-  /* Reset any min-content blow-out from long words / code in the content. */
+  /* Prevent long words / code blocks from blowing out the min-content width. */
   .content { min-width: 0; }
 </style>

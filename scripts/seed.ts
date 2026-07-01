@@ -1,14 +1,14 @@
 /**
- * scripts/seed.ts -- import the existing demo content into the database.
+ * scripts/seed.ts — import the demo content into the database.
  *
  *   npm run seed                # writes to DATABASE_URL_UNPOOLED
- *   npm run seed -- --dry-run   # prints the inserts but does not commit
+ *   npm run seed -- --dry-run   # prints the inserts, doesn't commit
  *   npm run seed -- --reset     # truncates posts/categories first
  *
- * The first article ("vmprotect-3x-devirt") receives the full body from
- * src/lib/data/article.js; the others land as ghost posts (published, with
- * title/dek/category/read_time set, but an empty body) so /blog can list
- * them and Task 7 can fill them in via the editor later.
+ * The full article (slug = FULL_ARTICLE_SLUG) receives the body from
+ * src/lib/data/article.js. The others are inserted as ghost posts
+ * (published, with metadata + empty body) so /blog can list them and
+ * the editor can fill them in later.
  */
 
 import 'dotenv/config';
@@ -38,13 +38,13 @@ const TONE_BY_CATEGORY: Record<string, string> = {
 };
 
 function splitTitle(title: string): { pre: string; em: string; post: string } {
-  // Prefer the article.head.title shape when we already have it.
+  // Prefer the pre/em/post shape when the title arrives as a structured object.
   if (typeof title === 'object' && title !== null) {
     const t = title as { pre: string; em: string; post: string };
     return { pre: t.pre ?? '', em: t.em ?? '', post: t.post ?? '' };
   }
-  // Heuristic: italicise the first 1-3 capitalised tokens that contain a
-  // digit or dot (project nouns: "VMProtect 3.x", "Hyper-V", "V8 Maglev"…).
+  // Heuristic: italicise the first 1–3 capitalised tokens containing a
+  // digit or dot ("VMProtect 3.x", "Hyper-V", "V8 Maglev"…).
   const m = title.match(/\b([A-Z][\w-]*(?:\s+[A-Z0-9][\w.-]*){0,2})\b/);
   if (m && m.index !== undefined) {
     return {
@@ -74,7 +74,7 @@ interface SeededPost {
 async function buildPosts(): Promise<SeededPost[]> {
   const out: SeededPost[] = [];
 
-  // ---- ghost entries (one row each, empty body) ---------------------------
+  // ---- ghost entries (one row each, empty body) ----
   for (const group of entryGroups) {
     for (const e of group.entries) {
       const t = splitTitle(e.title);
@@ -99,7 +99,7 @@ async function buildPosts(): Promise<SeededPost[]> {
     }
   }
 
-  // ---- the full demo article ---------------------------------------------
+  // ---- the full demo article ----
   const fullDoc = blocksToTiptap(article.body as any);
   const { bodyHtml } = await renderPost(fullDoc);
   const titleParts = article.head.title;

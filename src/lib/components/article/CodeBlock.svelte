@@ -1,11 +1,10 @@
 <script>
   /**
-   * CodeBlock - clipped <pre><code> with a uppercase-mono caption strip
-   * underneath. Accepts pre-highlighted HTML so the page or data layer
-   * can ship the colourised tokens directly.
+   * CodeBlock — clipped `<pre><code>` with a mono caption beneath.
+   * Accepts pre-highlighted HTML so the data layer ships colour spans.
    *
    * @typedef {Object} Props
-   * @property {string} html       inner HTML (already wrapped in <span class="kw|fn|str|com|num">)
+   * @property {string} html       inner HTML already wrapped in `<span class="kw|fn|str|com|num">`
    * @property {string} [caption]  figure caption shown beneath
    */
 

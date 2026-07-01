@@ -1,7 +1,7 @@
 /**
- * Admin-only query helpers. Strict separation from the public queries
- * in queries.ts: these read drafts too, expose internal columns, and
- * are invoked only from routes under /admin.
+ * Admin-only query helpers. Separate from queries.ts so the public path
+ * never accidentally reads drafts or internal columns. Only routes
+ * under /admin should import this module.
  */
 
 import { and, desc, eq, ne } from 'drizzle-orm';
@@ -35,6 +35,7 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
     })
     .from(posts)
     .orderBy(desc(posts.updatedAt));
+
   return rows.map((r) => ({
     id:          r.id,
     slug:        r.slug,
@@ -65,14 +66,14 @@ export async function isSlugTaken(slug: string, exceptPostId?: string): Promise<
 }
 
 export interface CreateDraftInput {
-  slug:     string;
-  titlePre: string;
-  titleEm:  string;
-  titlePost:string;
-  category: string;
-  dek:      string;
-  readTime: string;
-  author:   string;
+  slug:      string;
+  titlePre:  string;
+  titleEm:   string;
+  titlePost: string;
+  category:  string;
+  dek:       string;
+  readTime:  string;
+  author:    string;
 }
 
 export async function createDraft(input: CreateDraftInput) {
@@ -97,16 +98,16 @@ export async function createDraft(input: CreateDraftInput) {
 }
 
 export interface UpdateMetadataInput {
-  slug:           string;
-  titlePre:       string;
-  titleEm:        string;
-  titlePost:      string;
-  category:       string;
-  dek:            string;
-  readTime:       string;
-  author:         string;
-  coverImageUrl:  string | null;
-  publishAt:      Date | null;
+  slug:          string;
+  titlePre:      string;
+  titleEm:       string;
+  titlePost:     string;
+  category:      string;
+  dek:           string;
+  readTime:      string;
+  author:        string;
+  coverImageUrl: string | null;
+  publishAt:     Date | null;
 }
 
 export async function updatePostMetadata(id: string, input: UpdateMetadataInput) {

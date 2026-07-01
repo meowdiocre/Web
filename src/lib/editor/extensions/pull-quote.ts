@@ -1,12 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/**
- * pullQuote — block-level atom rendered as <blockquote class="pull">.
- *
- * The author-facing UI (toolbar + dialog) is responsible for collecting
- * the text and calling `editor.commands.insertPullQuote(text)`. This
- * extension itself is silent: no prompts, no alerts.
- */
+/** pullQuote — block-level atom rendered as `<blockquote class="pull">`. */
 export const PullQuote = Node.create({
   name: 'pullQuote',
   group: 'block',

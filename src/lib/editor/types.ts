@@ -1,7 +1,6 @@
 /**
- * TipTap / ProseMirror document model used throughout the editor and
- * the server-side renderer. Kept structural (not Class-based) so it
- * round-trips cleanly through JSON.
+ * TipTap / ProseMirror document model shared by the editor and the
+ * server-side renderer. Kept structural so it round-trips through JSON.
  */
 
 export type Mark =
@@ -39,7 +38,7 @@ export interface ListItemNode {
   content: ParagraphNode[];
 }
 
-export interface BulletListNode { type: 'bulletList';  content: ListItemNode[]; }
+export interface BulletListNode  { type: 'bulletList';  content: ListItemNode[]; }
 export interface OrderedListNode { type: 'orderedList'; content: ListItemNode[]; }
 
 export interface PullQuoteNode {
@@ -50,13 +49,13 @@ export interface PullQuoteNode {
 export interface CodeBlockNode {
   type: 'codeBlock';
   attrs: {
-    /** raw source for editor display; canonical when re-highlighting. */
+    /** Raw source; canonical when re-highlighting. */
     source: string;
-    /** Shiki-friendly lang slug, or 'plaintext' to disable highlighting. */
+    /** Shiki language id, or 'plaintext' to skip highlighting. */
     lang: string;
-    /** figure caption shown below the listing. */
+    /** Figure caption shown below the listing. */
     caption: string;
-    /** server-rendered HTML body (already wrapped in <span class="kw|com|num|str|fn">) */
+    /** Server-rendered body wrapped in <span class="kw|com|num|str|fn">. */
     html: string;
   };
 }

@@ -1,18 +1,9 @@
 <!--
-  EditorToolbar — the dark formatting strip that sits above the canvas.
-
-  Owns:
-    - Mark / heading / list buttons that mutate the Tiptap editor in place.
-    - Atom buttons that delegate to the parent (which owns dialog state).
-    - The distinct Save chip.
-    - Tooltip wiring via `use:tooltip`.
-
-  Reactivity: the parent passes `editorTick` (a $state number bumped on
-  every selection/transaction). `isActive()` reads it so toolbar
-  highlighting stays in sync with cursor position.
-
-  Logical groups, separated by 1px hairline dividers:
-    [ marks ] · [ headings ] · [ lists ] · [ link ] · [ atoms ] [ save → ]
+  EditorToolbar — formatting strip above the canvas. Marks, headings,
+  lists, and link buttons mutate the editor in place. Atom buttons
+  delegate to the parent which owns dialog state. The parent passes
+  `editorTick` (bumped on every selection/transaction) so `isActive()`
+  re-evaluates and active-state highlighting follows the cursor.
 -->
 <script>
   import { tooltip } from '$lib/actions/tooltip.js';
@@ -34,22 +25,19 @@
   let { editor, saving = false, editorTick = 0, openLink, openCode, openPull, openSidenote, openEnd, save } = $props();
 
   /**
-   * Re-evaluate on every selection/transaction by reading editorTick.
    * @param {string} name
    * @param {Record<string, any>} [attrs]
    */
   function isActive(name, attrs) {
-    void editorTick;
+    void editorTick;                                   // tracked: re-run on tick
     return !!editor?.isActive(name, attrs);
   }
 
-  /* Tiny helpers so the JSX stays scannable. */
   const chain = () => editor?.chain().focus();
 </script>
 
 {#if editor}
   <div class="toolbar mb-3" role="toolbar" aria-label="Editor formatting">
-    <!-- Inline marks -->
     <div class="toolbar__group">
       <button class="tb"        use:tooltip={'Bold · Ctrl+B'}        class:on={isActive('bold')}   onclick={() => chain()?.toggleBold().run()}>B</button>
       <button class="tb italic" use:tooltip={'Italic · Ctrl+I'}      class:on={isActive('italic')} onclick={() => chain()?.toggleItalic().run()}>i</button>
@@ -58,7 +46,6 @@
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
-    <!-- Headings -->
     <div class="toolbar__group">
       <button class="tb" use:tooltip={'Heading 2 · Ctrl+Alt+2'} class:on={isActive('heading', { level: 2 })} onclick={() => chain()?.toggleHeading({ level: 2 }).run()}>H2</button>
       <button class="tb" use:tooltip={'Heading 3 · Ctrl+Alt+3'} class:on={isActive('heading', { level: 3 })} onclick={() => chain()?.toggleHeading({ level: 3 }).run()}>H3</button>
@@ -66,7 +53,6 @@
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
-    <!-- Lists -->
     <div class="toolbar__group">
       <button class="tb" use:tooltip={'Bullet list · Ctrl+Shift+8'}  class:on={isActive('bulletList')}  onclick={() => chain()?.toggleBulletList().run()}>•</button>
       <button class="tb" use:tooltip={'Ordered list · Ctrl+Shift+7'} class:on={isActive('orderedList')} onclick={() => chain()?.toggleOrderedList().run()}>1.</button>
@@ -74,14 +60,12 @@
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
-    <!-- Link -->
     <div class="toolbar__group">
       <button class="tb" use:tooltip={'Link · Ctrl+K'} class:on={isActive('link')} onclick={openLink}>link</button>
     </div>
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
-    <!-- Atoms -->
     <div class="toolbar__group">
       <button class="tb" use:tooltip={'Pull quote · Ctrl+Shift+Q'} class:on={isActive('pullQuote')} onclick={openPull}>pull-quote</button>
       <button class="tb" use:tooltip={'Code block · Ctrl+Shift+K'} class:on={isActive('codeBlock')} onclick={openCode}>code</button>

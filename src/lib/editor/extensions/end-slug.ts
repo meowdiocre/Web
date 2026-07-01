@@ -1,6 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/** endSlug — block-level atom. One per document (convention, not enforced). */
+/** endSlug — block-level atom; one per document by convention. */
 export const EndSlug = Node.create({
   name: 'endSlug',
   group: 'block',
@@ -16,8 +16,7 @@ export const EndSlug = Node.create({
     return [{
       tag: 'div.end',
       getAttrs: (el) => {
-        const e = el as HTMLElement;
-        const txt = e.querySelector('span:last-child');
+        const txt = (el as HTMLElement).querySelector('span:last-child');
         return { text: txt?.textContent ?? '' };
       }
     }];

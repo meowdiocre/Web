@@ -18,12 +18,9 @@ describe('session tokens', () => {
   });
 });
 
-/* ------------------------------------------------------------------ */
-
 /**
- * Stub the `validateSessionToken` import inside the hooks file by
- * mocking the auth module. We still keep generateSessionToken/hashToken
- * real for the test above; mocks only target the bits that touch the DB.
+ * Mock `validateSessionToken` for the hook tests below; the actual
+ * generate/hash helpers stay real for the section above.
  */
 vi.mock('$lib/server/auth', async () => {
   const real = await vi.importActual<typeof import('$lib/server/auth')>('$lib/server/auth');

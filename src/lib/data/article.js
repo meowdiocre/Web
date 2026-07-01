@@ -1,29 +1,28 @@
 /**
- * Article content as a structured tree. The page renders this through
- * <Essay> and the per-block components in components/article/, so the
- * route stays narrative and the content stays out of the markup.
+ * Demo article content as a structured tree. Rendered via <Essay> and
+ * the per-block components in components/article/, so the route file
+ * stays narrative and the content stays out of the markup.
+ *
+ * Block kinds in `body`:
+ *   { type: 'p',          html }         paragraph (may include sidenote spans)
+ *   { type: 'h2'|'h3',    text }
+ *   { type: 'list',       kind: 'ol'|'ul', items }  items are raw HTML
+ *   { type: 'pull-quote', text }
+ *   { type: 'code',       caption, html }            html already syntax-spanned
+ *   { type: 'end-slug',   text }
+ *
+ * Sidenotes inline as
+ *   <span class="sidenote-ref">¹</span><span class="sidenote">¹ …</span>
+ * inside paragraph HTML — markup colocated with the prose it belongs to.
  *
  * @typedef {Object} ArticleHead
- * @property {string}   category
+ * @property {string} category
  * @property {{ pre: string, em: string, post: string }} title
- * @property {string}   dek
+ * @property {string} dek
  * @property {{ author: string, date: string, readTime: string }} meta
  *
  * @typedef {Object} Footnote
  * @property {string} html
- *
- * Block kinds in `body`:
- *   - { type: 'p',          html: string }         paragraph (may include <Sidenote />)
- *   - { type: 'h2',         text: string }
- *   - { type: 'list',       kind: 'ol'|'ul', items: string[] }   items are raw HTML
- *   - { type: 'pull-quote', text: string }
- *   - { type: 'code',       caption: string, html: string }      html is already syntax-spanned
- *   - { type: 'end-slug',   text: string }
- *
- * Sidenotes are inlined as
- *   <span class="sidenote-ref">¹</span><span class="sidenote">¹ ...</span>
- * inside paragraph HTML, exactly the way a magazine compositor would
- * set them — markup colocated with the prose that owns the reference.
  */
 
 /** @type {{ head: ArticleHead, body: any[], footnotes: Footnote[] }} */
