@@ -7,17 +7,6 @@
   import { NAV_WINDOWS, findWindowByPath, STORAGE_KEYS } from '$lib/config/site.js';
   import Toast from './Toast.svelte';
 
-  /**
-   * TmuxKeymap is a global keyboard layer that emulates tmux's prefix
-   * (Ctrl+B) + key dispatch. Mounts once in +layout.svelte.
-   *
-   * Bindings:
-   *   0 / 1 / 2   jump to index / writing / about
-   *   n / p       next / previous window (cyclical)
-   *   ?           show all bindings
-   *   Esc         cancel prefix
-   */
-
   const PREFIX_TIMEOUT_MS = 2000;
   const HINT_AUTOCLOSE_MS = 9000;
   const HELP_AUTOCLOSE_MS = 6500;
@@ -49,7 +38,6 @@
     clearTimeout(prefixTimer);
   }
 
-  /** Returns true if the key was a recognised tmux follow-up. */
   function dispatchKey(key) {
     if (/^[0-9]$/.test(key)) {
       const win = NAV_WINDOWS[parseInt(key, 10)];
@@ -76,11 +64,9 @@
 
   /** @param {KeyboardEvent} e */
   function onKey(e) {
-    // Don't hijack typing in form fields.
     const t = /** @type {HTMLElement} */ (e.target);
     if (t?.matches?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
 
-    // Ctrl+B (or Cmd+B on macOS) toggles the prefix on.
     if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !e.altKey) {
       e.preventDefault();
       startPrefix();
@@ -89,14 +75,12 @@
 
     if (!prefixActive) return;
 
-    // Esc cancels prefix without firing.
     if (e.key === 'Escape') {
       e.preventDefault();
       endPrefix();
       return;
     }
 
-    // Ignore lone modifier presses while prefix is alive.
     if (e.key === 'Control' || e.key === 'Meta' || e.key === 'Shift' || e.key === 'Alt') return;
 
     if (dispatchKey(e.key)) e.preventDefault();
@@ -108,7 +92,6 @@
 
   onMount(() => {
     if (!hasSeenHint()) {
-      // Defer a beat so the page paints first.
       hintTimer = setTimeout(() => { hintOpen = true; }, 700);
     }
   });
@@ -121,7 +104,6 @@
 
 <svelte:window onkeydown={onKey} />
 
-<!-- Prefix-active chip at the bottom left, mirroring tmux's status flip. -->
 {#if prefixActive}
   <div class="prefix" role="status" aria-live="polite" transition:fade={{ duration: 120 }}>
     <span class="key">C-b</span>
@@ -130,7 +112,6 @@
   </div>
 {/if}
 
-<!-- First-visit tip. Auto-closes and can also be dismissed. -->
 <Toast
   open={hintOpen}
   tag="tmux"
@@ -145,7 +126,6 @@
   </ul>
 </Toast>
 
-<!-- Help dialog, triggered by C-b ?. Auto-closes. -->
 <Toast
   open={helpOpen}
   tag="bindings"

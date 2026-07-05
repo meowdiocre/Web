@@ -1,20 +1,4 @@
 /**
- * Demo article content as a structured tree. Rendered via <Essay> and
- * the per-block components in components/article/, so the route file
- * stays narrative and the content stays out of the markup.
- *
- * Block kinds in `body`:
- *   { type: 'p',          html }         paragraph (may include sidenote spans)
- *   { type: 'h2'|'h3',    text }
- *   { type: 'list',       kind: 'ol'|'ul', items }  items are raw HTML
- *   { type: 'pull-quote', text }
- *   { type: 'code',       caption, html }            html already syntax-spanned
- *   { type: 'end-slug',   text }
- *
- * Sidenotes inline as
- *   <span class="sidenote-ref">¹</span><span class="sidenote">¹ …</span>
- * inside paragraph HTML — markup colocated with the prose it belongs to.
- *
  * @typedef {Object} ArticleHead
  * @property {string} category
  * @property {{ pre: string, em: string, post: string }} title

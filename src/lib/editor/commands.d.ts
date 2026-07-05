@@ -1,9 +1,3 @@
-/**
- * Module augmentation so `editor.commands.insertPullQuote(...)` and the
- * other custom commands type-check without `as any` casts. Imported for
- * side effects from src/lib/editor/index.ts.
- */
-
 import '@tiptap/core';
 
 declare module '@tiptap/core' {
@@ -14,7 +8,6 @@ declare module '@tiptap/core' {
     };
 
     codeBlock: {
-      /** Insert a new code block. `html` is recomputed by Shiki on save. */
       insertCodeBlock: (attrs: {
         source:  string;
         lang:    string;

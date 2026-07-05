@@ -1,15 +1,5 @@
-/**
- * Serialise a TipTap doc into the HTML the public Essay component
- * expects (read from `posts.body_html` and rendered via `{@html}`).
- *
- * Custom node mapping:
- *   pullQuote -> <blockquote class="pull">...</blockquote>
- *   codeBlock -> <pre><code>...</code></pre><span class="figure-cap">...</span>
- *   endSlug   -> <div class="end"><span class="glyph">◎</span><span>...</span></div>
- *   sidenote  -> <span class="sidenote-ref">...</span><span class="sidenote">...</span>
- */
-
 import { BRAND_GLYPH } from '../config/motif.js';
+import { escapeHtml, escapeAttr } from '../util/escape';
 
 import type {
   BlockNode,
@@ -19,33 +9,15 @@ import type {
   Mark
 } from './types';
 
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function escapeAttr(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
-
 function renderInlineNode(node: InlineNode): string {
   if (node.type === 'sidenote') {
     const ref      = escapeHtml(node.attrs.ref ?? '');
     const bodyHtml = node.attrs.bodyHtml ?? '';
-    // bodyHtml is editor-sanitised; pass through raw so inline marks
-    // (<em>, <strong>, <code>, <a>) inside footnotes survive.
     return `<span class="sidenote-ref">${ref}</span>` +
            `<span class="sidenote">${ref}${bodyHtml ? ' ' + bodyHtml : ''}</span>`;
   }
   let html = escapeHtml(node.text ?? '');
   const marks = node.marks ?? [];
-  // Apply innermost-first so the resulting nesting matches TipTap's order.
   for (let i = marks.length - 1; i >= 0; i--) {
     html = wrapMark(html, marks[i]);
   }
@@ -69,7 +41,6 @@ function renderInline(content: InlineNode[] | undefined): string {
 }
 
 function renderListItem(item: ListItemNode): string {
-  // Drop the <p> wrapper so <li>...</li> matches the public essay shape.
   const inner = (item.content ?? []).map((p) => renderInline(p.content)).join('');
   return `<li>${inner}</li>`;
 }
@@ -89,9 +60,6 @@ function renderBlock(node: BlockNode): string {
     case 'pullQuote':
       return `<blockquote class="pull">${escapeHtml(node.attrs.text)}</blockquote>`;
     case 'codeBlock': {
-      // attrs.html is server-trusted (Shiki on save, or pre-spanned seed).
-      // Fall back to escaping `source` when html is empty so newly-inserted
-      // blocks still render something before their first save.
       const inner = node.attrs.html && node.attrs.html.length > 0
         ? node.attrs.html
         : escapeHtml(node.attrs.source ?? '');
@@ -116,7 +84,6 @@ function renderBlock(node: BlockNode): string {
 }
 
 export interface RenderOutput {
-  /** Concatenated block HTML, one block per line for diffability. */
   html: string;
 }
 

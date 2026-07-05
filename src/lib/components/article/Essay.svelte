@@ -3,18 +3,13 @@
   import LegacyBlocks from './LegacyBlocks.svelte';
 
   /**
-   * Typographic shell for an article. Supports two inputs:
-   *
-   *   `html` server-rendered HTML from `lib/server/render-post`
-   *   `body` legacy structured block tree from `article.js`
-   *
    * @typedef {Object} Footnote
    * @property {string} html
    *
    * @typedef {Object} Props
-   * @property {string|undefined}     [html]      pre-rendered HTML body
-   * @property {any[]|undefined}      [body]      legacy block array
-   * @property {Footnote[]|undefined} [footnotes] rendered after the body
+   * @property {string|undefined} [html]
+   * @property {any[]|undefined} [body]
+   * @property {Footnote[]|undefined} [footnotes]
    */
 
   /** @type {Props} */
@@ -24,7 +19,6 @@
 <article class="essay relative px-[var(--gutter)] pt-4 pb-[clamp(48px,6vw,96px)]">
   <div class="essay__inner mx-auto max-w-[760px] relative">
     {#if html !== undefined}
-      <!-- The pre-rendered path already matches the public block markup. -->
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html html}
     {:else if body}
@@ -99,7 +93,6 @@
   .essay :global(li) { margin-bottom: 8px; }
   .essay :global(li > p) { margin: 0; }
 
-  /* Styles for pre-rendered block markup. */
   .essay :global(pre) {
     margin: 32px 0;
     padding: 22px;

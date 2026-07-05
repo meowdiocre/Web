@@ -1,6 +1,3 @@
-<!--
-  PullQuoteDialog captures or edits the text for a pull quote.
--->
 <script>
   import Modal from '$lib/components/Modal.svelte';
   import DialogFooter from './DialogFooter.svelte';

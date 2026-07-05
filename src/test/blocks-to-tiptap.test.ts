@@ -19,19 +19,14 @@ describe('blocksToTiptap', () => {
     expect(doc.content).toHaveLength(1);
     const p = doc.content[0];
     expect(p.type).toBe('paragraph');
-    // Inline node sequence: text, italic, text, bold, text, code, text, sidenote, text
     const types = (p as any).content.map((n: any) => n.type);
     expect(types).toEqual(['text', 'text', 'text', 'text', 'text', 'text', 'text', 'sidenote', 'text']);
-    // The italic node
     expect((p as any).content[1].marks?.[0].type).toBe('italic');
     expect((p as any).content[1].text).toBe('emulator');
-    // The bold node
     expect((p as any).content[3].marks?.[0].type).toBe('bold');
     expect((p as any).content[3].text).toBe("Don't.");
-    // The code node
     expect((p as any).content[5].marks?.[0].type).toBe('code');
     expect((p as any).content[5].text).toBe('z3');
-    // The sidenote node — body has the leading "¹ " stripped
     expect((p as any).content[7]).toEqual({
       type: 'sidenote',
       attrs: { ref: '¹', bodyHtml: 'The reflex is reasonable.' }
@@ -89,7 +84,6 @@ describe('blocksToTiptap', () => {
     expect((doc.content[1] as any).attrs.lang).toBe('python');
     expect((doc.content[1] as any).attrs.caption).toContain('Listing 02');
     expect((doc.content[1] as any).attrs.html).toContain('class="kw"');
-    // source should be tag-stripped
     expect((doc.content[1] as any).attrs.source).toBe('def devirt(ir):');
 
     expect(doc.content[2]).toEqual({ type: 'endSlug', attrs: { text: '4,720 words · 2026 · 03 · 14' } });
@@ -160,7 +154,6 @@ describe('tiptapToHtml — round trip', () => {
     const { html } = tiptapToHtml(doc);
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
     expect(html).toContain('<span class="figure-cap">a &gt; b &amp; c</span>');
-    // codeBlock.html is server-trusted: passed through verbatim
     expect(html).toContain('<span class="kw">trusted</span>');
   });
 });

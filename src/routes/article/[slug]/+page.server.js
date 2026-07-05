@@ -2,13 +2,7 @@ import { error } from '@sveltejs/kit';
 import { loadPublicArticle, loadRelated } from '$lib/server/db/queries';
 import { verifyPreviewToken } from '$lib/server/publish';
 
-/**
- * `/article/[slug]` reads one published post and its related list.
- * 404s when the slug is unknown or the post is still a draft, UNLESS
- * the request carries a valid ?preview=<token>.
- *
- * @type {import('./$types').PageServerLoad}
- */
+/** @type {import('./$types').PageServerLoad} */
 export function load({ params, url, setHeaders }) {
   const slug = params.slug;
   if (!slug) error(404, 'Not found.');
@@ -27,7 +21,6 @@ export function load({ params, url, setHeaders }) {
   );
 
   setHeaders({
-    // Preview pages must never be cached at the edge.
     'cache-control': allowDraft
       ? 'private, no-store'
       : 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400'

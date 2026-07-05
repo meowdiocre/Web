@@ -29,17 +29,23 @@ export async function GET({ url, cookies }) {
     error(400, 'OAuth code rejected.');
   }
 
-  const access  = tokens.accessToken();
-  const profile = await fetchGithubUser(access);
+  try {
+    const access  = tokens.accessToken();
+    const profile = await fetchGithubUser(access);
 
-  if (profile.login.toLowerCase() !== adminLogin()) {
-    error(403, 'This GitHub account is not allowed to administer this site.');
+    if (profile.login.toLowerCase() !== adminLogin()) {
+      error(403, 'This GitHub account is not allowed to administer this site.');
+    }
+
+    const userId = await upsertGithubUser(profile);
+    const token   = generateSessionToken();
+    const session = await createSession(token, userId);
+    cookies.set(SESSION_COOKIE, token, sessionCookieOptions(session.expiresAt));
+  } catch (e) {
+    if (e && typeof e === 'object' && 'status' in e) throw e;
+    cookies.delete(SESSION_COOKIE, { path: '/' });
+    error(502, 'Sign-in failed. Try again.');
   }
-
-  const userId = await upsertGithubUser(profile);
-  const token   = generateSessionToken();
-  const session = await createSession(token, userId);
-  cookies.set(SESSION_COOKIE, token, sessionCookieOptions(session.expiresAt));
 
   redirect(302, '/admin');
 }

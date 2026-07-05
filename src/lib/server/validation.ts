@@ -1,6 +1,5 @@
-/** Validation helpers shared by admin form actions. */
-
 import { z } from 'zod';
+import { SITE } from '$lib/config/site.js';
 
 export const slugRegex = /^[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?$/;
 
@@ -17,14 +16,13 @@ export const postMetadataSchema = z.object({
   category:      z.string().min(1).max(64),
   dek:           z.string().max(4096).default(''),
   readTime:      z.string().max(24).default(''),
-  author:        z.string().max(64).default('meowdiocre'),
+  author:        z.string().max(64).default(SITE.brand),
   coverImageUrl: z.string().url().max(1024).nullable().default(null),
   publishAt:     z.union([z.string().datetime({ offset: true }), z.string().length(0)]).default('')
 });
 
 export type PostMetadataInput = z.infer<typeof postMetadataSchema>;
 
-/** Coerce string -> Date; treat trailing-Z-less values from <input> as UTC. */
 export function normalisePublishAt(raw: string | null | undefined): Date | null {
   if (!raw) return null;
   const candidate = /[zZ]$|[+-]\d\d:?\d\d$/.test(raw) ? raw : `${raw}:00Z`.replace(/::00Z$/, ':00Z');

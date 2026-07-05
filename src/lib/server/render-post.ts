@@ -1,13 +1,3 @@
-/**
- * Pipeline: TipTap doc -> re-highlight code blocks via Shiki -> serialise.
- * Output is cached as `posts.body_html` for the public route.
- *
- * The re-highlight pass is idempotent and lang-aware:
- *   - lang === 'plaintext' or empty `source` pass through unchanged
- *     (preserves the seeded post's hand-spanned listings).
- *   - everything else has `attrs.html` regenerated from `attrs.source`.
- */
-
 import { tiptapToHtml } from '../editor/tiptap-to-html';
 import type { CodeBlockNode, Doc, BlockNode } from '../editor/types';
 import { highlightToClasses } from './shiki-to-classes';

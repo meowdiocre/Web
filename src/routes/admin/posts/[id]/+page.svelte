@@ -1,47 +1,33 @@
 <script>
   import Field         from '$lib/components/Field.svelte';
+  import FormAlert     from '$lib/components/admin/FormAlert.svelte';
   import StatusPill    from '$lib/components/StatusPill.svelte';
   import ConfirmDialog from '$lib/editor/dialogs/ConfirmDialog.svelte';
   import { toDatetimeLocalValue } from '$lib/util/dates';
+  import { composeTitle } from '$lib/util/strings';
 
-  /** @type {{
-   *    data: {
-   *      post: any,
-   *      categories: { slug: string, label: string }[]
-   *    },
-   *    form: {
-   *      saved?: boolean,
-   *      error?: string,
-   *      previewUrl?: string,
-   *      values?: Record<string,string>
-   *    }|null
-   *  }} */
+  /** @type {import('./$types').PageProps} */
   let { data, form } = $props();
   const p = $derived(data.post);
+  const postTitle = $derived(composeTitle({ pre: p.titlePre, em: p.titleEm, post: p.titlePost }));
 
   /** @type {HTMLFormElement|undefined}   */ let formEl = $state();
   /** @type {HTMLButtonElement|undefined} */ let deleteSubmitter = $state();
 
   let confirmingDelete = $state(false);
 
-  /** Convenience accessor: prefer form values (post-failure repaint) over post values. */
   const v = $derived({
     /** @param {string} key @param {string} [fallback] */
-    get: (key, fallback = '') => form?.values?.[key] ?? fallback
+    get: (key, fallback = '') => form?.ok === false ? form.values?.[key] ?? fallback : fallback
   });
 
-  /**
-   * Trigger the form's `?/delete` action via the hidden submitter so
-   * `requestSubmit(submitter)` preserves its `formaction`, routing
-   * SvelteKit to the named action.
-   */
   function runDelete() {
     confirmingDelete = false;
     if (formEl && deleteSubmitter) formEl.requestSubmit(deleteSubmitter);
   }
 </script>
 
-<svelte:head><title>{p.titlePre}{p.titleEm}{p.titlePost} | Admin</title></svelte:head>
+<svelte:head><title>{postTitle} | Admin</title></svelte:head>
 
 <header class="flex items-baseline justify-between flex-wrap gap-4 mb-8">
   <div class="min-w-0">
@@ -65,7 +51,6 @@
   </a>
 </header>
 
-<!-- Workflow actions -->
 <div class="flex items-center flex-wrap gap-2 mb-6">
   {#if p.status === 'draft'}
     <form method="POST" action="?/publish">
@@ -81,7 +66,7 @@
     <button class="btn-ghost">make preview link</button>
   </form>
 
-  {#if form?.previewUrl}
+  {#if form?.ok === true && form.previewUrl}
     <a
       href={form.previewUrl}
       target="_blank"
@@ -94,13 +79,12 @@
   {/if}
 </div>
 
-<!-- Metadata form -->
 <form bind:this={formEl} method="POST" action="?/update" class="grid gap-5 max-w-[720px]">
-  {#if form?.saved}
-    <p class="border border-rose text-rose px-3 py-2 font-mono text-[12px]">saved.</p>
+  {#if form?.ok === true && form.message}
+    <FormAlert tone="success" message={form.message} />
   {/if}
-  {#if form?.error}
-    <p class="border border-crimson text-crimson px-3 py-2 font-mono text-[12px]">{form.error}</p>
+  {#if form?.ok === false}
+    <FormAlert message={form.message} />
   {/if}
 
   <div class="grid gap-4 sm:grid-cols-2">
@@ -110,7 +94,7 @@
       {#each data.categories as c (c.slug)}
         <option
           value={c.slug}
-          selected={(form?.values?.category ?? p.category) === c.slug}
+          selected={(form?.ok === false ? form.values?.category : p.category) === c.slug}
         >{c.label}</option>
       {/each}
     </Field>
@@ -151,14 +135,10 @@
     value={v.get('publishAt', toDatetimeLocalValue(p.publishAt))}
   />
 
-  <!-- Action bar: save, back, delete -->
   <div class="flex flex-wrap items-center gap-2 mt-2">
     <button class="btn-primary">save metadata</button>
     <a href="/admin" class="btn-ghost">back</a>
 
-    <!-- Hidden submitter. The visible "delete" button is type=button
-         so it opens the confirm modal; the modal then triggers a real
-         submit via requestSubmit(deleteSubmitter), preserving formaction. -->
     <button
       type="submit"
       formaction="?/delete"
@@ -186,15 +166,3 @@
   onconfirm={runDelete}
   onclose={() => (confirmingDelete = false)}
 />
-
-<style>
-  .sr-only {
-    position: absolute;
-    width: 1px; height: 1px;
-    padding: 0; margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>

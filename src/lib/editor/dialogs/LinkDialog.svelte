@@ -1,8 +1,3 @@
-<!--
-  LinkDialog sets or updates an `<a>` mark. It pre-fills the current href
-  when the cursor is inside an existing link. Callers should open this
-  dialog only when there's a selection (or cursor in a link).
--->
 <script>
   import Modal from '$lib/components/Modal.svelte';
   import DialogFooter from './DialogFooter.svelte';
@@ -20,7 +15,6 @@
 
   let href = $state('');
 
-  // Reset on every open so the previous URL never leaks.
   $effect(() => { if (open) href = initialHref ?? ''; });
 
   const trimmed = $derived(href.trim());

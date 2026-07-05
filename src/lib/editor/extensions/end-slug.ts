@@ -1,7 +1,6 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 import { BRAND_GLYPH } from '../../config/motif.js';
 
-/** EndSlug is a block-level atom. By convention there is one per document. */
 export const EndSlug = Node.create({
   name: 'endSlug',
   group: 'block',

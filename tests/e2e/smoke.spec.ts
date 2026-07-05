@@ -20,8 +20,12 @@ test.describe('static surface', () => {
   });
 
   test('admin redirects to login', async ({ page }) => {
-    const res = await page.goto('/admin');
-    // Either we land on /admin/login (302 followed) or get a 200 from there.
-    expect(page.url()).toContain('/admin/login');
+    await page.goto('/admin');
+    const url = new URL(page.url());
+
+    expect(
+      url.pathname === '/admin/login' ||
+      url.hostname === 'github.com'
+    ).toBe(true);
   });
 });

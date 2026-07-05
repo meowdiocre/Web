@@ -10,7 +10,7 @@
     groupEntriesByYear
   } from '$lib/blog/entries';
 
-  /** @typedef {{ year: number, entries: any[] }} EntryGroup */
+  /** @typedef {import('$lib/server/db/queries').EntryGroup} EntryGroup */
   /** @typedef {{ entryGroups?: EntryGroup[], query?: string, selectedCategory?: string }} Props */
 
   const PAGE_SIZE = 12;

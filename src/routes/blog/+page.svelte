@@ -12,7 +12,7 @@
   import { SIGNAL_GLYPH } from '$lib/config/motif.js';
   import { page } from '$app/stores';
 
-  /** @type {{ data: { entryGroups: Promise<{ year: number, entries: any[] }[]> | { year: number, entries: any[] }[] } }} */
+  /** @type {{ data: { entryGroups: Promise<import('$lib/server/db/queries').EntryGroup[]> | import('$lib/server/db/queries').EntryGroup[] } }} */
   let { data } = $props();
   let searchQuery = $state($page.url.searchParams.get('q') ?? '');
   let categoryFilter = $state($page.url.searchParams.get('category') ?? 'all');
@@ -34,7 +34,6 @@
   {#await data.entryGroups}
     <BlogPageSkeleton />
   {:then entryGroups}
-    <!-- Head: title + lede on the left, polaroid on the right, epigraph below -->
     <section class="head" aria-labelledby="journal-title">
       <div class="head__inner">
         <div class="min-w-0">
@@ -62,6 +61,18 @@
       bind:query={searchQuery}
       bind:selectedCategory={categoryFilter}
     />
+  {:catch}
+    <section class="head" aria-labelledby="journal-title">
+      <div class="head__inner">
+        <div class="min-w-0">
+          <PageKicker label="Archive unavailable" tone="muted-warm" />
+          <PageTitle text="writing" id="journal-title" tone="ink" dotTone="crimson-deep" />
+          <Lede palette="ink">
+            The archive could not be loaded. Try again in a moment.
+          </Lede>
+        </div>
+      </div>
+    </section>
   {/await}
 </main>
 

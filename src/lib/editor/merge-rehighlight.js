@@ -1,15 +1,7 @@
 /**
- * After a save, the server returns a rehighlighted doc with fresh
- * `attrs.html` on every codeBlock. This walks the live editor doc and
- * the returned doc in positional order; for each codeBlock pair whose
- * `source/lang/caption` still agree, copies the server's `html` onto
- * the editor's node. A single ProseMirror transaction is marked
- * non-undoable and flagged so the host can suppress the resulting
- * onUpdate (otherwise it would re-trigger autosave and loop forever).
- *
  * @param {{ view: { dispatch: (tr: any) => void }, state: any }} editor
  * @param {{ content?: any[] } | null | undefined} rehighlighted
- * @returns {boolean} true if a transaction was dispatched.
+ * @returns {boolean}
  */
 export function mergeRehighlightedHtml(editor, rehighlighted) {
   if (!editor) return false;
@@ -36,11 +28,10 @@ export function mergeRehighlightedHtml(editor, rehighlighted) {
       tr.setNodeMarkup(pos, undefined, { ...node.attrs, html: r.attrs.html });
       touched = true;
     }
-    return false; // codeBlock is an atom, so this walk should not descend
+    return false;
   });
 
   if (!touched) return false;
-  // Re-highlighting is server housekeeping, not a user edit.
   tr.setMeta('addToHistory', false);
   editor.view.dispatch(tr);
   return true;

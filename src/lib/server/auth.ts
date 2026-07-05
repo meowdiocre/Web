@@ -1,13 +1,3 @@
-/**
- * Cookie-backed session layer. The cookie carries a 32-byte base32
- * token; the database stores its SHA-256 hash as `sessions.id` so a
- * DB leak cannot be replayed as a valid cookie.
- *
- * Sessions live for 30 days with sliding renewal: every access that
- * finds less than 15 days remaining extends `expiresAt` back to the
- * full TTL.
- */
-
 import { eq } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/encoding';
@@ -22,14 +12,12 @@ const HALF = 15 * DAY;
 
 export const SESSION_COOKIE = 'auth_session';
 
-/** Generate a fresh base32 token to hand to the browser. */
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(20);
   crypto.getRandomValues(bytes);
   return encodeBase32LowerCaseNoPadding(bytes);
 }
 
-/** Hash a cookie value into its DB key. Exported for unit testing. */
 export function hashToken(token: string): string {
   return encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
 }
@@ -83,7 +71,6 @@ export async function invalidateAllSessionsForUser(userId: string): Promise<void
   await db.delete(sessions).where(eq(sessions.userId, userId));
 }
 
-/** Cookie options compatible with the SvelteKit cookies API. */
 export function sessionCookieOptions(expiresAt: Date) {
   return {
     httpOnly: true,

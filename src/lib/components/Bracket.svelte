@@ -1,11 +1,7 @@
 <script>
   /**
-   * Bracket is a decorative L-shaped marker. It renders a positioned
-   * <use> element pointing at the global #bracket symbol, which is
-   * defined once by BracketDefs at the page root.
-   *
    * @typedef {Object} Props
-   * @property {'tl'|'tr'|'bl'|'br'} pos   corner placement
+   * @property {'tl'|'tr'|'bl'|'br'} pos
    */
 
   /** @type {Props} */

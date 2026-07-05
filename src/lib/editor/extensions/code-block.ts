@@ -2,15 +2,6 @@ import { Node, mergeAttributes } from '@tiptap/core';
 
 import { normaliseLang } from '../lang';
 
-/**
- * codeBlock is a block-level atom. Body HTML is server-rendered by Shiki
- * on save (`attrs.html`); the editor canvas mirrors that output via a
- * NodeView for WYSIWYG colour parity with /article/[slug].
- *
- * DOM shape (editor + public):
- *   <pre data-codeblock data-lang data-caption><code>...spans...</code></pre>
- *   <span class="figure-cap">...</span>
- */
 export const CodeBlock = Node.create({
   name: 'codeBlock',
   group: 'block',
@@ -56,19 +47,6 @@ export const CodeBlock = Node.create({
     ];
   },
 
-  /**
-   * Editor-only view. Injects `attrs.html` (the Shiki-spanned output)
-   * as the `<code>`'s innerHTML when present; falls back to raw source
-   * for freshly-inserted blocks awaiting first save.
-   *
-   * `attrs.html` is server-trusted: lib/server/shiki-to-classes only
-   * emits a fixed allow-list of `<span class="kw|fn|str|com|num">`
-   * wrappers around escaped content, so innerHTML assignment is safe.
-   *
-   * Layout: `<div class="cb-view"><pre>...</pre><span class="figure-cap">...</span></div>`.
-   * The wrapper uses `display: contents` in `EditorCanvas.svelte` so
-   * `<pre>` and `<span.figure-cap>` flow as siblings, matching the public essay.
-   */
   addNodeView() {
     return ({ node }) => {
       const dom  = document.createElement('div');
@@ -129,7 +107,6 @@ export const CodeBlock = Node.create({
               source:  attrs.source ?? '',
               lang:    normaliseLang(attrs.lang),
               caption: attrs.caption ?? '',
-              // Invalidate html. Shiki will repopulate it on the next save.
               html:    ''
             });
             dispatch(tr);

@@ -6,18 +6,9 @@
   import RouteProgress from '$lib/components/RouteProgress.svelte';
   import BlogPageSkeleton from '$lib/components/loading/BlogPageSkeleton.svelte';
   import ArticlePageSkeleton from '$lib/components/loading/ArticlePageSkeleton.svelte';
+  import { pageKey } from '$lib/util/page';
 
   let { children } = $props();
-
-  /** Map current pathname to data-page key (drives bg + atmosphere). */
-  function pageKey(pathname) {
-    if (pathname === '/' || pathname === '') return 'home';
-    if (pathname.startsWith('/admin'))   return 'admin';
-    if (pathname.startsWith('/blog'))    return 'blog';
-    if (pathname.startsWith('/about'))   return 'about';
-    if (pathname.startsWith('/article')) return 'article';
-    return 'home';
-  }
 
   let dataPage = $derived(pageKey($page.url.pathname));
   let navPending = $derived(Boolean($navigating));
@@ -30,9 +21,6 @@
         : null
   );
 
-  // Mirror onto <body> client-side so global selectors in app.css match.
-  // SSR is handled by hooks.server.js's transformPageChunk; this effect
-  // keeps it in sync across client navigations.
   $effect(() => {
     if (typeof document !== 'undefined') {
       document.body.setAttribute('data-page', dataPage);

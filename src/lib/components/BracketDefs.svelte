@@ -1,10 +1,3 @@
-<script>
-  /**
-   * BracketDefs declares the reusable #bracket SVG symbol. Render
-   * this once per page; <Bracket /> instances reference it by id.
-   */
-</script>
-
 <svg width="0" height="0" class="absolute" aria-hidden="true" focusable="false">
   <defs>
     <symbol id="bracket" viewBox="0 0 40 40">

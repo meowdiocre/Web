@@ -49,14 +49,12 @@ describe('/feed.xml', () => {
     expect(body).toMatch(/<channel>[\s\S]*<\/channel>/);
     expect(body).toMatch(/<item>[\s\S]*<\/item>/);
 
-    // First item
     expect(body).toContain('<title>Devirtualizing VMProtect 3.x without a VM.</title>');
     expect(body).toContain('<link>https://meowdiocre.example/article/foo</link>');
     expect(body).toContain('<guid isPermaLink="false">meowdiocre:2026-03-14:foo</guid>');
     expect(body).toContain('<category>Reverse</category>');
     expect(body).toContain('<![CDATA[<p>body & content</p>]]>');
 
-    // Two items present
     expect((body.match(/<item>/g) ?? []).length).toBe(2);
   });
 

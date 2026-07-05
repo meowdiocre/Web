@@ -26,7 +26,7 @@ describe('tiptap-to-html — editor-shaped docs', () => {
             source: 'print(1)',
             lang:   'python',
             caption: 'L2.',
-            html:    ''     // fresh node, no server render yet
+            html:    ''
         } },
         { type: 'orderedList', content: [
           { type: 'listItem', content: [
@@ -43,7 +43,6 @@ describe('tiptap-to-html — editor-shaped docs', () => {
     expect(html).toContain('<h2>Section A</h2>');
     expect(html).toContain('<blockquote class="pull">Stand by your work.</blockquote>');
     expect(html).toContain('<pre><code><span class="kw">mov</span> rax, 1</code></pre><span class="figure-cap">L1.</span>');
-    // Fresh node with empty html falls back to escaped source so something renders before first save.
     expect(html).toContain('<pre><code>print(1)</code></pre><span class="figure-cap">L2.</span>');
     expect(html).toContain('<ol><li>one</li></ol>');
     expect(html).toContain('<figure class="essay-image"><img src="https://example.com/a.png" alt="A"');

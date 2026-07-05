@@ -1,12 +1,9 @@
 <script>
   /**
-   * RowHead is an uppercase mono section divider. Title on the left,
-   * optional aside on the right, hairline rule below.
-   *
    * @typedef {Object} Props
    * @property {string}  title
    * @property {string} [aside]
-   * @property {'dark'|'cream'} [palette]   default 'dark' (paper text on ink)
+   * @property {'dark'|'cream'} [palette]
    */
 
   /** @type {Props} */

@@ -1,16 +1,3 @@
-/**
- * Server hook chain:
- *
- *   1. data-page transform — fills %body-page% so SSR'd <body> gets the
- *                            right data-page attribute.
- *   2. auth                — populate event.locals.{user,session} from
- *                            the auth_session cookie.
- *   3. admin gate          — reject /admin/* without a valid session
- *                            (except /admin/login + /admin/callback).
- */
-
-// Load .env into process.env so server code reading process.env.DATABASE_URL
-// works in dev. SvelteKit's `$env/*` helpers don't populate process.env.
 import 'dotenv/config';
 
 import { redirect } from '@sveltejs/kit';
@@ -20,17 +7,8 @@ import {
   sessionCookieOptions,
   validateSessionToken
 } from '$lib/server/auth';
+import { pageKey } from '$lib/util/page';
 
-/** @param {string} pathname */
-function pageKey(pathname) {
-  if (pathname.startsWith('/blog'))    return 'blog';
-  if (pathname.startsWith('/about'))   return 'about';
-  if (pathname.startsWith('/article')) return 'article';
-  if (pathname.startsWith('/admin'))   return 'admin';
-  return 'home';
-}
-
-/** /admin routes exempt from the auth gate — they ARE the login flow. */
 const ADMIN_PUBLIC = new Set([
   '/admin/login',
   '/admin/callback'
@@ -45,13 +23,11 @@ export async function handle({ event, resolve }) {
       event.locals.user    = user;
       event.locals.session = session;
       if (session) {
-        // Refresh cookie expiry whenever the session was extended.
         event.cookies.set(SESSION_COOKIE, token, sessionCookieOptions(session.expiresAt));
       } else {
         event.cookies.set(SESSION_COOKIE, '', expiredCookieOptions());
       }
     } catch {
-      // DB unreachable: deny rather than crash. Public pages still work.
       event.locals.user    = null;
       event.locals.session = null;
     }

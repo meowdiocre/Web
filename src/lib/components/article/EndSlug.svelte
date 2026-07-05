@@ -2,9 +2,6 @@
   import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   /**
-   * EndSlug is the closing strip below the final paragraph. Rotated motif glyph
-   * + mono signoff (e.g. "4,720 words · 2026 · 03 · 14").
-   *
    * @typedef {Object} Props
    * @property {string} text
    */

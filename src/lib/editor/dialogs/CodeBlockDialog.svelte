@@ -1,10 +1,3 @@
-<!--
-  CodeBlockDialog handles code-block authoring:
-    - language <select> populated from LANG_OPTIONS
-    - "auto-detect" button runs the heuristic detector on the source
-    - source <textarea> sized for a real listing
-    - caption input
--->
 <script>
   import Modal from '$lib/components/Modal.svelte';
   import DialogFooter from './DialogFooter.svelte';

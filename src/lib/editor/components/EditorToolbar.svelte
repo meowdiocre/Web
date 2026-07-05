@@ -1,24 +1,17 @@
-<!--
-  EditorToolbar is the formatting strip above the canvas. Marks, headings,
-  lists, and link buttons mutate the editor in place. Atom buttons
-  delegate to the parent which owns dialog state. The parent passes
-  `editorTick` (bumped on every selection/transaction) so `isActive()`
-  re-evaluates and active-state highlighting follows the cursor.
--->
 <script>
   import { tooltip } from '$lib/actions/tooltip.js';
 
   /**
    * @typedef {Object} Props
    * @property {import('@tiptap/core').Editor|null} editor
-   * @property {boolean}                            [saving]
-   * @property {number}                             [editorTick]
-   * @property {() => void}                         openLink
-   * @property {() => void}                         openCode
-   * @property {() => void}                         openPull
-   * @property {() => void}                         openSidenote
-   * @property {() => void}                         openEnd
-   * @property {() => void}                         save
+   * @property {boolean} [saving]
+   * @property {number} [editorTick]
+   * @property {() => void} openLink
+   * @property {() => void} openCode
+   * @property {() => void} openPull
+   * @property {() => void} openSidenote
+   * @property {() => void} openEnd
+   * @property {() => void} save
    */
 
   /** @type {Props} */
@@ -29,7 +22,7 @@
    * @param {Record<string, any>} [attrs]
    */
   function isActive(name, attrs) {
-    void editorTick;                                   // tracked: re-run on tick
+    void editorTick;
     return !!editor?.isActive(name, attrs);
   }
 
@@ -39,41 +32,42 @@
 {#if editor}
   <div class="toolbar mb-3" role="toolbar" aria-label="Editor formatting">
     <div class="toolbar__group">
-      <button class="tb"        use:tooltip={'Bold · Ctrl+B'}        class:on={isActive('bold')}   onclick={() => chain()?.toggleBold().run()}>B</button>
-      <button class="tb italic" use:tooltip={'Italic · Ctrl+I'}      class:on={isActive('italic')} onclick={() => chain()?.toggleItalic().run()}>i</button>
-      <button class="tb"        use:tooltip={'Inline code · Ctrl+E'} class:on={isActive('code')}   onclick={() => chain()?.toggleCode().run()}>‹/›</button>
+      <button type="button" class="tb"        use:tooltip={'Bold · Ctrl+B'}        class:on={isActive('bold')}   onclick={() => chain()?.toggleBold().run()}>B</button>
+      <button type="button" class="tb italic" use:tooltip={'Italic · Ctrl+I'}      class:on={isActive('italic')} onclick={() => chain()?.toggleItalic().run()}>i</button>
+      <button type="button" class="tb"        use:tooltip={'Inline code · Ctrl+E'} class:on={isActive('code')}   onclick={() => chain()?.toggleCode().run()}>‹/›</button>
     </div>
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
     <div class="toolbar__group">
-      <button class="tb" use:tooltip={'Heading 2 · Ctrl+Alt+2'} class:on={isActive('heading', { level: 2 })} onclick={() => chain()?.toggleHeading({ level: 2 }).run()}>H2</button>
-      <button class="tb" use:tooltip={'Heading 3 · Ctrl+Alt+3'} class:on={isActive('heading', { level: 3 })} onclick={() => chain()?.toggleHeading({ level: 3 }).run()}>H3</button>
+      <button type="button" class="tb" use:tooltip={'Heading 2 · Ctrl+Alt+2'} class:on={isActive('heading', { level: 2 })} onclick={() => chain()?.toggleHeading({ level: 2 }).run()}>H2</button>
+      <button type="button" class="tb" use:tooltip={'Heading 3 · Ctrl+Alt+3'} class:on={isActive('heading', { level: 3 })} onclick={() => chain()?.toggleHeading({ level: 3 }).run()}>H3</button>
     </div>
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
     <div class="toolbar__group">
-      <button class="tb" use:tooltip={'Bullet list · Ctrl+Shift+8'}  class:on={isActive('bulletList')}  onclick={() => chain()?.toggleBulletList().run()}>•</button>
-      <button class="tb" use:tooltip={'Ordered list · Ctrl+Shift+7'} class:on={isActive('orderedList')} onclick={() => chain()?.toggleOrderedList().run()}>1.</button>
+      <button type="button" class="tb" use:tooltip={'Bullet list · Ctrl+Shift+8'}  class:on={isActive('bulletList')}  onclick={() => chain()?.toggleBulletList().run()}>•</button>
+      <button type="button" class="tb" use:tooltip={'Ordered list · Ctrl+Shift+7'} class:on={isActive('orderedList')} onclick={() => chain()?.toggleOrderedList().run()}>1.</button>
     </div>
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
     <div class="toolbar__group">
-      <button class="tb" use:tooltip={'Link · Ctrl+K'} class:on={isActive('link')} onclick={openLink}>link</button>
+      <button type="button" class="tb" use:tooltip={'Link · Ctrl+K'} class:on={isActive('link')} onclick={openLink}>link</button>
     </div>
 
     <span class="toolbar__divider" aria-hidden="true"></span>
 
     <div class="toolbar__group">
-      <button class="tb" use:tooltip={'Pull quote · Ctrl+Shift+Q'} class:on={isActive('pullQuote')} onclick={openPull}>pull-quote</button>
-      <button class="tb" use:tooltip={'Code block · Ctrl+Shift+K'} class:on={isActive('codeBlock')} onclick={openCode}>code</button>
-      <button class="tb" use:tooltip={'Sidenote'}                  class:on={isActive('sidenote')}  onclick={openSidenote}>sidenote</button>
-      <button class="tb" use:tooltip={'End slug'}                  class:on={isActive('endSlug')}   onclick={openEnd}>end-slug</button>
+      <button type="button" class="tb" use:tooltip={'Pull quote · Ctrl+Shift+Q'} class:on={isActive('pullQuote')} onclick={openPull}>pull-quote</button>
+      <button type="button" class="tb" use:tooltip={'Code block · Ctrl+Shift+K'} class:on={isActive('codeBlock')} onclick={openCode}>code</button>
+      <button type="button" class="tb" use:tooltip={'Sidenote'}                  class:on={isActive('sidenote')}  onclick={openSidenote}>sidenote</button>
+      <button type="button" class="tb" use:tooltip={'End slug'}                  class:on={isActive('endSlug')}   onclick={openEnd}>end-slug</button>
     </div>
 
     <button
+      type="button"
       class="tb-save"
       use:tooltip={'Save · Ctrl+S'}
       onclick={save}

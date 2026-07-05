@@ -1,12 +1,11 @@
 <script>
   import CategoryForm from '$lib/components/admin/CategoryForm.svelte';
+  import CategoryList from '$lib/components/admin/CategoryList.svelte';
+  import FormAlert from '$lib/components/admin/FormAlert.svelte';
   import PageHeader from '$lib/components/admin/PageHeader.svelte';
   import PanelCard from '$lib/components/admin/PanelCard.svelte';
 
-  /** @type {{
-   *    data: { categories: { slug: string, label: string, tone: string }[] },
-   *    form: { error?: string, values?: Record<string, string>, success?: boolean }|null
-   *  }} */
+  /** @type {import('./$types').PageProps} */
   let { data, form } = $props();
 </script>
 
@@ -26,18 +25,7 @@
     {#if data.categories.length === 0}
       <p class="font-mono text-[12px] text-muted-warm">No categories yet.</p>
     {:else}
-      <ul class="divide-y divide-[var(--line-soft)] border-y border-[var(--line-soft)]">
-        {#each data.categories as category (category.slug)}
-          <li class="flex items-center justify-between gap-4 py-3">
-            <div>
-              <p class="font-serif text-[16px] text-paper">{category.label}</p>
-              <p class="font-mono text-[11px] tracking-[0.14em] uppercase text-muted-warm">
-                {category.slug}
-              </p>
-            </div>
-          </li>
-        {/each}
-      </ul>
+      <CategoryList categories={data.categories} />
     {/if}
   </PanelCard>
 
@@ -45,13 +33,16 @@
     title="new category"
     description="Create a new category for the post composer."
   >
-    {#if form?.success}
-      <p class="border border-rose px-3 py-2 text-rose font-mono text-[12px] mb-5">
-        category created
-      </p>
+    {#if form?.ok === true}
+      <div class="mb-5">
+        <FormAlert tone="success" message={form.message ?? 'category created'} />
+      </div>
     {/if}
 
-    <CategoryForm values={form?.values ?? {}} error={form?.error ?? ''}>
+    <CategoryForm
+      values={form?.ok === false ? form.values ?? {} : {}}
+      message={form?.ok === false ? form.message : ''}
+    >
       {#snippet footer()}
         <a href="/admin" class="btn-ghost">back to posts</a>
       {/snippet}

@@ -1,15 +1,10 @@
-<!--
-  EditorStatusBar is the thin footer that hugs the bottom of the canvas and
-  shows word/char counts + autosave cadence. Keyboard hint hides on
-  narrow viewports.
--->
 <script>
   /**
    * @typedef {Object} Props
    * @property {number} words
    * @property {number} chars
-   * @property {number} [autosaveSeconds]   default 3
-   * @property {string} [shortcutHint]      override the bundled hint line
+   * @property {number} [autosaveSeconds]
+   * @property {string} [shortcutHint]
    */
 
   /** @type {Props} */

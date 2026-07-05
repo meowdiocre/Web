@@ -2,11 +2,6 @@
   import { SITE } from '$lib/config/site.js';
 
   /**
-   * Footer with three variants:
-   *   `minimal` single hairline strip on dark pages
-   *   `paper` cream background with a dark slab footer
-   *   `article` dark slab footer with a back-to-writing link
-   *
    * @typedef {'minimal'|'paper'|'article'} Variant
    * @typedef {{ variant?: Variant }} Props
    */
@@ -75,7 +70,6 @@
 {/if}
 
 <style>
-  /* Shared link tinting across all variants. */
   .link          { color: var(--color-bone); transition: color 0.15s; }
   .link:hover    { color: var(--color-crimson); }
 </style>

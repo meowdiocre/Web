@@ -1,11 +1,8 @@
 <script>
   /**
-   * BtnPrimary is a terminal-bracket CTA button, paper on ink with a
-   * clip-path notch and offset hard shadow. Hover flips to crimson.
-   *
    * @typedef {Object} Props
    * @property {string} href
-   * @property {import('svelte').Snippet} children   button label
+   * @property {import('svelte').Snippet} children
    */
 
   /** @type {Props} */

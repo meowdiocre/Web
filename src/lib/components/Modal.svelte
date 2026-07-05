@@ -1,32 +1,14 @@
-<!--
-  Modal is a thin wrapper around the native <dialog> element.
-
-  Why <dialog>?
-    - Built-in focus management: `.showModal()` moves focus to the first
-      tabbable descendant and traps Tab inside the dialog.
-    - Built-in Escape-to-close: fires `cancel`, then `close`. We
-      intercept `cancel` and forward to the parent's `onclose`.
-    - Inert background: the user-agent blocks interaction with the rest
-      of the page while the dialog is open.
-
-  Contract:
-    - Parent owns the open flag. Set `open = true` to show; the parent
-      flips it back when `onclose` fires (Escape, backdrop click, or
-      its own logic).
-    - `title` is rendered into an accessible header; we pass its `id`
-      to `aria-labelledby` so screen readers announce the dialog.
--->
 <script>
   import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   /**
    * @typedef {Object} Props
-   * @property {boolean}                   open        Parent-owned visibility.
-   * @property {() => void}                [onclose]   Fires on Escape / backdrop / × click.
-   * @property {string}                    [title]     Header label; empty hides the chrome.
-   * @property {'sm'|'md'|'lg'}            [size]      Max-width preset.
-   * @property {import('svelte').Snippet}  [children]  Body content.
-   * @property {import('svelte').Snippet}  [footer]    Action row (buttons).
+   * @property {boolean} open
+   * @property {() => void} [onclose]
+   * @property {string} [title]
+   * @property {'sm'|'md'|'lg'} [size]
+   * @property {import('svelte').Snippet} [children]
+   * @property {import('svelte').Snippet} [footer]
    */
 
   /** @type {Props} */
@@ -35,29 +17,21 @@
   /** @type {HTMLDialogElement|undefined} */
   let dlg = $state();
 
-  // Keep the native dialog in step with the `open` prop.
   $effect(() => {
     if (!dlg) return;
     if (open && !dlg.open) dlg.showModal();
     else if (!open && dlg.open) dlg.close();
   });
 
-  /** Escape and form-method="dialog" cancel buttons fire `cancel`. */
   function onCancel(/** @type {Event} */ e) {
-    e.preventDefault();   // parent controls close via the open flag
+    e.preventDefault();
     onclose?.();
   }
 
-  /**
-   * The <dialog> itself fills the viewport (it's the backdrop surface),
-   * so a click on the dialog element directly, outside the inner panel,
-   * means the user clicked the backdrop.
-   */
   function onBackdropClick(/** @type {MouseEvent} */ e) {
     if (e.target === dlg) onclose?.();
   }
 
-  // Unique-ish id so multiple modals on one page don't collide.
   const titleId = `modal-title-${Math.random().toString(36).slice(2, 9)}`;
 </script>
 
@@ -97,11 +71,6 @@
 </dialog>
 
 <style>
-  /* The UA centres modal dialogs via `inset: 0; margin: auto` on a
-     fit-content-sized dialog, but Tailwind v4's preflight zeroes
-     margin, and our `width: 100%` makes the layout over-constrained
-     so auto margins collapse to 0. Pin with fixed + transform instead.
-     That stays deterministic regardless of UA defaults or framework resets. */
   .modal {
     position: fixed;
     top: 50%;
@@ -126,7 +95,6 @@
     backdrop-filter: blur(2px);
   }
 
-  /* Inner panel that holds the form-style content. */
   .panel {
     background: var(--color-ink-2);
     border: 1px solid rgb(232 156 146 / 0.30);

@@ -29,7 +29,6 @@
 <Nav current="about" />
 
 <main class="layer text-bone text-[16px] leading-[1.55]">
-  <!-- Head: kicker + title + tagline + 2 ledes, sigil on the right -->
   <section class="head" aria-labelledby="about-title">
     <div class="head__inner">
       <div class="min-w-0">
@@ -82,7 +81,6 @@
 <Footer variant="minimal" />
 
 <style>
-  /* Head section */
   .head { padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px); }
   .head__inner {
     max-width: 720px;
@@ -94,7 +92,6 @@
   }
   @media (max-width: 600px) { .head__inner { grid-template-columns: 1fr; gap: 18px; } }
 
-  /* Italic tagline directly under the headline. */
   .tagline {
     margin-top: 18px;
     display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
@@ -117,11 +114,9 @@
     .tagline .bar { width: 12px; transform: translateY(-4px); }
   }
 
-  /* Meta sections */
   .meta { padding: clamp(20px, 3vw, 32px) var(--gutter); }
   .meta__inner { max-width: 720px; margin: 0 auto; }
 
-  /* Lede inline link styling, only meaningful on the dark page. */
   :global(body[data-page='about']) main :global(.lede a),
   main :global(p) > :global(a) {
     color: var(--color-rose);

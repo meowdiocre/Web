@@ -12,5 +12,4 @@ export async function POST({ cookies, locals }) {
   redirect(302, '/');
 }
 
-/** GET also works so a plain anchor can log out. */
 export const GET = POST;

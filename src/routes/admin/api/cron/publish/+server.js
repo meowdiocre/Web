@@ -1,4 +1,5 @@
 import { json, error } from '@sveltejs/kit';
+import { timingSafeEqual } from 'node:crypto';
 
 import { loadDuePosts } from '$lib/server/db/queries';
 import { publishPost } from '$lib/server/db/admin-queries';
@@ -6,22 +7,20 @@ import { revalidatePaths } from '$lib/server/publish';
 
 export const prerender = false;
 
-/**
- * `/admin/api/cron/publish` is the scheduled publish endpoint.
- *
- * Auth: the scheduler sends `Authorization: Bearer ${CRON_SECRET}`.
- * Vercel Cron and GitHub Actions can both use the same secret. Use the
- * same header from `curl` in dev to trigger manually.
- *
- * Behaviour: for every draft whose `publish_at <= now`, flip status to
- * 'published', stamp `published_at`, and queue a revalidation.
- *
- * @type {import('./$types').RequestHandler}
- */
+/** @param {string} a @param {string} b */
+function secretMatches(a, b) {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  if (ab.length === 0) return false;
+  return timingSafeEqual(ab, bb);
+}
+
+/** @type {import('./$types').RequestHandler} */
 export async function GET({ request }) {
   const secret = process.env.CRON_SECRET;
   const auth = request.headers.get('authorization') ?? '';
-  if (!secret || auth !== `Bearer ${secret}`) {
+  if (!secret || !secretMatches(auth, `Bearer ${secret}`)) {
     error(401, 'Bad cron secret.');
   }
 
@@ -45,5 +44,4 @@ export async function GET({ request }) {
   return json({ ok: true, flipped: due.length, slugs: due.map((p) => p.slug) });
 }
 
-/** Mirror as POST so manual curl works with either verb. */
 export const POST = GET;

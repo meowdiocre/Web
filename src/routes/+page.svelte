@@ -59,8 +59,8 @@
 
     <div class="foot">
       <p class="kicker">
-        An independent researcher poking at <b>OS internals</b>, anti-cheat and cheat ecosystems,
-        virtualization, and the things that nobody is looking.
+        An independent researcher <b>dissecting</b> OS internals, anti-cheat and cheat ecosystems, virtualization, 
+        and the things that nobody is looking at.
       </p>
       <div class="cta">
         <BtnPrimary href="/blog">read the writing</BtnPrimary>
@@ -73,7 +73,6 @@
 <Footer variant="minimal" />
 
 <style>
-  /* Hero grid, two-up on desktop, stacked on mobile. */
   .hero {
     position: relative;
     flex: 1;
@@ -113,7 +112,6 @@
     border-top: 1px solid var(--line);
   }
 
-  /* Eyebrow, terminal-style category line. */
   .eyebrow {
     display: inline-flex;
     flex-wrap: wrap;
@@ -129,7 +127,6 @@
   .eyebrow .sep   { color: var(--color-crimson); opacity: 0.88; }
   .eyebrow b      { color: var(--color-bone);    font-weight: 400; }
 
-  /* Hero title */
   .title {
     font-family: var(--font-display);
     text-transform: uppercase;
@@ -146,7 +143,6 @@
   }
   .title .line { display: block; white-space: nowrap; position: relative; }
 
-  /* Blinking terminal cursor on the last line. */
   .cur {
     display: inline-block;
     margin-left: 0.08em;
@@ -159,7 +155,6 @@
     will-change: opacity;
   }
 
-  /* Paper-stamped "apart." block. */
   .stamp {
     display: inline-block;
     background: var(--color-paper);
@@ -171,7 +166,6 @@
     box-shadow: 5px 6px 0 var(--color-ink);
   }
 
-  /* Italic "inside." with crimson strike. */
   .title em {
     font-family: var(--font-italic);
     font-style: italic;
@@ -191,7 +185,6 @@
     pointer-events: none;
   }
 
-  /* Foot row */
   .kicker {
     max-width: 54ch;
     font-family: var(--font-italic);
@@ -209,7 +202,6 @@
     gap: 14px;
   }
 
-  /* Responsive */
   @media (max-width: 1100px) {
     .hero   { grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr); }
     .emblem { max-width: 360px; }

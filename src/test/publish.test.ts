@@ -29,11 +29,7 @@ describe('preview tokens', () => {
     expect(verifyPreviewToken('', 'foo')).toBe(false);
   });
 
-  it('survives 500 round-trips (sigs containing 0x2e do not confuse the parser)', () => {
-    // Regression test for a delimiter-scan bug: HMAC-SHA256 output is
-    // 32 random bytes, ~12% of which contain 0x2e ('.'). A naive
-    // `txt.lastIndexOf('.')` split picks the wrong dot and verification
-    // spuriously fails. Looping at scale forces hundreds of dirty sigs.
+  it('survives 500 round-trips with dot bytes inside signatures', () => {
     for (let i = 0; i < 500; i++) {
       const slug = `post-${i}-${Math.random().toString(36).slice(2, 8)}`;
       const t    = signPreviewToken(slug, 600);
@@ -41,8 +37,6 @@ describe('preview tokens', () => {
     }
   });
 });
-
-/* Cron handler auth ----------------------------------------------- */
 
 vi.mock('$lib/server/db/client', () => ({
   db: {
@@ -53,6 +47,28 @@ vi.mock('$lib/server/db/client', () => ({
     execute: vi.fn()
   }
 }));
+
+vi.mock('$lib/server/db/queries', () => ({
+  loadDuePosts: vi.fn()
+}));
+vi.mock('$lib/server/db/admin-queries', () => ({
+  publishPost: vi.fn()
+}));
+vi.mock('$lib/server/publish', async () => {
+  const real = await vi.importActual<typeof import('$lib/server/publish')>('$lib/server/publish');
+  return {
+    ...real,
+    revalidatePaths: vi.fn().mockResolvedValue(undefined)
+  };
+});
+
+const queries = await import('$lib/server/db/queries');
+const admin   = await import('$lib/server/db/admin-queries');
+const publish = await import('$lib/server/publish');
+
+function authedRequest() {
+  return { request: new Request('http://localhost/x', { headers: { Authorization: 'Bearer test-cron-secret' } }) } as any;
+}
 
 describe('cron auth', () => {
   beforeEach(() => vi.clearAllMocks());
@@ -67,5 +83,45 @@ describe('cron auth', () => {
     const { GET } = await import('../routes/admin/api/cron/publish/+server.js');
     const req = new Request('http://localhost/x', { headers: { Authorization: 'Bearer wrong' } });
     await expect(GET({ request: req } as any)).rejects.toMatchObject({ status: 401 });
+  });
+});
+
+describe('cron publish path', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('flips each due post and revalidates their routes', async () => {
+    const due = [
+      { id: 'p1', slug: 'a-slug' },
+      { id: 'p2', slug: 'b-slug' }
+    ];
+    (queries.loadDuePosts as any).mockResolvedValue(due);
+    (admin.publishPost as any).mockImplementation(async (id: string) => ({ slug: due.find((d) => d.id === id)!.slug }));
+
+    const { GET } = await import('../routes/admin/api/cron/publish/+server.js');
+    const res = await GET(authedRequest());
+
+    expect(admin.publishPost).toHaveBeenCalledTimes(2);
+    expect((admin.publishPost as any).mock.calls.map((c: any[]) => c[0])).toEqual(['p1', 'p2']);
+
+    expect(publish.revalidatePaths).toHaveBeenCalledTimes(1);
+    const paths = (publish.revalidatePaths as any).mock.calls[0][0] as string[];
+    expect(paths).toContain('/blog');
+    expect(paths).toContain('/feed.xml');
+    expect(paths).toContain('/article/a-slug');
+    expect(paths).toContain('/article/b-slug');
+
+    const body = await res.json();
+    expect(body).toMatchObject({ ok: true, flipped: 2, slugs: ['a-slug', 'b-slug'] });
+  });
+
+  it('short-circuits with flipped 0 when nothing is due', async () => {
+    (queries.loadDuePosts as any).mockResolvedValue([]);
+    const { GET } = await import('../routes/admin/api/cron/publish/+server.js');
+
+    const res = await GET(authedRequest());
+    const body = await res.json();
+    expect(body).toEqual({ ok: true, flipped: 0 });
+    expect(admin.publishPost).not.toHaveBeenCalled();
+    expect(publish.revalidatePaths).not.toHaveBeenCalled();
   });
 });

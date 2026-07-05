@@ -1,12 +1,9 @@
 <script>
   /**
-   * ArticleHead renders the breadcrumb, kicker chip, and italic h1 emphasis,
-   * dek, and mono meta row above the essay body.
-   *
    * @typedef {Object} TitleParts
-   * @property {string} pre    leading words
-   * @property {string} em     italicised emphasis
-   * @property {string} post   trailing words
+   * @property {string} pre
+   * @property {string} em
+   * @property {string} post
    *
    * @typedef {Object} Meta
    * @property {string} author
@@ -14,10 +11,10 @@
    * @property {string} readTime
    *
    * @typedef {Object} Props
-   * @property {string}     category
+   * @property {string} category
    * @property {TitleParts} title
-   * @property {string}     dek
-   * @property {Meta}       meta
+   * @property {string} dek
+   * @property {Meta} meta
    */
 
   /** @type {Props} */

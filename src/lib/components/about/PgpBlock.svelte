@@ -2,12 +2,10 @@
   import CopyButton from '../CopyButton.svelte';
 
   /**
-   * PgpBlock is a dark fingerprint card with a verification note and copy button.
-   *
    * @typedef {Object} Props
-   * @property {string}    fingerprint            full single-line fingerprint to copy
-   * @property {string[]} [display]               lines shown to the user (default: split fingerprint in half)
-   * @property {string}   [note]                  verification note above fingerprint
+   * @property {string} fingerprint
+   * @property {string[]} [display]
+   * @property {string} [note]
    */
 
   /** @type {Props} */
@@ -17,7 +15,6 @@
     note = 'Verify against keys.openpgp.org before encrypting anything sensitive.'
   } = $props();
 
-  // Default display: split into two equal lines for readability.
   const lines = $derived(
     display ?? (() => {
       const groups = fingerprint.split(' ');

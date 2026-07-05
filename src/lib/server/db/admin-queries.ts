@@ -1,13 +1,8 @@
-/**
- * Admin-only query helpers. Separate from queries.ts so the public path
- * never accidentally reads drafts or internal columns. Only routes
- * under /admin should import this module.
- */
-
 import { and, desc, eq, ne } from 'drizzle-orm';
 import { db } from './client';
 import { categories, posts } from './schema';
 import type { Doc } from '$lib/editor/types';
+import { composeTitle } from '$lib/util/strings';
 import { asInsert, asUpdate } from './write';
 
 export interface AdminPostListRow {
@@ -44,7 +39,7 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
   return rows.map((r) => ({
     id:          r.id,
     slug:        r.slug,
-    title:       `${r.titlePre}${r.titleEm}${r.titlePost}`.trim() || '(untitled)',
+    title:       composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }) || '(untitled)',
     status:      r.status,
     publishAt:   r.publishAt,
     publishedAt: r.publishedAt,

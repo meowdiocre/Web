@@ -1,8 +1,5 @@
 <script>
   /**
-   * Footnotes is the numbered references list. Items are HTML strings so
-   * they can contain inline marks (`<em>`, `<a>`, `<code>`).
-   *
    * @typedef {Object} Item
    * @property {string} html
    *

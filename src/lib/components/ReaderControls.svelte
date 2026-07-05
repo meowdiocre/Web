@@ -1,33 +1,54 @@
 <script>
   import { onMount } from 'svelte';
+  import { fly } from 'svelte/transition';
   import { STORAGE_KEYS } from '$lib/config/site.js';
 
-  /**
-   * ReaderControls is the sticky right-edge panel for /article. Theme
-   * (cream/slate) + reading size (S/M/L). Both persist to localStorage
-   * and mirror onto `body[data-theme]` / `--read-size` so the article
-   * page's CSS variables can swap.
-   */
-
-  const SIZES        = ['16px', '18px', '20px'];
+  const SIZES = ['16px', '18px', '20px'];
   const DEFAULT_SIZE = 1;
 
-  let theme   = $state(/** @type {'cream'|'slate'} */ ('cream'));
+  let theme = $state(/** @type {'cream'|'slate'} */ ('cream'));
   let sizeIdx = $state(DEFAULT_SIZE);
+  let open = $state(false);
+
+  /** @type {HTMLDivElement|undefined} */
+  let root = $state();
+  /** @type {HTMLButtonElement|undefined} */
+  let fab = $state();
+
+  const controlClass = `
+    grid h-[34px] w-[34px] place-items-center cursor-pointer
+    border border-transparent font-mono text-[13px] text-[var(--fg)]
+    transition-[background-color,border-color,color] duration-150
+    hover:border-[var(--rule)] hover:text-[var(--accent)]
+    aria-[pressed=true]:bg-[var(--accent)] aria-[pressed=true]:text-paper
+    max-[900px]:h-[40px] max-[900px]:w-[40px]
+    max-[600px]:h-[44px] max-[600px]:w-[44px] max-[600px]:text-[14px]
+  `;
 
   function applyTheme(name) {
     theme = name;
-    if (typeof document !== 'undefined') {
-      document.body.setAttribute('data-theme', name);
-      try { localStorage.setItem(STORAGE_KEYS.readerTheme, name); } catch (_) {}
-    }
+    if (typeof document === 'undefined') return;
+    document.body.setAttribute('data-theme', name);
+    try { localStorage.setItem(STORAGE_KEYS.readerTheme, name); } catch (_) {}
   }
 
   function applySize(idx) {
     sizeIdx = Math.max(0, Math.min(SIZES.length - 1, idx));
-    if (typeof document !== 'undefined') {
-      document.documentElement.style.setProperty('--read-size', SIZES[sizeIdx]);
-      try { localStorage.setItem(STORAGE_KEYS.readerSize, String(sizeIdx)); } catch (_) {}
+    if (typeof document === 'undefined') return;
+    document.body.style.setProperty('--read-size', SIZES[sizeIdx]);
+    try { localStorage.setItem(STORAGE_KEYS.readerSize, String(sizeIdx)); } catch (_) {}
+  }
+
+  /** @param {PointerEvent} e */
+  function onPointerDown(e) {
+    if (open && root && !root.contains(/** @type {Node} */ (e.target))) open = false;
+  }
+
+  /** @param {KeyboardEvent} e */
+  function onKeyDown(e) {
+    if (e.key === 'Escape' && open) {
+      open = false;
+      fab?.focus();
     }
   }
 
@@ -43,108 +64,122 @@
       applyTheme('cream');
       applySize(DEFAULT_SIZE);
     }
+
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
   });
 </script>
 
-<div class="controls" aria-label="Reader controls">
-  <!-- Paper -->
-  <div class="control">
-    <h6>Paper</h6>
-    <div class="row" role="group" aria-label="Reader theme">
-      <button
-        type="button"
-        class="ctl-btn"
-        aria-pressed={theme === 'cream'}
-        aria-label="Cream paper"
-        title="Cream paper"
-        onclick={() => applyTheme('cream')}
-      >
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#ebd8be" stroke="currentColor" /></svg>
-      </button>
-      <button
-        type="button"
-        class="ctl-btn"
-        aria-pressed={theme === 'slate'}
-        aria-label="Cool slate"
-        title="Cool slate"
-        onclick={() => applyTheme('slate')}
-      >
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#2a2530" stroke="currentColor" /></svg>
-      </button>
-    </div>
-  </div>
+<div
+  bind:this={root}
+  class="
+    fixed top-1/2 right-[18px] z-[55] flex -translate-y-1/2 items-center gap-[10px]
+    max-[900px]:right-[12px] max-[900px]:top-auto max-[900px]:bottom-4 max-[900px]:translate-y-0
+    max-[900px]:flex-col max-[900px]:items-end max-[900px]:gap-2
+    max-[600px]:right-2 max-[600px]:bottom-3
+  "
+>
+  {#if open}
+    <!-- svelte-ignore a11y_no_static_element_interactions -->
+    <div
+      id="reader-panel"
+      role="group"
+      aria-label="Reading settings"
+      transition:fly={{ duration: 140, x: 8, opacity: 0 }}
+      class="
+        reader-clip-panel relative min-w-[124px] border border-[var(--rule)] bg-[var(--bg-2)] p-[10px]
+        shadow-[0_8px_22px_var(--shadow)]
+      "
+    >
+      <div
+        aria-hidden="true"
+        class="pointer-events-none absolute left-1.5 right-1.5 top-0 border-t-2 border-dashed border-rose/[0.45]"
+      ></div>
 
-  <!-- Size -->
-  <div class="control">
-    <h6>Size</h6>
-    <div class="row" role="group" aria-label="Reading size">
-      <button type="button" class="ctl-btn" aria-label="Smaller" onclick={() => applySize(sizeIdx - 1)}>A−</button>
-      <button
-        type="button"
-        class="ctl-btn"
-        aria-pressed={sizeIdx === DEFAULT_SIZE}
-        aria-label="Default"
-        onclick={() => applySize(DEFAULT_SIZE)}
-      >A</button>
-      <button type="button" class="ctl-btn" aria-label="Larger" onclick={() => applySize(sizeIdx + 1)}>A+</button>
+      <div class="px-1 py-0.5">
+        <h6 class="mb-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-warm">Paper</h6>
+        <div class="flex gap-1" role="group" aria-label="Reader theme">
+          <button
+            type="button"
+            class={controlClass}
+            aria-pressed={theme === 'cream'}
+            aria-label="Cream paper"
+            title="Cream paper"
+            onclick={() => applyTheme('cream')}
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" fill="#ebd8be" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class={controlClass}
+            aria-pressed={theme === 'slate'}
+            aria-label="Cool slate"
+            title="Cool slate"
+            onclick={() => applyTheme('slate')}
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="9" fill="#2a2530" stroke="currentColor" stroke-width="1.6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div aria-hidden="true" class="mx-0.5 my-2 h-px bg-[var(--rule)] opacity-70"></div>
+
+      <div class="px-1 py-0.5">
+        <h6 class="mb-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-warm">Size</h6>
+        <div class="flex gap-1" role="group" aria-label="Reading size">
+          <button type="button" class={controlClass} aria-label="Smaller" onclick={() => applySize(sizeIdx - 1)}>A−</button>
+          <button
+            type="button"
+            class={controlClass}
+            aria-pressed={sizeIdx === DEFAULT_SIZE}
+            aria-label="Default"
+            onclick={() => applySize(DEFAULT_SIZE)}
+          >A</button>
+          <button type="button" class={controlClass} aria-label="Larger" onclick={() => applySize(sizeIdx + 1)}>A+</button>
+        </div>
+      </div>
     </div>
-  </div>
+  {/if}
+
+  <button
+    bind:this={fab}
+    type="button"
+    aria-label="Reading settings"
+    aria-haspopup="true"
+    aria-expanded={open}
+    aria-controls="reader-panel"
+    onclick={() => (open = !open)}
+    class="
+      reader-clip-fab grid h-[42px] w-[42px] place-items-center cursor-pointer
+      border border-[var(--rule)] bg-[var(--bg-2)] text-[var(--fg)]
+      font-display text-[13px] leading-none tracking-[-0.02em]
+      shadow-[0_4px_14px_var(--shadow)]
+      transition-[border-color,color,background-color] duration-150
+      hover:border-[var(--accent)] hover:text-[var(--accent)]
+      aria-[expanded=true]:border-[var(--accent)]
+      aria-[expanded=true]:bg-[var(--accent)]
+      aria-[expanded=true]:text-paper
+      max-[900px]:h-[44px] max-[900px]:w-[44px]
+      max-[600px]:h-[46px] max-[600px]:w-[46px]
+    "
+  >
+    <span aria-hidden="true">Aa</span>
+  </button>
 </div>
 
 <style>
-  .controls {
-    position: fixed;
-    right: 18px; top: 50%;
-    transform: translateY(-50%);
-    z-index: 55;
-    display: flex; flex-direction: column; gap: 14px;
+  .reader-clip-fab {
+    clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
   }
-  .control {
-    padding: 8px;
-    background: var(--bg-2);
-    border: 1px solid var(--rule);
-    box-shadow: 0 4px 14px var(--shadow, rgb(36 24 20 / 0.08));
-    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  }
-  h6 {
-    margin: 0 4px 6px;
-    text-align: center;
-    font-family: var(--font-mono);
-    font-size: 9px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-muted-warm);
-  }
-  .row { display: flex; gap: 4px; }
-
-  .ctl-btn {
-    width: 34px; height: 34px;
-    display: grid; place-items: center;
-    font-family: var(--font-mono);
-    font-size: 13px;
-    color: var(--fg, #241814);
-    border: 1px solid transparent;
-    transition: background 0.15s, border-color 0.15s;
-  }
-  .ctl-btn:hover { border-color: var(--rule); }
-  .ctl-btn[aria-pressed='true'] {
-    background: var(--accent, var(--color-crimson-deep));
-    color: var(--color-paper);
-  }
-  .ctl-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
-
-  @media (max-width: 900px) {
-    .controls {
-      right: 12px; top: auto; bottom: 16px;
-      transform: none;
-      flex-direction: row; gap: 8px;
-    }
-    .control { padding: 6px; }
-    h6       { display: none; }
-    .ctl-btn { width: 40px; height: 40px; }
-  }
-  @media (max-width: 600px) {
-    .controls { right: 8px; bottom: 12px; }
-    .ctl-btn  { width: 44px; height: 44px; font-size: 14px; }
+  .reader-clip-panel {
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   }
 </style>

@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 
-import { createCategoryFromForm } from '$lib/server/admin/workflows';
+import { actionFailure, actionSuccess } from '$lib/server/admin/action-result';
+import { categoryFormValues, createCategoryFromForm } from '$lib/server/admin/workflows';
 import { listCategories } from '$lib/server/db/admin-queries';
 
 export const prerender = false;
@@ -14,18 +15,15 @@ export async function load() {
 /** @type {import('./$types').Actions} */
 export const actions = {
   default: async ({ request, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
 
     const form = await request.formData();
-    const result = await createCategoryFromForm({
-      label: String(form.get('label') ?? ''),
-      slug: String(form.get('slug') ?? '')
-    });
+    const result = await createCategoryFromForm(categoryFormValues(form));
 
     if (!result.ok) {
       return fail(400, result);
     }
 
-    return { success: true };
+    return actionSuccess({ message: 'category created' });
   }
 };

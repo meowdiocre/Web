@@ -1,11 +1,8 @@
 <script>
   /**
-   * CtaText is a small terminal-style text link with a leading arrow that
-   * tints rose → crimson on hover. Used as the secondary CTA on /.
-   *
    * @typedef {Object} Props
    * @property {string} href
-   * @property {string} [arrow]   glyph before the label (default '→')
+   * @property {string} [arrow]
    * @property {import('svelte').Snippet} children
    */
 

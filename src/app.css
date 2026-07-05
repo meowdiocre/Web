@@ -1,15 +1,12 @@
 @import 'tailwindcss';
 
-/* Design tokens (Tailwind v4 @theme). Auto-generates utilities like
-   bg-ink, text-rose, font-terminal. */
-
 @theme {
-  --color-ink:          #161115; /* warm near-black, plum undertone */
+  --color-ink:          #161115;
   --color-ink-2:        #1f191c;
-  --color-paper:        #ebd8be; /* warm peach-cream */
+  --color-paper:        #ebd8be;
   --color-paper-2:      #d8c4a6;
-  --color-rose:         #e89c92; /* dusty rose pulled from Lain */
-  --color-crimson:      #c83a3d; /* dusty Wired-red */
+  --color-rose:         #e89c92;
+  --color-crimson:      #c83a3d;
   --color-crimson-deep: #8e2a27;
   --color-bone:         #d4c5a8;
   --color-muted:        #9a8a80;
@@ -32,9 +29,6 @@
   }
 }
 
-/* Page-frame variables (gutters, hairlines). Outside @theme because
-   they're not utility-bound. */
-
 :root {
   --gutter:      clamp(20px, 4vw, 56px);
   --line:        rgba(245, 239, 224, 0.12);
@@ -43,9 +37,6 @@
   --rule:        rgba(36, 24, 20, 0.16);
   --rule-soft:   rgba(36, 24, 20, 0.08);
 }
-
-/* Base — body baseline + per-page background switch.
-   Utilities can't target body[data-page=...]; do it once here. */
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 
@@ -75,9 +66,6 @@ body[data-page='blog']                        { background: var(--color-paper); 
 body[data-page='article']                     { background: var(--color-paper); color: #241814; transition: background 0.25s, color 0.25s; }
 body[data-page='article'][data-theme='slate'] { background: #2a2530; color: #e4d6c2; }
 
-/* Atmosphere — CRT scanlines (dark) / paper grain (cream).
-   Fixed full-viewport overlay; pointer-events: none. */
-
 body[data-page='home']::before,
 body[data-page='about']::before,
 body[data-page='article'][data-theme='slate']::before {
@@ -105,15 +93,8 @@ body[data-page='article']:not([data-theme='slate'])::before {
 }
 
 @layer base {
-  /* Above body::before scanlines. Wrapped in @layer base so it never
-     beats Tailwind utilities like `sticky`/`z-50` on positioned chrome. */
   .layer { position: relative; z-index: 1; }
 }
-
-/* Article reader theme — cream (default) ↔ slate.
-   The article page reads these via var(--bg) / var(--fg). Defined
-   app-level so the entire article subtree (incl. fixed ReaderControls
-   + ScrollProgress) shares the palette. */
 
 body[data-page='article'] {
   --bg:        #ebd8be;
@@ -156,8 +137,6 @@ body[data-page='article'][data-theme='slate'] {
   --shadow:    rgb(0 0 0 / 0.4);
 }
 
-/* A11y — skip link + global focus ring. */
-
 .skip-link {
   position: absolute;
   top: -100px; left: 16px;
@@ -191,9 +170,6 @@ body[data-page='article']:not([data-theme='slate']) :focus-visible {
   html { scroll-behavior: auto; }
 }
 
-/* Tooltip — singleton appended to <body> by the `use:tooltip` action
-   in src/lib/actions/tooltip.js. Global so it's reusable anywhere. */
-
 .tooltip {
   position: fixed;
   top: 0; left: 0;
@@ -222,14 +198,7 @@ body[data-page='article']:not([data-theme='slate']) :focus-visible {
   .tooltip { transition: opacity 0.05s linear; transform: none; }
 }
 
-/* ==========================================================
-/* Admin chrome — form fields, buttons, nav links. Scoped to
-   body[data-page='admin'] so utility-style class names (.field, .inp,
-   .btn-primary) only collide inside /admin. Declared once here instead
-   of being re-:global()-ed by every admin page. */
-
 body[data-page='admin'] {
-  /* Form fields */
   .field { display: grid; gap: 8px; min-width: 0; }
   .lbl {
     font-family: var(--font-mono);
@@ -258,7 +227,6 @@ body[data-page='admin'] {
   .inp:focus { outline: 2px solid var(--color-rose); outline-offset: 2px; }
   textarea.inp { resize: vertical; min-height: 80px; }
 
-  /* Buttons */
   .btn-primary,
   .btn-ghost,
   .btn-danger {
@@ -290,7 +258,6 @@ body[data-page='admin'] {
   }
   .btn-danger:hover { background: var(--color-crimson-deep); color: var(--color-paper); }
 
-  /* Status pill */
   .status {
     display: inline-block;
     padding: 2px 8px;
@@ -303,8 +270,6 @@ body[data-page='admin'] {
   .status--draft     { color: var(--color-muted-warm); }
   .status--published { color: var(--color-rose); }
 
-  /* Sidebar / dropdown nav — structured into sections, with an active
-     state that paints a rose left-accent bar + recolours the caret. */
   .nav-section + .nav-section { margin-top: 18px; }
   .nav-section__label {
     display: flex;

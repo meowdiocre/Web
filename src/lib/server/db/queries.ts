@@ -1,9 +1,6 @@
-/**
- * Public query helpers around the `posts` and `categories` tables.
- * Consumed by SvelteKit `+page.server.js` loads and the feed handler.
- */
-
 import { and, desc, eq, lte, ne } from 'drizzle-orm';
+import { SITE } from '$lib/config/site.js';
+import { composeTitle } from '$lib/util/strings';
 import { db } from './client';
 import { posts, categories } from './schema';
 
@@ -34,7 +31,6 @@ export interface EntryGroup {
   entries: PublicEntry[];
 }
 
-/** Published posts grouped by year, newest year first. */
 export async function loadPublicEntries(): Promise<EntryGroup[]> {
   const rows = await db
     .select({
@@ -59,7 +55,7 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
     const entry: PublicEntry = {
       href:     `/article/${r.slug}`,
       date:     shortDate(when),
-      title:    `${r.titlePre}${r.titleEm}${r.titlePost}`.trim(),
+      title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
       desc:     r.dek,
       category: r.categoryLabel ?? '',
       readTime: r.readTime
@@ -86,10 +82,14 @@ export interface PublicArticle {
   category:  string;
 }
 
-/**
- * Load one post by slug. Returns null if missing or unpublished;
- * pass `{ allowDraft: true }` to bypass the status filter (signed previews).
- */
+export interface RelatedEntry {
+  href:     string;
+  category: string;
+  readTime: string;
+  title:    string;
+  blurb:    string;
+}
+
 export async function loadPublicArticle(
   slug: string,
   opts: { allowDraft?: boolean } = {}
@@ -136,8 +136,7 @@ export async function loadPublicArticle(
   };
 }
 
-/** Up to 3 same-category posts, newest first, excluding the given slug. */
-export async function loadRelated(slug: string, categorySlug: string) {
+export async function loadRelated(slug: string, categorySlug: string): Promise<RelatedEntry[]> {
   const rows = await db
     .select({
       slug:      posts.slug,
@@ -156,19 +155,18 @@ export async function loadRelated(slug: string, categorySlug: string) {
       ne(posts.slug, slug)
     ))
     .orderBy(desc(posts.publishedAt))
-    .limit(3);
+    .limit(SITE.relatedPosts.itemCount);
 
   return rows.map((r) => ({
     href:     `/article/${r.slug}`,
     category: r.category ?? '',
     readTime: r.readTime,
-    title:    `${r.titlePre}${r.titleEm}${r.titlePost}`.trim(),
+    title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
     blurb:    r.dek
   }));
 }
 
-/** Latest N published posts for the RSS feed. */
-export async function loadFeedPosts(limit = 20) {
+export async function loadFeedPosts(limit: number) {
   return db
     .select({
       slug:        posts.slug,
@@ -188,7 +186,6 @@ export async function loadFeedPosts(limit = 20) {
     .limit(limit);
 }
 
-/** Drafts whose `publishAt` is due — consumed by the publish cron. */
 export async function loadDuePosts(now: Date) {
   return db
     .select()

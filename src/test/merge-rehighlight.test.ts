@@ -1,9 +1,3 @@
-/**
- * Smoke tests for the post-save rehighlight merge. We can't easily
- * instantiate a real ProseMirror state in unit tests, so we use a
- * minimal duck-typed fake.
- */
-
 import { describe, expect, it, vi } from 'vitest';
 import { mergeRehighlightedHtml } from '$lib/editor/merge-rehighlight.js';
 
@@ -21,11 +15,6 @@ function fakeParagraph() {
   };
 }
 
-/**
- * Build a fake editor whose `state.doc.descendants(cb)` walks the
- * provided node list in order (top-level only). Records dispatched
- * transactions for assertions.
- */
 function fakeEditor(nodes: any[]) {
   const setNodeMarkup = vi.fn();
   const dispatch      = vi.fn();
@@ -125,7 +114,6 @@ describe('mergeRehighlightedHtml', () => {
         { type: 'codeBlock', attrs: { source: 'a', lang: 'javascript', caption: '', html: '<span>A</span>' } }
       ]
     });
-    // Only the first code block updates.
     expect(ed._setNodeMarkup).toHaveBeenCalledTimes(1);
     expect(ed._setNodeMarkup.mock.calls[0][2].html).toBe('<span>A</span>');
   });

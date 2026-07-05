@@ -2,7 +2,7 @@
   import EntryItem from '$lib/components/EntryItem.svelte';
   import EntriesYear from '$lib/components/EntriesYear.svelte';
 
-  /** @typedef {{ year: number, entries: any[] }} EntryGroup */
+  /** @typedef {import('$lib/server/db/queries').EntryGroup} EntryGroup */
   /** @typedef {{ entryGroups?: EntryGroup[], filteredCount?: number, visibleCount?: number, remainingCount?: number, onShowMore?: () => void }} Props */
 
   /** @type {Props} */

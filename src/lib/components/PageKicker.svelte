@@ -2,13 +2,10 @@
   import { SITE } from '$lib/config/site.js';
 
   /**
-   * PageKicker is a small uppercase mono header above a page title.
-   * Mirrors the "kind / brand" pattern used on /blog, /about, /article.
-   *
    * @typedef {Object} Props
-   * @property {string}  label    section label (e.g. 'About')
-   * @property {string} [brand]   right-side label (defaults to site brand)
-   * @property {'muted'|'muted-warm'} [tone]   colour family
+   * @property {string} label
+   * @property {string} [brand]
+   * @property {'muted'|'muted-warm'} [tone]
    */
 
   /** @type {Props} */

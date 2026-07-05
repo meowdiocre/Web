@@ -1,6 +1,3 @@
-<!--
-  SidenoteDialog sets the ref glyph and body HTML for a sidenote.
--->
 <script>
   import Modal from '$lib/components/Modal.svelte';
   import DialogFooter from './DialogFooter.svelte';

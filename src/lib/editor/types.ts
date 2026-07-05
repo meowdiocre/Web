@@ -1,8 +1,3 @@
-/**
- * TipTap / ProseMirror document model shared by the editor and the
- * server-side renderer. Kept structural so it round-trips through JSON.
- */
-
 export type Mark =
   | { type: 'bold' }
   | { type: 'italic' }
@@ -49,13 +44,9 @@ export interface PullQuoteNode {
 export interface CodeBlockNode {
   type: 'codeBlock';
   attrs: {
-    /** Raw source; canonical when re-highlighting. */
     source: string;
-    /** Shiki language id, or 'plaintext' to skip highlighting. */
     lang: string;
-    /** Figure caption shown below the listing. */
     caption: string;
-    /** Server-rendered body wrapped in <span class="kw|com|num|str|fn">. */
     html: string;
   };
 }

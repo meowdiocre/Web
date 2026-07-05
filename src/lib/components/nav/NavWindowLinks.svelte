@@ -13,7 +13,7 @@
 
 {#each NAV_WINDOWS as window (window.key)}
   <a
-    class:nav-window={true}
+    class="nav-window"
     class:nav-window-mobile={mobile}
     class:nav-window-desktop={!mobile}
     class:is-current={current === window.key}

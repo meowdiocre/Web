@@ -1,17 +1,7 @@
-export interface BlogEntry {
-  href: string;
-  date: string;
-  title: string;
-  desc: string;
-  category: string;
-  readTime: string;
-  year: number;
-}
+import type { EntryGroup as PublicEntryGroup, PublicEntry } from '$lib/server/db/queries';
 
-export interface BlogEntryGroup {
-  year: number;
-  entries: Array<Omit<BlogEntry, 'year'>>;
-}
+export type BlogEntry = PublicEntry & { year: number };
+export type BlogEntryGroup = PublicEntryGroup;
 
 export interface BlogCategorySummary {
   key: string;

@@ -1,17 +1,14 @@
 /**
  * @typedef {Object} Entry
  * @property {string} href
- * @property {string} date     'Mar 14'
+ * @property {string} date
  * @property {string} title
  * @property {string} desc
  * @property {string} category
  * @property {string} readTime
  */
 
-/**
- * Entries grouped by year, in display order (newest first).
- * @type {{ year: number, entries: Entry[] }[]}
- */
+/** @type {{ year: number, entries: Entry[] }[]} */
 export const entryGroups = [
   {
     year: 2026,

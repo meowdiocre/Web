@@ -2,11 +2,11 @@ import { SITE } from '../config/site.js';
 
 /**
  * @typedef {Object} Contact
- * @property {string}  label   uppercase mono key  ('Email')
- * @property {string}  href    full URL or mailto:
- * @property {string}  value   primary line shown in serif
- * @property {string} [note]   optional secondary line in muted sans
- * @property {boolean}[external]  add target=_blank + rel=noopener
+ * @property {string} label
+ * @property {string} href
+ * @property {string} value
+ * @property {string} [note]
+ * @property {boolean} [external]
  */
 
 /** @type {Contact[]} */

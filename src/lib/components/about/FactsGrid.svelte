@@ -1,10 +1,5 @@
 <script>
   /**
-   * FactsGrid is the 2xN quick-facts strip on /about.
-   *
-   * Each fact's `value` may contain ' · ' separators; they get accent
-   * colour automatically by splitting and re-joining with a styled span.
-   *
    * @typedef {Object} Fact
    * @property {string} label
    * @property {string} value
@@ -16,7 +11,6 @@
   /** @type {Props} */
   let { items } = $props();
 
-  /** Split on ' · ' and stitch with accent-coloured separators. */
   function parts(value) {
     return value.split(' · ');
   }

@@ -1,7 +1,5 @@
 <script>
   /**
-   * PullQuote - full-width italic block quote bracketed by guillemets.
-   *
    * @typedef {Object} Props
    * @property {string} text
    */

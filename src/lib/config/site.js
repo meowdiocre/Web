@@ -1,30 +1,32 @@
-/** Site-wide configuration. Centralise brand strings, paths, storage keys. */
-
 export const SITE = Object.freeze({
   brand:           'meowdiocre',
   session:         'meowdiocre',
   host:            'berlin',
   email:           'meowdiocre@proton.me',
   github:          'devirtz',
-  copyrightYear:   2026,
+  copyrightYear:   new Date().getFullYear(),
+  feed: Object.freeze({
+    description: 'Long-form essays and lab notes on reverse engineering, Windows internals, anti-cheat infrastructure, browser sandbox internals, and the strange behavior of large language models.',
+    itemCount: 40
+  }),
+  relatedPosts: Object.freeze({
+    itemCount: 3
+  }),
   pgpFingerprint:  'A0F4 8E12 9BCD 7654 3210 FEDC BA98 7654 3210 EFAB',
   pgpFingerprintDisplay: ['A0F4 8E12 9BCD 7654 3210', 'FEDC BA98 7654 3210 EFAB']
 });
 
 /**
  * @typedef {Object} NavWindow
- * @property {number} idx        tmux window index (0-based)
- * @property {string} path       SvelteKit route path
- * @property {'home'|'writing'|'about'} key   logical identifier
- * @property {string} name       window label shown in nav
- * @property {string} crumb      mobile crumb text
- * @property {string} hostPath   tmux session host suffix
+ * @property {number} idx
+ * @property {string} path
+ * @property {'home'|'writing'|'about'} key
+ * @property {string} name
+ * @property {string} crumb
+ * @property {string} hostPath
  */
 
-/**
- * Declaration order drives the tmux 0/1/2 + n/p cycle.
- * @type {readonly NavWindow[]}
- */
+/** @type {readonly NavWindow[]} */
 export const NAV_WINDOWS = Object.freeze([
   { idx: 0, path: '/',      key: 'home',    name: 'index',   crumb: 'home',    hostPath: '~'         },
   { idx: 1, path: '/blog',  key: 'writing', name: 'writing', crumb: 'writing', hostPath: '~/writing' },
@@ -36,7 +38,6 @@ export function findWindowByKey(key) {
 }
 
 export function findWindowByPath(path) {
-  // /article belongs under /blog ("writing") for nav purposes.
   if (path?.startsWith('/article')) return NAV_WINDOWS[1];
   return NAV_WINDOWS.find((w) => w.path === path) ?? NAV_WINDOWS[0];
 }

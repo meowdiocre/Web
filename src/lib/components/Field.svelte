@@ -1,11 +1,3 @@
-<!--
-  Field is the unified form field for admin forms. It wraps `.field` / `.lbl` /
-  `.inp` markup so every form gets the same label-on-top layout and
-  consistent input/textarea/select/datetime variants.
-
-  Inputs are uncontrolled (plain `name` + `value`) because SvelteKit's
-  form actions read FormData straight off the submitted form.
--->
 <script>
   /**
    * @typedef {'input'|'textarea'|'select'|'datetime'} FieldKind

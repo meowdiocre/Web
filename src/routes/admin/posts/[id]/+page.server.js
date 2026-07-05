@@ -1,5 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
+import { SITE } from '$lib/config/site.js';
+import { actionFailure, actionSuccess, formValues } from '$lib/server/admin/action-result';
 import {
   deletePost,
   getPostById,
@@ -10,7 +12,7 @@ import {
   updatePostMetadata
 } from '$lib/server/db/admin-queries';
 import { postMetadataSchema, normalisePublishAt } from '$lib/server/validation';
-import { revalidatePaths, signPreviewToken } from '$lib/server/publish';
+import { revalidatePost, signPreviewToken } from '$lib/server/publish';
 
 export const prerender = false;
 
@@ -25,9 +27,10 @@ export async function load({ params }) {
 /** @type {import('./$types').Actions} */
 export const actions = {
   update: async ({ params, request, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const form = await request.formData();
     const raw = Object.fromEntries(form.entries());
+    const values = formValues(raw);
 
     const parsed = postMetadataSchema.safeParse({
       slug:          raw.slug,
@@ -37,20 +40,20 @@ export const actions = {
       category:      raw.category,
       dek:           raw.dek,
       readTime:      raw.readTime,
-      author:        raw.author || 'meowdiocre',
+      author:        raw.author || SITE.brand,
       coverImageUrl: (raw.coverImageUrl ? String(raw.coverImageUrl) : null),
       publishAt:     raw.publishAt ?? ''
     });
 
     if (!parsed.success) {
-      return fail(400, {
-        error: parsed.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; '),
-        values: raw
-      });
+      return fail(400, actionFailure(
+        parsed.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; '),
+        { values }
+      ));
     }
 
     if (await isSlugTaken(parsed.data.slug, params.id)) {
-      return fail(409, { error: 'That slug is already taken by another post.', values: raw });
+      return fail(409, actionFailure('That slug is already taken by another post.', { values }));
     }
 
     await updatePostMetadata(params.id, {
@@ -66,37 +69,37 @@ export const actions = {
       publishAt:     normalisePublishAt(parsed.data.publishAt)
     });
 
-    return { saved: true };
+    return actionSuccess({ message: 'saved.' });
   },
 
   delete: async ({ params, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await deletePost(params.id);
     if (row?.status === 'published') {
-      await revalidatePaths(['/blog', `/article/${row.slug}`, '/feed.xml']);
+      await revalidatePost(row.slug);
     }
     redirect(303, '/admin');
   },
 
   publish: async ({ params, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await publishPost(params.id);
-    if (row) await revalidatePaths(['/blog', `/article/${row.slug}`, '/feed.xml']);
-    return { saved: true, status: 'published' };
+    if (row) await revalidatePost(row.slug);
+    return actionSuccess({ message: 'saved.', status: 'published' });
   },
 
   unpublish: async ({ params, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await unpublishPost(params.id);
-    if (row) await revalidatePaths(['/blog', `/article/${row.slug}`, '/feed.xml']);
-    return { saved: true, status: 'draft' };
+    if (row) await revalidatePost(row.slug);
+    return actionSuccess({ message: 'saved.', status: 'draft' });
   },
 
   preview: async ({ params, locals }) => {
-    if (!locals.user) return fail(401, { error: 'Not signed in.' });
+    if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const post = await getPostById(params.id);
-    if (!post) return fail(404, { error: 'Post not found.' });
+    if (!post) return fail(404, actionFailure('Post not found.'));
     const token = signPreviewToken(post.slug);
-    return { previewUrl: `/article/${post.slug}?preview=${encodeURIComponent(token)}` };
+    return actionSuccess({ previewUrl: `/article/${post.slug}?preview=${encodeURIComponent(token)}` });
   }
 };

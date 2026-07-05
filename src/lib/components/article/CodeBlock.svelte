@@ -1,11 +1,8 @@
 <script>
   /**
-   * CodeBlock is a clipped `<pre><code>` block with a mono caption beneath.
-   * Accepts pre-highlighted HTML so the data layer ships colour spans.
-   *
    * @typedef {Object} Props
-   * @property {string} html       inner HTML already wrapped in `<span class="kw|fn|str|com|num">`
-   * @property {string} [caption]  figure caption shown beneath
+   * @property {string} html
+   * @property {string} [caption]
    */
 
   /** @type {Props} */

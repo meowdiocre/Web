@@ -1,11 +1,8 @@
 <script>
   /**
-   * PageTitle is a large display headline with a coloured terminator dot
-   * (the "writing." / "about." flourish).
-   *
    * @typedef {Object} Props
-   * @property {string} text       lowercase word, e.g. 'about'
-   * @property {string} id         anchor id for aria-labelledby
+   * @property {string} text
+   * @property {string} id
    * @property {'crimson'|'crimson-deep'} [dotTone]
    * @property {'paper'|'ink'} [tone]
    */

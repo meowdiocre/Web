@@ -1,19 +1,15 @@
-<!--
-  DialogFooter is the shared cancel | [delete] | confirm action row for the
-  atom-authoring dialogs. Goes inside a Modal's `{#snippet footer()}` slot.
--->
 <script>
   /**
    * @typedef {Object} Props
-   * @property {'insert'|'edit'}      [mode]          drives the confirm label
-   * @property {string}               [insertLabel]
-   * @property {string}               [saveLabel]
-   * @property {string}               [removeLabel]
-   * @property {string}               [cancelLabel]
-   * @property {boolean}              [canSubmit]     gates the confirm button
-   * @property {() => void}           onCancel
-   * @property {() => void}           onSubmit
-   * @property {() => void}           [onRemove]      shown only when mode === 'edit'
+   * @property {'insert'|'edit'} [mode]
+   * @property {string} [insertLabel]
+   * @property {string} [saveLabel]
+   * @property {string} [removeLabel]
+   * @property {string} [cancelLabel]
+   * @property {boolean} [canSubmit]
+   * @property {() => void} onCancel
+   * @property {() => void} onSubmit
+   * @property {() => void} [onRemove]
    */
 
   /** @type {Props} */

@@ -5,8 +5,6 @@
   import NavToggle from '$lib/components/nav/NavToggle.svelte';
 
   /**
-   * Sticky tmux-style status bar shared across the public pages.
-   *
    * @typedef {'home'|'writing'|'about'} Current
    * @typedef {{ current: Current }} Props
    */
@@ -111,13 +109,11 @@
 </header>
 
 <style>
-  /* Slightly darker plum bg on article pages. */
   :global(body[data-page='article']) .nav {
     background: rgb(22 17 21 / 0.94);
     box-shadow: 0 1px 0 rgb(22 17 21 / 0.94), 0 2px 0 rgb(232 156 146 / 0.07);
   }
 
-  /* Solid fallback for browsers without backdrop-filter. */
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
     .nav { background: rgb(10 9 8 / 0.985); }
     :global(body[data-page='article']) .nav { background: rgb(22 17 21 / 0.985); }

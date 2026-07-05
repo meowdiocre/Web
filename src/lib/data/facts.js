@@ -1,7 +1,7 @@
 /**
  * @typedef {Object} Fact
  * @property {string} label
- * @property {string} value      may contain a single ' · ' separator that gets accent colour
+ * @property {string} value
  */
 
 /** @type {Fact[]} */

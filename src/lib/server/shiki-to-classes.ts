@@ -1,19 +1,7 @@
-/**
- * Server-side syntax highlighting. Maps Shiki TextMate scopes onto the
- * fixed class set the public CSS already styles:
- *
- *   kw  — keyword.*, storage.*, support.type.*, support.class.*
- *   fn  — entity.name.function.*, support.function.*, variable.function.*
- *   str — string.*, constant.character.*
- *   com — comment.*
- *   num — constant.numeric.*, constant.language.*
- *
- * Anything else is emitted as plain (unspanned) escaped text.
- */
-
 import type { BundledLanguage, ThemedToken } from 'shiki';
 import { createHighlighter, type Highlighter } from 'shiki';
 import { SAFE_LANGS, SAFE_LANGS_SET, normaliseLang } from '../editor/lang';
+import { escapeAttr as escapeHtml } from '../util/escape';
 
 let _hl: Promise<Highlighter> | null = null;
 
@@ -24,14 +12,6 @@ function getHighlighter(): Promise<Highlighter> {
     langs:  SAFE_LANGS.filter((l) => l !== 'plaintext')
   }) as unknown as Promise<Highlighter>;
   return _hl;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
 }
 
 function classFor(scopes: string[] | undefined, _fallback: string): string | null {
@@ -46,11 +26,6 @@ function classFor(scopes: string[] | undefined, _fallback: string): string | nul
   return null;
 }
 
-/**
- * Highlight `source` as `lang`. Returns HTML safe to splice into a
- * <pre><code> via `{@html}`. Falls back to plain escape for plaintext
- * or any lang not in the allow-list.
- */
 export async function highlightToClasses(source: string, lang: string): Promise<string> {
   const l = normaliseLang(lang);
   if (!source) return '';
@@ -66,10 +41,6 @@ export async function highlightToClasses(source: string, lang: string): Promise<
 
   let tokens: ThemedToken[][];
   try {
-    // `includeExplanation: 'scopeName'` populates each token with
-    // `explanation[0].scopes` so classFor() can bucket by TextMate scope.
-    // Without it, codeToTokensBase only fills colour/fontStyle metadata
-    // and every token comes out unspanned (= no syntax colour).
     tokens = hl.codeToTokensBase(source, {
       lang:  l as BundledLanguage,
       theme: 'github-light',
@@ -82,8 +53,6 @@ export async function highlightToClasses(source: string, lang: string): Promise<
   const lines = tokens.map((line) =>
     line
       .map((tk) => {
-        // A single ThemedToken may bundle several sub-spans (Shiki merges
-        // by colour). Pick the first explanation entry as representative.
         const scopes = (tk as any).explanation?.[0]?.scopes
           ?.map((s: any) => s.scopeName) ?? scopesOf(tk);
         const cls = classFor(scopes, 'kw');
@@ -99,7 +68,6 @@ function scopesOf(tk: ThemedToken): string[] {
   return ((tk as any).scopes as string[]) ?? [];
 }
 
-/** Sync passthrough for the seed (which keeps its existing spans). */
 export function passthroughHtml(html: string): string {
   return html;
 }

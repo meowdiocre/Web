@@ -1,7 +1,5 @@
 <script>
   /**
-   * ContactList renders three-column rows on /about: key | value | arrow.
-   *
    * @typedef {Object} Contact
    * @property {string}  label
    * @property {string}  href

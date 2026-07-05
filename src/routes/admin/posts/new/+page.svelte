@@ -2,10 +2,7 @@
   import PageHeader from '$lib/components/admin/PageHeader.svelte';
   import PostDraftForm from '$lib/components/admin/PostDraftForm.svelte';
 
-  /** @type {{
-   *    data: { categories: { slug: string, label: string }[] },
-   *    form: { error?: string, values?: Record<string,string> }|null
-   *  }} */
+  /** @type {import('./$types').PageProps} */
   let { data, form } = $props();
 </script>
 
@@ -20,8 +17,8 @@
 <div class="max-w-[640px]">
   <PostDraftForm
     categories={data.categories}
-    values={form?.values ?? {}}
-    error={form?.error ?? ''}
+    values={form?.ok === false ? form.values ?? {} : {}}
+    message={form?.ok === false ? form.message : ''}
   >
     {#snippet footer()}
       <a href="/admin" class="btn-ghost">cancel</a>

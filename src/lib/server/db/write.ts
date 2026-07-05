@@ -1,12 +1,9 @@
-/**
- * Drizzle 0.36 narrows insert/update payloads to required columns only in
- * this mixed JS/TS setup. Keep the escape hatch isolated to the DB layer.
- */
+/** Drizzle 0.36 typing escape hatch for JS/TS mixed writes. */
 
-export function asInsert(value: object): any {
+export function asInsert<T extends Record<string, unknown>>(value: T): any {
   return value;
 }
 
-export function asUpdate(value: object): any {
+export function asUpdate<T extends Record<string, unknown>>(value: T): any {
   return value;
 }

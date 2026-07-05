@@ -1,15 +1,3 @@
-/**
- * meowdiocre database schema (Postgres / Drizzle).
- *
- *   posts       canonical content is doc_json (TipTap); body_html is the
- *               cached server-rendered version served to the public.
- *   categories  controlled vocabulary referenced by posts.
- *   users       one row in production (the admin), keyed by GitHub id;
- *               the allow-list is still enforced at OAuth callback.
- *   sessions    SHA-256(cookie token) -> users.
- *   media       Vercel Blob uploads referenced from the editor.
- */
-
 import {
   pgTable,
   pgEnum,
@@ -56,7 +44,6 @@ export const users = pgTable(
 export const sessions = pgTable(
   'sessions',
   {
-    // SHA-256 of the cookie value; the cookie itself carries the raw token.
     id:        varchar('id', { length: 64 }).primaryKey(),
     userId:    uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
@@ -73,8 +60,6 @@ export const posts = pgTable(
     id:   uuid('id').primaryKey().defaultRandom(),
     slug: varchar('slug', { length: 128 }).notNull(),
 
-    // Title is split so the public h1 can italicise the middle slice
-    // exactly like the original demo article.
     titlePre:  varchar('title_pre',  { length: 256 }).notNull().default(''),
     titleEm:   varchar('title_em',   { length: 256 }).notNull().default(''),
     titlePost: varchar('title_post', { length: 256 }).notNull().default(''),
@@ -88,17 +73,13 @@ export const posts = pgTable(
 
     status: postStatus('status').notNull().default('draft'),
 
-    /** Optional future-dated publish trigger (used by the publish cron). */
     publishAt:   timestamp('publish_at',   { withTimezone: true }),
     publishedAt: timestamp('published_at', { withTimezone: true }),
 
     coverImageUrl: text('cover_image_url'),
 
-    /** Canonical content (TipTap / ProseMirror JSON). */
     docJson:  jsonb('doc_json').notNull().default(sql`'{}'::jsonb`),
-    /** Cached server-rendered HTML; rebuilt every save. */
     bodyHtml: text('body_html').notNull().default(''),
-    /** Flat list of `{ html }` rendered after the body. */
     footnotesJson: jsonb('footnotes_json').notNull().default(sql`'[]'::jsonb`),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

@@ -3,6 +3,8 @@
   import PageHeader from '$lib/components/admin/PageHeader.svelte';
   import PanelCard from '$lib/components/admin/PanelCard.svelte';
   import ActionMenu from '$lib/components/admin/ActionMenu.svelte';
+  import CategoryList from '$lib/components/admin/CategoryList.svelte';
+  import FormAlert from '$lib/components/admin/FormAlert.svelte';
   import PostDraftForm from '$lib/components/admin/PostDraftForm.svelte';
   import CategoryForm from '$lib/components/admin/CategoryForm.svelte';
   import Modal from '$lib/components/Modal.svelte';
@@ -11,20 +13,7 @@
 
   /** @typedef {import('$lib/server/db/admin-queries').AdminPostListRow} AdminPost */
 
-  /** @type {{
-   *   data: {
-   *     posts: AdminPost[],
-   *     categories: { slug: string, label: string, tone: string }[]
-   *   },
-   *   form: {
-   *     kind?: 'create-post'|'create-category',
-   *     error?: string,
-   *     values?: Record<string, string>,
-   *     actionError?: string,
-   *     success?: boolean,
-   *     categoryCreated?: boolean
-   *   } | null
-   * }} */
+  /** @type {import('./$types').PageProps} */
   let { data, form } = $props();
 
   const posts = $derived(data.posts);
@@ -38,10 +27,10 @@
   let deleteCandidate = $state(null);
 
   $effect(() => {
-    if (form?.kind === 'create-post' && form.error) {
+    if (form?.action === 'create-post' && form.ok === false) {
       postDialogOpen = true;
     }
-    if (form?.kind === 'create-category' && form.error) {
+    if (form?.action === 'create-category' && form.ok === false) {
       categoryDialogOpen = true;
     }
   });
@@ -54,6 +43,31 @@
     categoryDialogOpen = false;
   }
 </script>
+
+{#snippet postActions(post)}
+  <a class="menu-item" href="/admin/posts/{post.id}/edit">edit body</a>
+  <a class="menu-item" href="/admin/posts/{post.id}">edit metadata</a>
+
+  {#if post.status === 'draft'}
+    <form method="POST" action="?/publish">
+      <input type="hidden" name="postId" value={post.id} />
+      <button class="menu-item w-full text-left" type="submit">publish now</button>
+    </form>
+  {:else}
+    <form method="POST" action="?/unpublish">
+      <input type="hidden" name="postId" value={post.id} />
+      <button class="menu-item w-full text-left" type="submit">move to draft</button>
+    </form>
+  {/if}
+
+  <button
+    class="menu-item menu-item--danger w-full text-left"
+    type="button"
+    onclick={() => (deleteCandidate = post)}
+  >
+    delete post
+  </button>
+{/snippet}
 
 <svelte:head><title>Posts | Admin</title></svelte:head>
 
@@ -72,10 +86,10 @@
   {/snippet}
 </PageHeader>
 
-{#if form?.actionError}
-  <p class="border border-crimson px-3 py-2 text-crimson font-mono text-[12px] mb-6">
-    {form.actionError}
-  </p>
+{#if form?.ok === false && !form.action}
+  <div class="mb-6">
+    <FormAlert message={form.message} />
+  </div>
 {/if}
 
 <div class="flex flex-wrap gap-2 mb-6">
@@ -125,28 +139,7 @@
               <td class="td font-mono text-[11px] text-muted-warm">{formatRelativeAge(post.updatedAt)}</td>
               <td class="td text-right">
                 <ActionMenu label="Post actions">
-                  <a class="menu-item" href="/admin/posts/{post.id}/edit">edit body</a>
-                  <a class="menu-item" href="/admin/posts/{post.id}">edit metadata</a>
-
-                  {#if post.status === 'draft'}
-                    <form method="POST" action="?/publish">
-                      <input type="hidden" name="postId" value={post.id} />
-                      <button class="menu-item w-full text-left" type="submit">publish now</button>
-                    </form>
-                  {:else}
-                    <form method="POST" action="?/unpublish">
-                      <input type="hidden" name="postId" value={post.id} />
-                      <button class="menu-item w-full text-left" type="submit">move to draft</button>
-                    </form>
-                  {/if}
-
-                  <button
-                    class="menu-item menu-item--danger w-full text-left"
-                    type="button"
-                    onclick={() => (deleteCandidate = post)}
-                  >
-                    delete post
-                  </button>
+                  {@render postActions(post)}
                 </ActionMenu>
               </td>
             </tr>
@@ -168,28 +161,7 @@
               </div>
 
               <ActionMenu label="Post actions" align="left">
-                <a class="menu-item" href="/admin/posts/{post.id}/edit">edit body</a>
-                <a class="menu-item" href="/admin/posts/{post.id}">edit metadata</a>
-
-                {#if post.status === 'draft'}
-                  <form method="POST" action="?/publish">
-                    <input type="hidden" name="postId" value={post.id} />
-                    <button class="menu-item w-full text-left" type="submit">publish now</button>
-                  </form>
-                {:else}
-                  <form method="POST" action="?/unpublish">
-                    <input type="hidden" name="postId" value={post.id} />
-                    <button class="menu-item w-full text-left" type="submit">move to draft</button>
-                  </form>
-                {/if}
-
-                <button
-                  class="menu-item menu-item--danger w-full text-left"
-                  type="button"
-                  onclick={() => (deleteCandidate = post)}
-                >
-                  delete post
-                </button>
+                {@render postActions(post)}
               </ActionMenu>
             </div>
 
@@ -213,25 +185,16 @@
       title="categories"
       description="Keep category labels short. Slugs are used in the database."
     >
-      {#if form?.categoryCreated}
-        <p class="border border-rose px-3 py-2 text-rose font-mono text-[12px] mb-4">
-          category created
-        </p>
+      {#if form?.ok === true && form.action === 'create-category'}
+        <div class="mb-4">
+          <FormAlert tone="success" message={form.message ?? 'category created'} />
+        </div>
       {/if}
 
       {#if categories.length === 0}
         <p class="font-mono text-[12px] text-muted-warm">No categories yet.</p>
       {:else}
-        <ul class="divide-y divide-[var(--line-soft)] border-y border-[var(--line-soft)]">
-          {#each categories as category (category.slug)}
-            <li class="py-3">
-              <p class="font-serif text-[15px] text-paper">{category.label}</p>
-              <p class="font-mono text-[10px] tracking-[0.14em] uppercase text-muted-warm">
-                /{category.slug}
-              </p>
-            </li>
-          {/each}
-        </ul>
+        <CategoryList {categories} slash compact />
       {/if}
 
       <div class="flex flex-wrap gap-2 mt-4">
@@ -264,8 +227,8 @@
   <PostDraftForm
     action="?/createPost"
     categories={categories}
-    values={form?.kind === 'create-post' ? form.values ?? {} : {}}
-    error={form?.kind === 'create-post' ? form.error ?? '' : ''}
+    values={form?.action === 'create-post' && form.ok === false ? form.values ?? {} : {}}
+    message={form?.action === 'create-post' && form.ok === false ? form.message : ''}
   >
     {#snippet footer()}
       <button type="button" class="btn-ghost" onclick={closePostDialog}>cancel</button>
@@ -283,8 +246,8 @@
 >
   <CategoryForm
     action="?/createCategory"
-    values={form?.kind === 'create-category' ? form.values ?? {} : {}}
-    error={form?.kind === 'create-category' ? form.error ?? '' : ''}
+    values={form?.action === 'create-category' && form.ok === false ? form.values ?? {} : {}}
+    message={form?.action === 'create-category' && form.ok === false ? form.message : ''}
   >
     {#snippet footer()}
       <button type="button" class="btn-ghost" onclick={closeCategoryDialog}>cancel</button>

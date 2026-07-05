@@ -1,6 +1,5 @@
 <script>
   /**
-   * CopyButton handles clipboard copy with transient "Copied ✓" state.
    * @typedef {Object} Props
    * @property {string} value
    * @property {string} [label]
@@ -26,7 +25,7 @@
         document.execCommand('copy');
         document.body.removeChild(ta);
       }
-    } catch (_) { /* still flash UI */ }
+    } catch (_) {}
     copied = true;
     clearTimeout(timer);
     timer = setTimeout(() => { copied = false; }, 1800);

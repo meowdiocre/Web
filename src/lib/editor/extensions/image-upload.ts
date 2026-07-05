@@ -1,10 +1,3 @@
-/**
- * ImageUpload handles drag, drop, and paste uploads to
- * /admin/api/media and inserts an `image` node at the drop position.
- * Surfaces progress via an `onStatus` callback so the page can show
- * toasts instead of writing to the console.
- */
-
 import { Extension } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 

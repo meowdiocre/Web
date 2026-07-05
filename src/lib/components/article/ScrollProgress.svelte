@@ -1,11 +1,6 @@
 <script>
   import { onMount } from 'svelte';
 
-  /**
-   * ScrollProgress - slim fixed bar at the very top of the viewport
-   * that fills as the user scrolls through the document.
-   */
-
   let pct = $state(0);
 
   onMount(() => {

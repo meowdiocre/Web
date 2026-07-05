@@ -8,8 +8,6 @@
    *  }} */
   let { data, children } = $props();
 
-  // The body[data-page="admin"] attribute is set server-side by
-  // hooks.server.js → pageKey(), so no client mirror is needed here.
 </script>
 
 <svelte:head>
@@ -33,6 +31,5 @@
     color: var(--color-paper);
     font-family: var(--font-sans);
   }
-  /* Prevent long words / code blocks from blowing out the min-content width. */
   .content { min-width: 0; }
 </style>

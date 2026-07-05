@@ -1,8 +1,3 @@
-/**
- * GitHub OAuth client. Lazy so importing this module doesn't crash a
- * build that hasn't yet configured GITHUB_CLIENT_ID / SECRET.
- */
-
 import { GitHub } from 'arctic';
 
 let _client: GitHub | null = null;
@@ -27,7 +22,6 @@ export function githubClient(): GitHub {
 
 export const ADMIN_LOGIN_ENV = 'ADMIN_GITHUB_LOGIN';
 
-/** Returns the allow-listed GitHub login, lowercase. */
 export function adminLogin(): string {
   const login = process.env[ADMIN_LOGIN_ENV];
   if (!login) throw new Error(`${ADMIN_LOGIN_ENV} must be set.`);

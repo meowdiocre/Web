@@ -1,5 +1,6 @@
 import { createCategory, createDraft } from '$lib/server/db/admin-queries';
 import { newCategorySchema, newPostSchema } from '$lib/server/validation';
+import { actionFailure, actionSuccess } from './action-result';
 import { resolveCategorySlug, resolveDraftSlug } from './slugs';
 
 export interface PostDraftFormState {
@@ -13,6 +14,18 @@ export interface CategoryFormState {
   slug?: string;
 }
 
+function field(form: FormData, name: string): string {
+  return String(form.get(name) ?? '');
+}
+
+export function draftFormValues(form: FormData): PostDraftFormState {
+  return { title: field(form, 'title'), slug: field(form, 'slug'), category: field(form, 'category') };
+}
+
+export function categoryFormValues(form: FormData): CategoryFormState {
+  return { label: field(form, 'label'), slug: field(form, 'slug') };
+}
+
 export async function createDraftFromForm(values: PostDraftFormState, author: string) {
   const parsed = newPostSchema.safeParse({
     title: values.title,
@@ -21,30 +34,26 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
   });
 
   if (!parsed.success) {
-    return {
-      ok: false as const,
-      error: 'Title and category are required.',
+    return actionFailure('Title and category are required.', {
       values: {
         title: String(values.title ?? ''),
         slug: String(values.slug ?? ''),
         category: String(values.category ?? '')
       }
-    };
+    });
   }
 
   let slug: string;
   try {
     slug = await resolveDraftSlug(parsed.data.title, parsed.data.slug);
   } catch (error) {
-    return {
-      ok: false as const,
-      error: error instanceof Error ? error.message : 'Could not create a slug for this draft.',
+    return actionFailure(error instanceof Error ? error.message : 'Could not create a slug for this draft.', {
       values: {
         title: parsed.data.title,
         slug: parsed.data.slug,
         category: parsed.data.category
       }
-    };
+    });
   }
 
   const row = await createDraft({
@@ -58,7 +67,7 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
     author
   });
 
-  return { ok: true as const, row };
+  return actionSuccess({ row });
 }
 
 export async function createCategoryFromForm(values: CategoryFormState) {
@@ -68,28 +77,24 @@ export async function createCategoryFromForm(values: CategoryFormState) {
   });
 
   if (!parsed.success) {
-    return {
-      ok: false as const,
-      error: 'Label is required. Use lowercase letters, digits, and hyphens for a custom slug.',
+    return actionFailure('Label is required. Use lowercase letters, digits, and hyphens for a custom slug.', {
       values: {
         label: String(values.label ?? ''),
         slug: String(values.slug ?? '')
       }
-    };
+    });
   }
 
   let slug: string;
   try {
     slug = await resolveCategorySlug(parsed.data.label, parsed.data.slug);
   } catch (error) {
-    return {
-      ok: false as const,
-      error: error instanceof Error ? error.message : 'Could not create a slug for this category.',
+    return actionFailure(error instanceof Error ? error.message : 'Could not create a slug for this category.', {
       values: {
         label: parsed.data.label,
         slug: parsed.data.slug
       }
-    };
+    });
   }
 
   const row = await createCategory({
@@ -97,5 +102,5 @@ export async function createCategoryFromForm(values: CategoryFormState) {
     label: parsed.data.label
   });
 
-  return { ok: true as const, row };
+  return actionSuccess({ row });
 }

@@ -1,6 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/** PullQuote is a block-level atom rendered as `<blockquote class="pull">`. */
 export const PullQuote = Node.create({
   name: 'pullQuote',
   group: 'block',

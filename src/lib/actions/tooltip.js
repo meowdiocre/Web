@@ -1,19 +1,4 @@
-/**
- * tooltip — Svelte action that replaces the native browser tooltip with
- * a single styled floating one shared across all triggers.
- *
- * Usage: `<button use:tooltip={'Bold · Ctrl+B'}>B</button>`
- *
- * - Removes the native `title` attribute so it doesn't double-show.
- * - Mirrors the label as `aria-label` when one isn't already set.
- * - Show/hide on hover + focus, with `Escape` and scroll dismissal.
- * - One singleton DOM node appended on first use, reused thereafter.
- * - Placement: above the trigger; flip below if the gutter runs out.
- *
- * Styling lives in app.css under `.tooltip` so the action stays portable.
- *
- * @typedef {string} TooltipParam
- */
+/** @typedef {string} TooltipParam */
 
 const SHOW_DELAY_MS = 350;
 const HIDE_DELAY_MS = 80;
@@ -21,7 +6,6 @@ const GUTTER_PX     = 8;
 
 /** @type {HTMLDivElement|null} */
 let singleton = null;
-/** Trigger currently owning the tooltip; lets Escape target the right one. */
 /** @type {HTMLElement|null} */
 let owner = null;
 
@@ -44,7 +28,6 @@ function showFor(trigger, label) {
   el.setAttribute('aria-hidden', 'false');
   owner = trigger;
 
-  // Place above with flip-below fallback. Measure after textContent set.
   const t   = trigger.getBoundingClientRect();
   const tip = el.getBoundingClientRect();
 

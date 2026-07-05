@@ -1,6 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-// Mock the DB layer before importing the route loader.
 vi.mock('$lib/server/db/queries', () => {
   return {
     loadPublicArticle: vi.fn(),

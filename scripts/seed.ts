@@ -1,14 +1,7 @@
 /**
- * scripts/seed.ts — import the demo content into the database.
- *
- *   npm run seed                # writes to DATABASE_URL_UNPOOLED
- *   npm run seed -- --dry-run   # prints the inserts, doesn't commit
- *   npm run seed -- --reset     # truncates posts/categories first
- *
- * The full article (slug = FULL_ARTICLE_SLUG) receives the body from
- * src/lib/data/article.js. The others are inserted as ghost posts
- * (published, with metadata + empty body) so /blog can list them and
- * the editor can fill them in later.
+ * npm run seed
+ * npm run seed -- --dry-run
+ * npm run seed -- --reset
  */
 
 import { drizzle } from 'drizzle-orm/postgres-js';

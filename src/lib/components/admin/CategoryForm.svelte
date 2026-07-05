@@ -1,12 +1,13 @@
 <script>
   import Field from '$lib/components/Field.svelte';
+  import FormAlert from '$lib/components/admin/FormAlert.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {string} [action]
    * @property {string} [submitLabel]
    * @property {Record<string, string>} [values]
-   * @property {string} [error]
+   * @property {string} [message]
    * @property {import('svelte').Snippet} [footer]
    */
 
@@ -15,17 +16,13 @@
     action = '',
     submitLabel = 'create category',
     values = {},
-    error = '',
+    message = '',
     footer
   } = $props();
 </script>
 
 <form method="POST" action={action} class="grid gap-5">
-  {#if error}
-    <p class="border border-crimson px-3 py-2 text-crimson font-mono text-[12px]">
-      {error}
-    </p>
-  {/if}
+  <FormAlert {message} />
 
   <Field
     name="label"

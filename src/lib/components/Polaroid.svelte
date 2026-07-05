@@ -1,6 +1,5 @@
 <script>
   /**
-   * Polaroid is a tilted frame with a CRT-scanlined caption strip.
    * @typedef {Object} Props
    * @property {string} src
    * @property {string} [alt]
@@ -49,9 +48,6 @@
 </figure>
 
 <style>
-  /* The frame's tilt + clipped corners + drop-shadow + the scanline
-     overlay over the caption are the "design soul", kept here so that
-     all the visual moves stay in one obvious place. */
   .polaroid {
     transform: rotate(var(--rot, -2.6deg));
     filter: drop-shadow(10px 10px 0 rgba(0, 0, 0, 0.55));
@@ -65,9 +61,6 @@
     image-rendering: crisp-edges;
   }
 
-  
-
-  /* CRT scanline strip over caption area */
   .polaroid::after {
     content: '';
     position: absolute;
@@ -86,6 +79,4 @@
     .polaroid       { padding: 10px 10px 38px; }
     .polaroid::after { bottom: 7px; height: 20px; left: 10px; right: 10px; }
   }
-
- 
 </style>

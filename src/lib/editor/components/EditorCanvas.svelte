@@ -1,25 +1,13 @@
-<!--
-  EditorCanvas is the paper canvas TipTap mounts into. It owns the
-  bleed-past-the-gutter `.paper-wrap` chrome and the ProseMirror
-  styling that mirrors the public essay component.
-
-  Exposes `element` via `$bindable()` so the page can mount TipTap into it:
-
-  ```svelte
-  <EditorCanvas bind:element={canvas} />
-  ```
--->
 <script>
   /**
    * @typedef {Object} Props
-   * @property {HTMLDivElement} [element]   $bindable mount target
+   * @property {HTMLDivElement} [element]
    */
 
   /** @type {Props} */
   let { element = $bindable() } = $props();
 </script>
 
-<!-- data-page="article" makes app.css apply the cream-paper theme. -->
 <div class="paper-wrap" data-page="article">
   <div class="paper essay">
     <div bind:this={element} class="canvas"></div>
@@ -28,7 +16,6 @@
 
 <style>
   .paper-wrap {
-    /* Bleed past the layout's content gutter (px-5 mobile, px-8 md+). */
     margin: 0 -20px -24px;
     padding: 24px 20px;
     background: var(--bg, #ebd8be);
@@ -42,8 +29,6 @@
   .paper { max-width: 760px; margin: 0 auto; background: transparent; padding: 0; }
   .canvas { outline: none; }
 
-  /* ProseMirror styles mirror the public essay component so what
-     the author sees is what ships. */
   .canvas :global(.ProseMirror) { outline: none; min-height: 60vh; }
   .canvas :global(.ProseMirror > * + *) { margin-top: 1.1em; }
 
@@ -70,8 +55,6 @@
   .canvas :global(ol ol)    { list-style-type: lower-alpha; }
   .canvas :global(ol ol ol) { list-style-type: lower-roman; }
   .canvas :global(li)       { margin-bottom: 6px; }
-  /* TipTap wraps each <li>'s content in a <p>; collapse the default
-     margin so list items don't gain a blank line above each row. */
   .canvas :global(li > p) { margin: 0; }
   .canvas :global(.ProseMirror > p:first-of-type::first-letter) {
     font-family: var(--font-display);
@@ -131,9 +114,6 @@
   .canvas :global(.com) { color: var(--code-com); font-style: italic; }
   .canvas :global(.num) { color: var(--code-num); }
 
-  /* codeBlock NodeView wrapper. `display: contents` lifts the inner
-     <pre> and <span.figure-cap> out of the wrapper so they act as siblings
-     under .ProseMirror, matching the public essay component. */
   .canvas :global(.cb-view) { display: contents; }
   .canvas :global(.figure-cap) {
     display: block;

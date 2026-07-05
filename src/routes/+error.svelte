@@ -5,7 +5,7 @@
 </script>
 
 <svelte:head>
-  <title>404 | meowdiocre</title>
+  <title>{$page.status} | meowdiocre</title>
 </svelte:head>
 
 <Nav current="home" />

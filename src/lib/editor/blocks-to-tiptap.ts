@@ -1,9 +1,3 @@
-/**
- * One-way adapter from the structured block tree in src/lib/data/article.js
- * into a TipTap document. Lossy by design: hand-spanned code highlights
- * are stripped to plain `source`, then re-applied by Shiki on next save.
- */
-
 import type {
   BlockNode,
   CodeBlockNode,
@@ -24,7 +18,6 @@ export type SrcBlock =
   | { type: 'end-slug';   text: string };
 
 export interface ConvertOptions {
-  /** Override the automatic language sniff for `code` blocks. */
   langFor?: (caption: string, html: string, idx: number) => string;
 }
 
@@ -40,7 +33,6 @@ function sniffLang(caption: string, html: string): string {
   return 'plaintext';
 }
 
-/** Strip prerendered class spans so the editor has a clean `source`. */
 function stripCodeSpans(html: string): string {
   return html
     .replace(/<span class="(kw|fn|str|com|num)">/g, '')
@@ -110,7 +102,6 @@ export function blocksToTiptap(blocks: SrcBlock[], opts: ConvertOptions = {}): D
         break;
       }
       default: {
-        // Unknown source block. Skip it so a schema bump does not break seed.
         // eslint-disable-next-line no-console
         console.warn(`[blocks-to-tiptap] unknown block kind: ${(b as any).type}`);
       }

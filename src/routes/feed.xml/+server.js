@@ -1,21 +1,7 @@
 import { SITE } from '$lib/config/site.js';
 import { loadFeedPosts } from '$lib/server/db/queries';
-
-/**
- * @param {string} s
- * @returns {string}
- */
-function xml(s) {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-/** @param {string} s */
-function attrXml(s) {
-  return xml(s).replace(/"/g, '&quot;');
-}
+import { escapeHtml as xml, escapeAttr as attrXml } from '$lib/util/escape';
+import { composeTitle } from '$lib/util/strings';
 
 /** @param {Date} d */
 function rfc822(d) {
@@ -27,16 +13,16 @@ export const prerender = false;
 /** @type {import('./$types').RequestHandler} */
 export async function GET({ url, setHeaders }) {
   const origin = url.origin;
-  const rows = await loadFeedPosts(40);
+  const rows = await loadFeedPosts(SITE.feed.itemCount);
 
   const lastBuild = rows[0]?.publishedAt ?? new Date();
 
   const items = rows
     .map((r) => {
       const link  = `${origin}/article/${r.slug}`;
-      const title = `${r.titlePre}${r.titleEm}${r.titlePost}`.trim();
+      const title = composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost });
       const pub   = r.publishedAt ?? new Date();
-      const guid  = `meowdiocre:${pub.toISOString().slice(0, 10)}:${r.slug}`;
+      const guid  = `${SITE.brand}:${pub.toISOString().slice(0, 10)}:${r.slug}`;
       const body  = (r.bodyHtml ?? '').replace(/\]\]>/g, ']]]]><![CDATA[>');
       return [
         '    <item>',
@@ -61,7 +47,7 @@ export async function GET({ url, setHeaders }) {
   <channel>
     <title>${xml(SITE.brand)} - writing</title>
     <link>${attrXml(origin + '/blog')}</link>
-    <description>Long-form essays and lab notes on reverse engineering, Windows internals, anti-cheat infrastructure, browser sandbox internals, and the strange behavior of large language models.</description>
+    <description>${xml(SITE.feed.description)}</description>
     <language>en</language>
     <copyright>© ${SITE.copyrightYear} ${xml(SITE.brand)}</copyright>
     <managingEditor>${xml(SITE.email)} (${xml(SITE.brand)})</managingEditor>

@@ -1,19 +1,3 @@
-/**
- * Convert the snippet HTML used in src/lib/data/article.js into the
- * TipTap inline-node array stored in `paragraph.content`.
- *
- * Recognised:
- *   <em|i>           -> italic mark
- *   <strong|b>       -> bold mark
- *   <code>           -> code mark
- *   <a href>         -> link mark
- *   <span class="sidenote-ref">¹</span>
- *   <span class="sidenote">¹ body</span>  -> sidenote atom { ref, bodyHtml }
- *
- * The sidenote body is stored as raw HTML so embedded marks
- * (`<code>`, `<em>`) inside a footnote survive the round-trip.
- */
-
 import type { InlineNode, Mark, SidenoteNode, TextNode } from './types';
 
 const NAMED_ENTITIES: Record<string, string> = {
@@ -55,11 +39,9 @@ interface Tag {
   attrs: Record<string, string>;
 }
 
-/** Match `<tag ...>` starting at `i`. Returns null if not a tag. */
 function readTag(s: string, i: number): Tag | null {
   if (s[i] !== '<') return null;
   const close = s[i + 1] === '/';
-  // Skip <!-- comments --> and <!DOCTYPE ...> as opaque self-closing tokens.
   if (s[i + 1] === '!' || s[i + 1] === '?') {
     const end = s.indexOf('>', i + 1);
     if (end === -1) return null;
@@ -103,7 +85,6 @@ function readTag(s: string, i: number): Tag | null {
   return { end: j + 1, close, selfClose, name, attrs };
 }
 
-/** Depth-aware search for the matching `</tag>` of an opening at `i`. */
 function findCloseTag(
   s: string, i: number, name: string
 ): { contentStart: number; closeStart: number; closeEnd: number } | null {
@@ -181,7 +162,6 @@ export function parseInline(html: string): InlineNode[] {
       continue;
     }
 
-    // Sidenote spans: keep body HTML raw, decode ref text.
     if (!tag.close && tag.name === 'span') {
       const cls = (tag.attrs.class ?? '').trim();
       if (cls === 'sidenote-ref' || cls === 'sidenote') {
@@ -192,7 +172,6 @@ export function parseInline(html: string): InlineNode[] {
             pendingRef = decodeEntities(stripTags(innerHtml));
           } else {
             const ref = pendingRef ?? '';
-            // Normalise by stripping the leading "<ref> " prefix on storage.
             let bodyHtml = innerHtml;
             if (ref && bodyHtml.startsWith(ref)) {
               bodyHtml = bodyHtml.slice(ref.length).replace(/^[\s\u00A0]+/, '');
@@ -205,7 +184,6 @@ export function parseInline(html: string): InlineNode[] {
           continue;
         }
       }
-      // Unknown span: skip its tag, keep walking inner text.
       i = tag.end;
       continue;
     }

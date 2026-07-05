@@ -4,14 +4,11 @@
   import { BRAND_GLYPH } from '$lib/config/motif.js';
 
   /**
-   * Toast is a terminal-style notification chip. Parent owns the open
-   * state and reacts to `onclose` (fired by × click or auto-close).
-   *
    * @typedef {Object} Props
-   * @property {boolean}             open                 visible flag (parent-owned)
-   * @property {string}              [tag]                tmux-style tag label
-   * @property {string}              [glyph]              single-char glyph in the tag
-   * @property {number}              [autoCloseMs]        if > 0, fire onclose after N ms
+   * @property {boolean} open
+   * @property {string} [tag]
+   * @property {string} [glyph]
+   * @property {number} [autoCloseMs]
    * @property {() => void}          [onclose]
    * @property {import('svelte').Snippet} [children]
    */
@@ -29,7 +26,6 @@
   /** @type {ReturnType<typeof setTimeout>|undefined} */
   let timer;
 
-  // Restart the auto-close timer whenever `open` flips to true.
   $effect(() => {
     clearTimeout(timer);
     if (open && autoCloseMs > 0) {

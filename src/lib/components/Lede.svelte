@@ -1,17 +1,14 @@
 <script>
   /**
-   * Lede is the large serif intro paragraph used on /blog and /about.
-   *
    * @typedef {Object} Props
-   * @property {'primary'|'secondary'} [tone]      primary = on-page text, secondary = muted continuation
-   * @property {'paper'|'ink'}         [palette]   page palette (paper = dark page, ink = cream page)
+   * @property {'primary'|'secondary'} [tone]
+   * @property {'paper'|'ink'} [palette]
    * @property {import('svelte').Snippet} [children]
    */
 
   /** @type {Props} */
   let { tone = 'primary', palette = 'paper', children } = $props();
 
-  /** Resolve text colour against the page palette. */
   const colour = $derived(
     palette === 'ink'
       ? (tone === 'primary' ? 'text-[#3a3027]' : 'text-muted-warm')

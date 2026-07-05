@@ -1,9 +1,3 @@
-<!--
-  AdminNav is the responsive admin chrome. Desktop uses a fixed sidebar with
-  grouped sections and active-route highlight; mobile is a sticky top
-  bar whose dropdown mirrors the same structure and auto-closes on
-  navigation.
--->
 <script>
   import { page } from '$app/stores';
 
@@ -24,7 +18,6 @@
 
   let open = $state(false);
 
-  // Close mobile dropdown on every navigation.
   $effect(() => { void $page.url.pathname; open = false; });
 
   /** @type {NavSection[]} */
@@ -35,7 +28,6 @@
         {
           href: '/admin',
           label: 'posts',
-          // /admin or any /admin/posts/*, but not /admin/posts/new.
           match: (p) => p === '/admin' || (p.startsWith('/admin/posts/') && p !== '/admin/posts/new')
         },
         {
@@ -120,7 +112,6 @@
   {/if}
 {/snippet}
 
-<!-- Mobile top bar -->
 <header
   class="md:hidden sticky top-0 z-30 flex items-center justify-between
          border-b border-[var(--line-soft)] bg-ink-2 px-5 py-3"
@@ -153,7 +144,6 @@
   </div>
 {/if}
 
-<!-- Desktop sidebar -->
 <aside
   class="hidden md:flex md:flex-col relative
          border-r border-[var(--line-soft)] bg-ink-2"
@@ -172,7 +162,6 @@
 </aside>
 
 <style>
-  /* Account chrome pinned to the bottom of the sidebar or mobile menu. */
   :global(.account__handle) {
     font-family: var(--font-mono);
     font-size: 10px;

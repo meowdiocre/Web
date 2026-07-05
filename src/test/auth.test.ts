@@ -18,10 +18,6 @@ describe('session tokens', () => {
   });
 });
 
-/**
- * Mock `validateSessionToken` for the hook tests below; the actual
- * generate/hash helpers stay real for the section above.
- */
 vi.mock('$lib/server/auth', async () => {
   const real = await vi.importActual<typeof import('$lib/server/auth')>('$lib/server/auth');
   return {

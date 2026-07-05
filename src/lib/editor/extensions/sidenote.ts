@@ -1,11 +1,5 @@
 import { Node, mergeAttributes } from '@tiptap/core';
 
-/**
- * Sidenote is an inline atom. It round-trips through tiptap-to-html as a pair:
- *   `<span class="sidenote-ref">¹</span><span class="sidenote">¹ body</span>`
- * In the editor it appears as a single chip so the cursor moves over it
- * like one character.
- */
 export const Sidenote = Node.create({
   name: 'sidenote',
   group: 'inline',

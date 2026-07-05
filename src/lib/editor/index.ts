@@ -1,16 +1,7 @@
-/**
- * Editor factory used by /admin/posts/[id]/edit. Loads TipTap with all
- * extensions and returns a ready-to-mount editor. Browser-only because
- * TipTap touches `window`.
- */
-
 import { Editor } from '@tiptap/core';
 import StarterKit from '@tiptap/starter-kit';
 import Link       from '@tiptap/extension-link';
 import Image      from '@tiptap/extension-image';
-
-// Custom command typings live in `commands.d.ts`, and TS picks them up via
-// `declare module` augmentation. No runtime import: .d.ts has no JS form.
 
 import { PullQuote }                       from './extensions/pull-quote';
 import { CodeBlock as CustomCodeBlock }    from './extensions/code-block';
@@ -41,7 +32,7 @@ export function createEditor({
     element,
     extensions: [
       StarterKit.configure({
-        codeBlock: false,                  // replaced by our custom node
+        codeBlock: false,
         heading:   { levels: [2, 3] }
       }),
       Link.configure({

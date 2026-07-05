@@ -1,10 +1,6 @@
 /**
- * scripts/reset.ts — DROP every table from drizzle/migrations and re-run
- * them. DEV ONLY. Refuses to run when NODE_ENV === 'production' unless
- * --force is passed (and even then requires explicit confirmation).
- *
- *   npm run db:reset
- *   npm run db:reset -- --force
+ * npm run db:reset
+ * npm run db:reset -- --force
  */
 import { stdin as input, stdout as output } from 'node:process';
 import { createInterface } from 'node:readline/promises';

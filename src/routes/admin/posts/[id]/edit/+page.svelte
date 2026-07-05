@@ -12,6 +12,8 @@
   import SidenoteDialog  from '$lib/editor/dialogs/SidenoteDialog.svelte';
   import EndSlugDialog   from '$lib/editor/dialogs/EndSlugDialog.svelte';
   import { BRAND_GLYPH } from '$lib/config/motif.js';
+  import { isDoc } from '$lib/editor/types';
+  import { composeTitle } from '$lib/util/strings';
 
   import {
     createDialogSpecs,
@@ -22,31 +24,25 @@
   } from '$lib/editor/dialog-specs.js';
   import { mergeRehighlightedHtml } from '$lib/editor/merge-rehighlight.js';
 
-  /* Types */
-
   /** @typedef {import('@tiptap/core').Editor} TiptapEditor */
   /** @typedef {{ source: string; lang: string; caption: string }} CodeAttrs */
   /** @typedef {{ ref: string; bodyHtml: string }} SidenoteAttrs */
   /** @typedef {'link'|'codeBlock'|'pullQuote'|'sidenote'|'endSlug'} DialogName */
   /** @typedef {{ tag: string; glyph: string; message: string }} ToastPayload */
 
-  /** @type {{ data: { post: any } }} */
+  /** @type {import('./$types').PageProps} */
   let { data } = $props();
   const post = $derived(data.post);
-
-  /* Editor state */
+  const postTitle = $derived(composeTitle({ pre: post.titlePre, em: post.titleEm, post: post.titlePost }));
 
   /** @type {HTMLDivElement|undefined} */
   let canvas = $state();
   /** @type {TiptapEditor|null} */
   let editor = $state(null);
-  /** Bumped on every selection/transaction so toolbar isActive() re-evaluates. */
   let editorTick = $state(0);
 
   let wordCount = $state(0);
   let charCount = $state(0);
-
-  /* Save state (autosave + Ctrl-S) */
 
   const AUTOSAVE_MS = 3000;
 
@@ -55,12 +51,8 @@
   let lastSavedAt = $state(/** @type {Date|null} */(null));
   let saveError   = $state(/** @type {string|null} */(null));
 
-  /** Coalesce a follow-up save that arrives while one is in flight. */
   let pendingSave = false;
 
-  /** Set during the rehighlight merge so onUpdate doesn't treat the
-   *  synthetic transaction as a user edit (would re-schedule autosave
-   *  and loop forever). */
   let suppressNextUpdate = false;
 
   /** @type {ReturnType<typeof setTimeout>|null} */
@@ -87,7 +79,7 @@
         if (body?.doc && mergeRehighlightedHtml(editor, body.doc)) {
           suppressNextUpdate = true;
         }
-      } catch {/* tolerate missing or non-JSON body */}
+      } catch {}
       lastSavedAt = new Date();
       dirty = false;
     } catch (err) {
@@ -108,8 +100,6 @@
     if (saveTimer) { clearTimeout(saveTimer); saveTimer = null; }
     save();
   }
-
-  /* Dialog plumbing */
 
   /** @type {DialogName|null} */
   let dialog        = $state(null);
@@ -143,15 +133,11 @@
 
   const closeDialog = () => (dialog = null);
 
-  /* Toast (image upload + general feedback) */
-
   /** @type {ToastPayload|null} */
   let toast = $state(null);
 
   /** @param {string} message  @param {string} [tag]  @param {string} [glyph] */
   const notify = (message, tag = 'tip', glyph = BRAND_GLYPH) => { toast = { tag, glyph, message }; };
-
-  /* Keyboard shortcuts */
 
   /** @param {KeyboardEvent} e */
   function onKey(e) {
@@ -164,8 +150,6 @@
     else if (k === 'q' &&  e.shiftKey) { e.preventDefault(); openDialog('pullQuote'); }
   }
 
-  /* Editor lifecycle */
-
   function recomputeStats() {
     if (!editor) { wordCount = 0; charCount = 0; return; }
     const text = editor.state.doc.textContent;
@@ -176,9 +160,9 @@
   onMount(async () => {
     if (!canvas) return;
     const { createEditor } = await import('$lib/editor');
-    const initialDoc = post.docJson?.type === 'doc'
+    const initialDoc = isDoc(post.docJson)
       ? post.docJson
-      : { type: 'doc', content: [{ type: 'paragraph' }] };
+      : /** @type {import('$lib/editor/types').Doc} */ ({ type: 'doc', content: [{ type: 'paragraph' }] });
 
     editor = createEditor({
       element:  canvas,
@@ -207,7 +191,6 @@
     editor?.destroy();
   });
 
-  /* Toolbar callbacks keep the toolbar API simple. */
   const openLink     = () => openDialog('link');
   const openCode     = () => openDialog('codeBlock');
   const openPull     = () => openDialog('pullQuote');
@@ -216,9 +199,8 @@
 </script>
 
 <svelte:window onkeydown={onKey} />
-<svelte:head><title>Edit | {post.titlePre}{post.titleEm}{post.titlePost}</title></svelte:head>
+<svelte:head><title>Edit | {postTitle}</title></svelte:head>
 
-<!-- Header -->
 <header class="flex items-baseline justify-between flex-wrap gap-x-6 gap-y-3 mb-4">
   <div class="min-w-0">
     <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-muted-warm mb-1 truncate">
@@ -260,7 +242,6 @@
   autosaveSeconds={AUTOSAVE_MS / 1000}
 />
 
-<!-- Dialogs. Each one only reads its initial props while open=true. -->
 <LinkDialog
   open={dialog === 'link'}
   initialHref={dialog === 'link' ? /** @type {string} */ (dialogInitial) : ''}
