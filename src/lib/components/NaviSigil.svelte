@@ -4,7 +4,7 @@
   /** @typedef {{ caption?: string, role?: string }} Props */
 
   /** @type {Props} */
-  let { caption = SITE.brand, role = 'obby' } = $props();
+  let { caption = SITE.brand, role = 'Researcher' } = $props();
 </script>
 
 <aside

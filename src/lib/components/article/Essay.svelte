@@ -95,14 +95,15 @@
 
   .essay :global(pre) {
     margin: 32px 0;
-    padding: 22px;
+    padding: 20px 22px;
     background: var(--code-bg);
     color: var(--code-fg);
     overflow-x: auto;
     font-family: var(--font-mono);
     font-size: 13px;
-    line-height: 1.65;
-    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+    line-height: 1.7;
+    border: 1px solid var(--rule);
+    border-left: 2px solid var(--accent);
   }
   .essay :global(pre code) { background: transparent; border: 0; padding: 0; font-size: 13px; color: inherit; }
   .essay :global(pre .kw)  { color: var(--code-kw); }
@@ -113,7 +114,7 @@
 
   .essay :global(.figure-cap) {
     display: block;
-    margin: -16px 0 28px;
+    margin: 10px 0 28px;
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.1em;
