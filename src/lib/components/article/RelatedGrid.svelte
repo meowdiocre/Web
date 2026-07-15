@@ -5,7 +5,7 @@
    * @typedef {Object} Item
    * @property {string} href
    * @property {string} category
-   * @property {string} readTime
+   * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
    * @property {string} title
    * @property {string} blurb
    *

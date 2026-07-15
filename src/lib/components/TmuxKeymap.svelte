@@ -68,7 +68,6 @@
     if (t?.matches?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
 
     if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !e.altKey) {
-      e.preventDefault();
       startPrefix();
       return;
     }
@@ -121,6 +120,7 @@
   <p>this site responds to <b>tmux keys</b>:</p>
   <ul>
     <li><code>C-b 0</code> · <code>1</code> · <code>2</code> &nbsp;jump to index / writing / about</li>
+    <li><code>C-b r</code> &nbsp;reader panel</li>
     <li><code>C-b n</code> / <code>p</code> &nbsp;next / previous window</li>
     <li><code>C-b ?</code> &nbsp;show all bindings</li>
   </ul>
@@ -136,6 +136,7 @@
     <li><code>C-b 0</code> &nbsp;index</li>
     <li><code>C-b 1</code> &nbsp;writing</li>
     <li><code>C-b 2</code> &nbsp;about</li>
+    <li><code>C-b r</code> &nbsp;reader panel</li>
     <li><code>C-b n</code> &nbsp;next window</li>
     <li><code>C-b p</code> &nbsp;previous window</li>
     <li><code>Esc</code> &nbsp;cancel prefix</li>

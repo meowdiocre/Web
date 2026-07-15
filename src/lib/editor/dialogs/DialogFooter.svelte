@@ -1,4 +1,6 @@
 <script>
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
+
   /**
    * @typedef {Object} Props
    * @property {'insert'|'edit'} [mode]
@@ -28,17 +30,18 @@
   const confirmLabel = $derived(mode === 'edit' ? saveLabel : insertLabel);
 </script>
 
-<button type="button" class="btn-ghost" onclick={onCancel}>{cancelLabel}</button>
+<AdminButton icon="close" label={cancelLabel} onclick={onCancel} />
 
 {#if mode === 'edit' && onRemove}
-  <button type="button" class="btn-danger" onclick={onRemove}>{removeLabel}</button>
+  <AdminButton icon="trash" label={removeLabel} variant="danger" onclick={onRemove} />
 {/if}
 
-<button
-  type="button"
-  class="btn-primary ml-auto"
-  disabled={!canSubmit}
-  onclick={onSubmit}
->
-  {confirmLabel}
-</button>
+<div class="ml-auto">
+  <AdminButton
+    icon={mode === 'edit' ? 'save' : 'plus'}
+    label={confirmLabel}
+    variant="primary"
+    disabled={!canSubmit}
+    onclick={onSubmit}
+  />
+</div>

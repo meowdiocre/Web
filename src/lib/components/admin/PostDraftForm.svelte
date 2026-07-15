@@ -1,5 +1,6 @@
 <script>
   import Field from '$lib/components/Field.svelte';
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
   import FormAlert from '$lib/components/admin/FormAlert.svelte';
 
   /**
@@ -54,7 +55,7 @@
   </Field>
 
   <div class="flex items-center gap-2 flex-wrap">
-    <button class="btn-primary">{submitLabel}</button>
+    <AdminButton type="submit" icon="plus" label={submitLabel} variant="primary" />
     {@render footer?.()}
   </div>
 </form>

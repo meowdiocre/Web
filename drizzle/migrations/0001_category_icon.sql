@@ -1,0 +1,1 @@
+ALTER TABLE "categories" ADD COLUMN "icon" varchar(64) DEFAULT 'book-open' NOT NULL;

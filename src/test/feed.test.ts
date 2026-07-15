@@ -25,6 +25,7 @@ describe('/feed.xml', () => {
         dek:         'A field guide.',
         bodyHtml:    '<p>body & content</p>',
         publishedAt: new Date('2026-03-14T00:00:00Z'),
+        categorySlug: 'reverse',
         categoryLabel: 'Reverse',
         author:      'meowdiocre'
       },
@@ -36,6 +37,7 @@ describe('/feed.xml', () => {
         dek:         'A survey.',
         bodyHtml:    '<p>x</p>',
         publishedAt: new Date('2026-02-02T00:00:00Z'),
+        categorySlug: 'windows',
         categoryLabel: 'Windows',
         author:      'meowdiocre'
       }
@@ -50,7 +52,7 @@ describe('/feed.xml', () => {
     expect(body).toMatch(/<item>[\s\S]*<\/item>/);
 
     expect(body).toContain('<title>Devirtualizing VMProtect 3.x without a VM.</title>');
-    expect(body).toContain('<link>https://meowdiocre.example/article/foo</link>');
+    expect(body).toContain('<link>https://meowdiocre.example/blog/reverse/foo</link>');
     expect(body).toContain('<guid isPermaLink="false">meowdiocre:2026-03-14:foo</guid>');
     expect(body).toContain('<category>Reverse</category>');
     expect(body).toContain('<![CDATA[<p>body & content</p>]]>');

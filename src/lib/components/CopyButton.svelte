@@ -40,7 +40,7 @@
     py-[7px] px-3
     border border-[var(--line-strong)]
     bg-transparent
-    font-display text-[10px] tracking-[0.18em] uppercase
+    font-display text-[10px] tracking-[0.06em]
     text-paper
     transition-colors duration-150
     hover:bg-paper hover:text-ink

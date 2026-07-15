@@ -1,6 +1,8 @@
 <script>
   import Field         from '$lib/components/Field.svelte';
+  import AdminButton   from '$lib/components/admin/AdminButton.svelte';
   import FormAlert     from '$lib/components/admin/FormAlert.svelte';
+  import PixelIcon     from '$lib/components/PixelIcon.svelte';
   import StatusPill    from '$lib/components/StatusPill.svelte';
   import ConfirmDialog from '$lib/editor/dialogs/ConfirmDialog.svelte';
   import { toDatetimeLocalValue } from '$lib/util/dates';
@@ -31,39 +33,36 @@
 
 <header class="flex items-baseline justify-between flex-wrap gap-4 mb-8">
   <div class="min-w-0">
-    <p class="font-mono text-[10px] tracking-[0.22em] uppercase text-muted-warm mb-1 truncate">
+    <p class="font-mono text-[10px] tracking-[0.12em] text-muted mb-1 truncate">
       ~/admin/posts/{p.slug}
     </p>
-    <h1 class="font-display text-[clamp(24px,3vw,38px)] uppercase tracking-[-0.015em] leading-[1.05]">
-      {p.titlePre}<em class="text-rose">{p.titleEm}</em>{p.titlePost}
-    </h1>
-    <p class="mt-2 font-mono text-[11px] tracking-[0.18em] uppercase">
+    <div class="flex items-center gap-3">
+      <PixelIcon name="article" size={22} />
+      <h1 class="min-w-0 [overflow-wrap:anywhere] font-display text-[clamp(24px,3vw,38px)] tracking-[-0.015em] leading-[1.05]">
+        {p.titlePre}<em class="not-italic text-rose">{p.titleEm}</em>{p.titlePost}
+      </h1>
+    </div>
+    <p class="mt-2 font-mono text-[11px] tracking-[0.08em]">
       status: <StatusPill value={p.status} />
     </p>
   </div>
 
-  <a
-    href="/admin/posts/{p.id}/edit"
-    class="shrink-0 font-mono text-[11px] tracking-[0.18em] uppercase
-           border border-rose px-4 py-2 text-rose hover:bg-rose hover:text-ink"
-  >
-    edit body →
-  </a>
+  <AdminButton href="/admin/posts/{p.id}/edit" icon="pencil" label="edit body" />
 </header>
 
 <div class="flex items-center flex-wrap gap-2 mb-6">
   {#if p.status === 'draft'}
     <form method="POST" action="?/publish">
-      <button class="btn-primary">publish now</button>
+      <AdminButton type="submit" icon="send" label="publish now" variant="primary" />
     </form>
   {:else}
     <form method="POST" action="?/unpublish">
-      <button class="btn-ghost">unpublish</button>
+      <AdminButton type="submit" icon="archive" label="unpublish" />
     </form>
   {/if}
 
   <form method="POST" action="?/preview">
-    <button class="btn-ghost">make preview link</button>
+    <AdminButton type="submit" icon="eye" label="make preview link" />
   </form>
 
   {#if form?.ok === true && form.previewUrl}
@@ -102,7 +101,7 @@
 
   <div class="grid gap-4 md:grid-cols-[1fr_1.6fr_1fr]">
     <Field name="titlePre"  label="title pre"    value={v.get('titlePre',  p.titlePre)} />
-    <Field name="titleEm"   label="title italic" value={v.get('titleEm',   p.titleEm)} />
+    <Field name="titleEm"   label="title emphasis" value={v.get('titleEm',   p.titleEm)} />
     <Field name="titlePost" label="title post"   value={v.get('titlePost', p.titlePost)} />
   </div>
 
@@ -114,9 +113,7 @@
     value={v.get('dek', p.dek)}
   />
 
-  <div class="grid gap-4 sm:grid-cols-2">
-    <Field name="readTime" label="read time"
-           value={v.get('readTime', p.readTime)} placeholder="e.g. 22 min read" />
+  <div>
     <Field name="author" label="author"
            value={v.get('author', p.author)} />
   </div>
@@ -136,8 +133,8 @@
   />
 
   <div class="flex flex-wrap items-center gap-2 mt-2">
-    <button class="btn-primary">save metadata</button>
-    <a href="/admin" class="btn-ghost">back</a>
+    <AdminButton type="submit" icon="save" label="save metadata" variant="primary" />
+    <AdminButton href="/admin" icon="article" label="back" />
 
     <button
       type="submit"
@@ -149,11 +146,9 @@
       aria-hidden="true"
     >submit delete</button>
 
-    <button
-      type="button"
-      class="btn-danger sm:ml-auto"
-      onclick={() => (confirmingDelete = true)}
-    >delete</button>
+    <div class="sm:ml-auto">
+      <AdminButton icon="trash" label="delete" variant="danger" onclick={() => (confirmingDelete = true)} />
+    </div>
   </div>
 </form>
 

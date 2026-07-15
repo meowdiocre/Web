@@ -29,10 +29,11 @@
   let dataPage = $derived(pageKey($page.url.pathname));
   let navPending = $derived(Boolean($navigating));
   let navTarget = $derived($navigating?.to?.url?.pathname ?? '');
+  let navPage = $derived(pageKey(navTarget));
   let publicSkeleton = $derived(
-    navTarget.startsWith('/blog')
+    navPage === 'blog'
       ? 'blog'
-      : navTarget.startsWith('/article/')
+      : navPage === 'article'
         ? 'article'
         : null
   );

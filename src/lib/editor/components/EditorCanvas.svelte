@@ -69,7 +69,6 @@
     font-size: clamp(28px, 3.2vw, 38px);
     line-height: 1.05;
     letter-spacing: -0.015em;
-    text-transform: uppercase;
     color: var(--fg);
     margin: 40px 0 14px;
     padding-top: 18px;
@@ -79,7 +78,6 @@
     font-family: var(--font-display);
     font-size: 20px;
     letter-spacing: -0.01em;
-    text-transform: uppercase;
     color: var(--fg);
     margin: 32px 0 12px;
   }
@@ -122,7 +120,6 @@
     font-size: 11px;
     letter-spacing: 0.1em;
     color: var(--color-muted);
-    text-transform: uppercase;
   }
 
   .canvas :global(blockquote.pull) {
@@ -150,7 +147,6 @@
   }
   .canvas :global(.end > span:last-child) {
     font-family: var(--font-mono); font-size: 11px;
-    letter-spacing: 0.12em; color: var(--color-muted); text-transform: uppercase;
   }
 
   .canvas :global(.sidenote-chip) {

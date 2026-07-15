@@ -8,10 +8,10 @@
    * @typedef {Object} Meta
    * @property {string} author
    * @property {string} date
-   * @property {string} readTime
    *
    * @typedef {Object} Props
    * @property {string} category
+   * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
    * @property {TitleParts} title
    * @property {string} dek
    * @property {Meta} meta
@@ -19,12 +19,9 @@
 
   import { reveal } from '$lib/motion/reveal';
   import PixelIcon from '$lib/components/PixelIcon.svelte';
-  import { categoryIcon } from '$lib/config/category-icons.js';
 
   /** @type {Props} */
-  let { category, title, dek, meta } = $props();
-
-  const iconName = $derived(categoryIcon(category));
+  let { category, categoryIcon, title, dek, meta } = $props();
 </script>
 
 <section
@@ -41,7 +38,7 @@
     </p>
 
     <span class="kicker" use:reveal={{ y: 10, delay: 0.06 }}>
-      <PixelIcon name={iconName} size={10} />
+      <PixelIcon name={categoryIcon} size={10} />
       {category}
     </span>
 
@@ -61,7 +58,6 @@
     <div class="meta" use:reveal={{ y: 12, delay: 0.24 }}>
       <span>By <b>{meta.author}</b></span>
       <span>{meta.date}</span>
-      <span>{meta.readTime}</span>
     </div>
   </div>
 </section>

@@ -12,6 +12,7 @@ export interface PostDraftFormState {
 export interface CategoryFormState {
   label?: string;
   slug?: string;
+  icon?: string;
 }
 
 function field(form: FormData, name: string): string {
@@ -23,7 +24,7 @@ export function draftFormValues(form: FormData): PostDraftFormState {
 }
 
 export function categoryFormValues(form: FormData): CategoryFormState {
-  return { label: field(form, 'label'), slug: field(form, 'slug') };
+  return { label: field(form, 'label'), slug: field(form, 'slug'), icon: field(form, 'icon') };
 }
 
 export async function createDraftFromForm(values: PostDraftFormState, author: string) {
@@ -63,7 +64,6 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
     titlePost: parsed.data.title,
     category: parsed.data.category,
     dek: '',
-    readTime: '',
     author
   });
 
@@ -73,14 +73,16 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
 export async function createCategoryFromForm(values: CategoryFormState) {
   const parsed = newCategorySchema.safeParse({
     label: values.label,
-    slug: values.slug ?? ''
+    slug: values.slug ?? '',
+    icon: values.icon
   });
 
   if (!parsed.success) {
-    return actionFailure('Label is required. Use lowercase letters, digits, and hyphens for a custom slug.', {
+    return actionFailure('Label and icon are required. Use lowercase letters, digits, and hyphens for a custom slug.', {
       values: {
         label: String(values.label ?? ''),
-        slug: String(values.slug ?? '')
+        slug: String(values.slug ?? ''),
+        icon: String(values.icon ?? '')
       }
     });
   }
@@ -92,14 +94,16 @@ export async function createCategoryFromForm(values: CategoryFormState) {
     return actionFailure(error instanceof Error ? error.message : 'Could not create a slug for this category.', {
       values: {
         label: parsed.data.label,
-        slug: parsed.data.slug
+        slug: parsed.data.slug,
+        icon: parsed.data.icon
       }
     });
   }
 
   const row = await createCategory({
     slug,
-    label: parsed.data.label
+    label: parsed.data.label,
+    icon: parsed.data.icon
   });
 
   return actionSuccess({ row });

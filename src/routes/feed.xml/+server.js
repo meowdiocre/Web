@@ -1,4 +1,5 @@
 import { SITE } from '$lib/config/site.js';
+import { articlePath } from '$lib/blog/urls';
 import { loadFeedPosts } from '$lib/server/db/queries';
 import { escapeHtml as xml, escapeAttr as attrXml } from '$lib/util/escape';
 import { composeTitle } from '$lib/util/strings';
@@ -19,7 +20,7 @@ export async function GET({ url, setHeaders }) {
 
   const items = rows
     .map((r) => {
-      const link  = `${origin}/article/${r.slug}`;
+      const link  = `${origin}${articlePath(r.categorySlug, r.slug)}`;
       const title = composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost });
       const pub   = r.publishedAt ?? new Date();
       const guid  = `${SITE.brand}:${pub.toISOString().slice(0, 10)}:${r.slug}`;

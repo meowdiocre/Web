@@ -1,6 +1,7 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 
 import { SITE } from '$lib/config/site.js';
+import { articlePath } from '$lib/blog/urls';
 import { actionFailure, actionSuccess, formValues } from '$lib/server/admin/action-result';
 import {
   deletePost,
@@ -39,7 +40,6 @@ export const actions = {
       titlePost:     raw.titlePost,
       category:      raw.category,
       dek:           raw.dek,
-      readTime:      raw.readTime,
       author:        raw.author || SITE.brand,
       coverImageUrl: (raw.coverImageUrl ? String(raw.coverImageUrl) : null),
       publishAt:     raw.publishAt ?? ''
@@ -63,7 +63,6 @@ export const actions = {
       titlePost:     parsed.data.titlePost,
       category:      parsed.data.category,
       dek:           parsed.data.dek,
-      readTime:      parsed.data.readTime,
       author:        parsed.data.author,
       coverImageUrl: parsed.data.coverImageUrl,
       publishAt:     normalisePublishAt(parsed.data.publishAt)
@@ -76,7 +75,7 @@ export const actions = {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await deletePost(params.id);
     if (row?.status === 'published') {
-      await revalidatePost(row.slug);
+      await revalidatePost(row.category, row.slug);
     }
     redirect(303, '/admin');
   },
@@ -84,14 +83,14 @@ export const actions = {
   publish: async ({ params, locals }) => {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await publishPost(params.id);
-    if (row) await revalidatePost(row.slug);
+    if (row) await revalidatePost(row.category, row.slug);
     return actionSuccess({ message: 'saved.', status: 'published' });
   },
 
   unpublish: async ({ params, locals }) => {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const row = await unpublishPost(params.id);
-    if (row) await revalidatePost(row.slug);
+    if (row) await revalidatePost(row.category, row.slug);
     return actionSuccess({ message: 'saved.', status: 'draft' });
   },
 
@@ -100,6 +99,7 @@ export const actions = {
     const post = await getPostById(params.id);
     if (!post) return fail(404, actionFailure('Post not found.'));
     const token = signPreviewToken(post.slug);
-    return actionSuccess({ previewUrl: `/article/${post.slug}?preview=${encodeURIComponent(token)}` });
+    const path = articlePath(post.category, post.slug);
+    return actionSuccess({ previewUrl: `${path}?preview=${encodeURIComponent(token)}` });
   }
 };

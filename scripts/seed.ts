@@ -58,7 +58,7 @@ async function main() {
         .values(category)
         .onConflictDoUpdate({
           target: categoriesTable.slug,
-          set: { label: category.label, tone: category.tone }
+          set: { label: category.label, tone: category.tone, icon: category.icon }
         });
     }
 

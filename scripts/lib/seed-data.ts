@@ -14,6 +14,14 @@ const TONE_BY_CATEGORY: Record<string, string> = {
   'Anti-cheat': 'muted-warm'
 };
 
+const ICON_BY_CATEGORY: Record<string, string> = {
+  Reverse: 'debug',
+  Windows: 'app-windows',
+  ML: 'ai-scan',
+  Web: 'globe',
+  'Anti-cheat': 'shield'
+};
+
 type TitleParts = { pre?: string; em?: string; post?: string };
 
 export interface SeededPost {
@@ -23,7 +31,6 @@ export interface SeededPost {
   titlePost: string;
   dek: string;
   category: string;
-  readTime: string;
   status: 'published' | 'draft';
   publishedAt: Date | null;
   docJson: unknown;
@@ -34,6 +41,7 @@ export interface SeededPost {
 export interface SeededCategory {
   slug: string;
   label: string;
+  icon: string;
   tone: string;
 }
 
@@ -92,6 +100,7 @@ export function uniqueCategories(posts: SeededPost[]): SeededCategory[] {
     seen.set(key, {
       slug: slugify(post.category),
       label: post.category,
+      icon: ICON_BY_CATEGORY[post.category] ?? 'book-open',
       tone: TONE_BY_CATEGORY[post.category] ?? 'crimson-deep'
     });
   }
@@ -117,7 +126,6 @@ export async function buildSeedPlan(): Promise<SeedPlan> {
         titlePost: title.post,
         dek: entry.desc,
         category: entry.category,
-        readTime: entry.readTime,
         status: 'published',
         publishedAt,
         docJson: { type: 'doc', content: [] },
@@ -136,7 +144,6 @@ export async function buildSeedPlan(): Promise<SeedPlan> {
     titlePost: article.head.title.post,
     dek: article.head.dek,
     category: article.head.category.replace(/ engineering$/i, '').trim() || article.head.category,
-    readTime: article.head.meta.readTime,
     status: 'published',
     publishedAt: parseEntryDate('Mar 14', 2026),
     docJson: fullDoc,

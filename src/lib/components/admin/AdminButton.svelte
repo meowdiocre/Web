@@ -67,10 +67,6 @@
 {/if}
 
 <style>
-  /* Hallmark · component: admin button · genre: editorial · theme: existing admin
-   * states: default · hover · focus · active · disabled · loading · error · success
-   * contrast: project-token pairings
-   */
   .admin-button {
     display: inline-flex;
     min-height: 44px;
@@ -92,7 +88,7 @@
   }
 
   .admin-button--primary {
-    background: var(--color-crimson);
+    background: var(--color-crimson-deep);
     color: var(--color-paper);
   }
 
@@ -102,7 +98,7 @@
 
   .admin-button--danger {
     border-color: var(--color-crimson-deep);
-    color: var(--color-crimson);
+    color: var(--color-rose);
   }
 
   .admin-button:focus-visible {
@@ -125,7 +121,7 @@
   .admin-button[data-state='success'] { border-color: var(--color-paper-2); color: var(--color-paper-2); }
 
   @media (hover: hover) and (pointer: fine) {
-    .admin-button--primary:hover { background: var(--color-crimson-deep); }
+    .admin-button--primary:hover { border-color: var(--color-rose); }
     .admin-button--ghost:hover { border-color: var(--color-rose); color: var(--color-rose); }
     .admin-button--danger:hover { background: var(--color-crimson-deep); color: var(--color-paper); }
   }

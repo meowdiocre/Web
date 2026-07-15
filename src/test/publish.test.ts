@@ -91,8 +91,8 @@ describe('cron publish path', () => {
 
   it('flips each due post and revalidates their routes', async () => {
     const due = [
-      { id: 'p1', slug: 'a-slug' },
-      { id: 'p2', slug: 'b-slug' }
+      { id: 'p1', slug: 'a-slug', category: 'reverse' },
+      { id: 'p2', slug: 'b-slug', category: 'windows' }
     ];
     (queries.loadDuePosts as any).mockResolvedValue(due);
     (admin.publishPost as any).mockImplementation(async (id: string) => ({ slug: due.find((d) => d.id === id)!.slug }));
@@ -107,8 +107,8 @@ describe('cron publish path', () => {
     const paths = (publish.revalidatePaths as any).mock.calls[0][0] as string[];
     expect(paths).toContain('/blog');
     expect(paths).toContain('/feed.xml');
-    expect(paths).toContain('/article/a-slug');
-    expect(paths).toContain('/article/b-slug');
+    expect(paths).toContain('/blog/reverse/a-slug');
+    expect(paths).toContain('/blog/windows/b-slug');
 
     const body = await res.json();
     expect(body).toMatchObject({ ok: true, flipped: 2, slugs: ['a-slug', 'b-slug'] });

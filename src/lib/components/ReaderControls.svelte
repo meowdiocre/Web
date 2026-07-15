@@ -4,49 +4,77 @@
   import PixelIcon from '$lib/components/PixelIcon.svelte';
   import { STORAGE_KEYS } from '$lib/config/site.js';
 
-  const SIZES = ['16px', '18px', '20px'];
-  const DEFAULT_SIZE = 1;
+  const DEFAULT_PX = 18;
+  const MIN_PX = 12;
+  const MAX_PX = 28;
+  const STEP = 2;
 
   let theme = $state(/** @type {'cream'|'slate'} */ ('cream'));
-  let sizeIdx = $state(DEFAULT_SIZE);
+  let fontSize = $state(DEFAULT_PX);
   let open = $state(false);
+  let fab = $state(/** @type {HTMLButtonElement|undefined} */ (undefined));
+  let prefixPending = $state(false);
+  /** @type {ReturnType<typeof setTimeout>|undefined} */
+  let prefixTimer;
 
-  /** @type {HTMLDivElement|undefined} */
-  let root = $state();
-  /** @type {HTMLButtonElement|undefined} */
-  let fab = $state();
-
-  const controlClass = `
-    grid h-[34px] w-[34px] place-items-center cursor-pointer
-    border border-transparent font-mono text-[13px] text-[var(--fg)]
-    transition-[background-color,border-color,color] duration-150
-    hover:border-[var(--rule)] hover:text-[var(--accent)]
-    aria-[pressed=true]:bg-[var(--accent)] aria-[pressed=true]:text-paper
-    max-[900px]:h-[40px] max-[900px]:w-[40px]
-    max-[600px]:h-[44px] max-[600px]:w-[44px] max-[600px]:text-[14px]
-  `;
+  const btnClass =
+    'py-1 px-2.5 border-0 bg-transparent font-mono text-[11px] tracking-[0.08em] cursor-pointer transition-[color,background-color] duration-100 aria-[pressed=true]:bg-[var(--accent)] aria-[pressed=true]:text-paper';
 
   function applyTheme(name) {
     theme = name;
     if (typeof document === 'undefined') return;
     document.body.setAttribute('data-theme', name);
-    try { localStorage.setItem(STORAGE_KEYS.readerTheme, name); } catch (_) {}
+    try { localStorage.setItem(STORAGE_KEYS.readerTheme, name); } catch (_) { }
   }
 
-  function applySize(idx) {
-    sizeIdx = Math.max(0, Math.min(SIZES.length - 1, idx));
+  function applySize(px) {
+    const clamped = Math.max(MIN_PX, Math.min(MAX_PX, px));
+    fontSize = clamped;
     if (typeof document === 'undefined') return;
-    document.body.style.setProperty('--read-size', SIZES[sizeIdx]);
-    try { localStorage.setItem(STORAGE_KEYS.readerSize, String(sizeIdx)); } catch (_) {}
+    document.body.style.setProperty('--read-size', `${clamped}px`);
+    try { localStorage.setItem(STORAGE_KEYS.readerSize, String(clamped)); } catch (_) { }
+  }
+
+  function toggle() { open = !open; }
+
+  function startPrefix() {
+    prefixPending = true;
+    clearTimeout(prefixTimer);
+    prefixTimer = setTimeout(() => { prefixPending = false; }, 2000);
   }
 
   /** @param {PointerEvent} e */
   function onPointerDown(e) {
-    if (open && root && !root.contains(/** @type {Node} */ (e.target))) open = false;
+    if (!open) return;
+    const pane = document.getElementById('reader-pane');
+    if (pane && !pane.contains(/** @type {Node} */ (e.target))) open = false;
   }
 
   /** @param {KeyboardEvent} e */
-  function onKeyDown(e) {
+  function onKey(e) {
+    /** @type {Element|null} */
+    const t = /** @type {Element|null} */ (e.target);
+    if (t?.matches?.('input, textarea, select, [contenteditable="true"]')) return;
+
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'b' || e.key === 'B') && !e.altKey) {
+      e.preventDefault();
+      startPrefix();
+      return;
+    }
+
+    if (prefixPending) {
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        toggle();
+      }
+      if (e.key === 'Escape') {
+        open = false;
+        fab?.focus();
+      }
+      prefixPending = false;
+      return;
+    }
+
     if (e.key === 'Escape' && open) {
       open = false;
       fab?.focus();
@@ -57,93 +85,70 @@
     try {
       const t = localStorage.getItem(STORAGE_KEYS.readerTheme);
       applyTheme(t === 'slate' ? 'slate' : 'cream');
-
       const raw = localStorage.getItem(STORAGE_KEYS.readerSize);
-      const n = raw == null ? DEFAULT_SIZE : Number.parseInt(raw, 10);
-      applySize(Number.isFinite(n) ? n : DEFAULT_SIZE);
+      const n = raw == null ? DEFAULT_PX : Number.parseInt(raw, 10);
+      applySize(Number.isFinite(n) ? n : DEFAULT_PX);
     } catch (_) {
       applyTheme('cream');
-      applySize(DEFAULT_SIZE);
+      applySize(DEFAULT_PX);
     }
 
     document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keydown', onKey);
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('keydown', onKey);
     };
   });
 </script>
 
-<div
-  bind:this={root}
-  class="
-    fixed top-1/2 right-[18px] z-[55] flex -translate-y-1/2 items-center gap-[10px]
-    max-[900px]:right-[12px] max-[900px]:top-auto max-[900px]:bottom-4 max-[900px]:translate-y-0
-    max-[900px]:flex-col max-[900px]:items-end max-[900px]:gap-2
-    max-[600px]:right-2 max-[600px]:bottom-3
-  "
->
+<svelte:window onkeydown={onKey} />
+
+<div class="pane-wrapper">
   {#if open}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
-      id="reader-panel"
+      id="reader-pane"
       role="group"
       aria-label="Reading settings"
-      transition:fly={{ duration: 140, x: 8, opacity: 0 }}
-      class="
-        reader-clip-panel relative min-w-[124px] border border-[var(--rule)] bg-[var(--bg-2)] p-[10px]
-        shadow-[0_8px_22px_var(--shadow)]
-      "
+      transition:fly={{ duration: 120, y: 6, opacity: 0 }}
+      class="pane"
     >
-      <div
-        aria-hidden="true"
-        class="pointer-events-none absolute left-1.5 right-1.5 top-0 border-t-2 border-dashed border-rose/[0.45]"
-      ></div>
+      <div class="pane__head">
+        <span class="pane__session">
+          <span class="pane__glyph">◎</span>meowdiocre:<span class="pane__win">reader</span>
+        </span>
+        <span class="pane__close">
+          C-r <button type="button" aria-label="Close panel" class="pane__close-btn" onclick={() => (open = false)}>&times;</button>
+        </span>
+      </div>
 
-      <div class="px-1 py-0.5">
-        <h6 class="mb-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-warm">Paper</h6>
-        <div class="flex gap-1" role="group" aria-label="Reader theme">
-          <button
-            type="button"
-            class={controlClass}
-            aria-pressed={theme === 'cream'}
-            aria-label="Cream paper"
-            title="Cream paper"
-            onclick={() => applyTheme('cream')}
-          >
-            <svg class="h-4 w-4" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" fill="#ebd8be" stroke="currentColor" stroke-width="1.6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class={controlClass}
-            aria-pressed={theme === 'slate'}
-            aria-label="Cool slate"
-            title="Cool slate"
-            onclick={() => applyTheme('slate')}
-          >
-            <PixelIcon name="moon" size={16} />
-          </button>
+      <div class="pane__body">
+        <div class="pane__row">
+          <span class="pane__label">theme</span>
+          <div class="pane__btns" role="group" aria-label="Reader theme">
+            <button type="button" class={btnClass} aria-pressed={theme === 'cream'} onclick={() => applyTheme('cream')}>
+              cream
+            </button>
+            <button type="button" class={btnClass} aria-pressed={theme === 'slate'} onclick={() => applyTheme('slate')}>
+              slate
+            </button>
+          </div>
+        </div>
+
+        <div class="pane__row">
+          <span class="pane__label">size</span>
+          <div class="pane__btns" role="group" aria-label="Reading size">
+            <button type="button" class={btnClass} aria-label="Smaller" onclick={() => applySize(fontSize - STEP)}>&minus;</button>
+            <button type="button" class={btnClass} aria-label="Default size" onclick={() => applySize(DEFAULT_PX)}>{fontSize}</button>
+            <button type="button" class={btnClass} aria-label="Larger" onclick={() => applySize(fontSize + STEP)}>+</button>
+          </div>
         </div>
       </div>
 
-      <div aria-hidden="true" class="mx-0.5 my-2 h-px bg-[var(--rule)] opacity-70"></div>
-
-      <div class="px-1 py-0.5">
-        <h6 class="mb-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-warm">Size</h6>
-        <div class="flex gap-1" role="group" aria-label="Reading size">
-          <button type="button" class={controlClass} aria-label="Smaller" onclick={() => applySize(sizeIdx - 1)}>A−</button>
-          <button
-            type="button"
-            class={controlClass}
-            aria-pressed={sizeIdx === DEFAULT_SIZE}
-            aria-label="Default"
-            onclick={() => applySize(DEFAULT_SIZE)}
-          >A</button>
-          <button type="button" class={controlClass} aria-label="Larger" onclick={() => applySize(sizeIdx + 1)}>A+</button>
-        </div>
+      <div class="pane__foot">
+        <span class="pane__status">{theme} · {fontSize}px</span>
+        <span class="pane__date">[reader]</span>
       </div>
     </div>
   {/if}
@@ -154,31 +159,161 @@
     aria-label="Reading settings"
     aria-haspopup="true"
     aria-expanded={open}
-    aria-controls="reader-panel"
-    onclick={() => (open = !open)}
-    class="
-      reader-clip-fab grid h-[42px] w-[42px] place-items-center cursor-pointer
-      border border-[var(--rule)] bg-[var(--bg-2)] text-[var(--fg)]
-      font-display text-[13px] leading-none tracking-[-0.02em]
-      shadow-[0_4px_14px_var(--shadow)]
-      transition-[border-color,color,background-color] duration-150
-      hover:border-[var(--accent)] hover:text-[var(--accent)]
-      aria-[expanded=true]:border-[var(--accent)]
-      aria-[expanded=true]:bg-[var(--accent)]
-      aria-[expanded=true]:text-paper
-      max-[900px]:h-[44px] max-[900px]:w-[44px]
-      max-[600px]:h-[46px] max-[600px]:w-[46px]
-    "
+    aria-controls="reader-pane"
+    onclick={toggle}
+    class="fab"
   >
-    <span aria-hidden="true">Aa</span>
+    <PixelIcon name="terminal" size={16} />
   </button>
 </div>
 
 <style>
-  .reader-clip-fab {
-    clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 9px 100%, 0 calc(100% - 9px));
+  .pane-wrapper {
+    position: fixed;
+    bottom: clamp(14px, 2.4vw, 24px);
+    right: clamp(14px, 2.4vw, 24px);
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
   }
-  .reader-clip-panel {
-    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+
+  .pane {
+    width: 220px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border: 1px solid rgb(232 156 146 / 0.25);
+    border-bottom: 2px solid var(--color-crimson);
+    box-shadow: 6px 6px 0 rgb(0 0 0 / 0.5);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+  }
+
+  .pane__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-bottom: 1px solid rgb(232 156 146 / 0.15);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+  }
+  .pane__session {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-bone);
+  }
+  .pane__glyph { color: var(--color-rose); opacity: 0.9; }
+  .pane__win   { color: var(--color-rose); }
+  .pane__close {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-muted);
+    font-size: 9px;
+  }
+  .pane__close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px; height: 16px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    cursor: pointer;
+    transition: color 0.12s;
+  }
+  .pane__close-btn:hover { color: var(--color-crimson); }
+
+  .pane__body {
+    padding: 10px;
+    display: grid;
+    gap: 12px;
+  }
+
+  .pane__row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 8px;
+    align-items: center;
+  }
+  .pane__label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--color-muted-warm);
+    opacity: 0.85;
+  }
+  .pane__btns {
+    display: flex;
+    gap: 2px;
+  }
+  .pane__btns button {
+    color: var(--color-bone);
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .pane__btns button:hover,
+  .pane__btns button:focus-visible {
+    color: var(--color-paper);
+    background: rgb(232 156 146 / 0.12);
+    outline: none;
+  }
+
+  .pane__foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px;
+    border-top: 1px solid rgb(232 156 146 / 0.12);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: lowercase;
+  }
+  .pane__status { color: var(--color-rose); opacity: 0.9; }
+  .pane__date   { color: var(--color-muted); opacity: 0.65; }
+
+  .fab {
+    display: grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    padding: 0;
+    border: 1px solid rgb(232 156 146 / 0.25);
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-display);
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    box-shadow: 3px 3px 0 rgb(0 0 0 / 0.45);
+  }
+  .fab:hover,
+  .fab:focus-visible {
+    border-color: var(--color-rose);
+    color: var(--color-rose);
+    outline: none;
+  }
+  .fab[aria-expanded='true'] {
+    border-color: var(--color-crimson);
+    background: var(--color-crimson-deep);
+    color: var(--color-paper);
+  }
+
+  @media (max-width: 600px) {
+    .pane-wrapper {
+      bottom: 10px; right: 10px;
+    }
+    .pane { width: 200px; }
+    .fab { width: 36px; height: 36px; font-size: 13px; }
   }
 </style>

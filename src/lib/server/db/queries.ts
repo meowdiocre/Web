@@ -1,6 +1,9 @@
 import { and, desc, eq, lte, ne } from 'drizzle-orm';
 import { SITE } from '$lib/config/site.js';
+import { articlePath } from '$lib/blog/urls';
 import { composeTitle } from '$lib/util/strings';
+import { normalizeCategoryIcon } from '$lib/icons/icon-names';
+import type { CategoryIconName } from '$lib/icons/icon-names';
 import { db } from './client';
 import { posts, categories } from './schema';
 
@@ -23,7 +26,7 @@ export interface PublicEntry {
   title:    string;
   desc:     string;
   category: string;
-  readTime: string;
+  categoryIcon: CategoryIconName;
 }
 
 export interface EntryGroup {
@@ -39,9 +42,10 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
       titleEm:     posts.titleEm,
       titlePost:   posts.titlePost,
       dek:         posts.dek,
-      readTime:    posts.readTime,
       publishedAt: posts.publishedAt,
-      categoryLabel: categories.label
+      categorySlug: posts.category,
+      categoryLabel: categories.label,
+      categoryIcon: categories.icon
     })
     .from(posts)
     .leftJoin(categories, eq(posts.category, categories.slug))
@@ -53,12 +57,12 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
     const when  = r.publishedAt ?? new Date(0);
     const year  = when.getUTCFullYear();
     const entry: PublicEntry = {
-      href:     `/article/${r.slug}`,
+      href:     articlePath(r.categorySlug, r.slug),
       date:     shortDate(when),
       title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
       desc:     r.dek,
       category: r.categoryLabel ?? '',
-      readTime: r.readTime
+      categoryIcon: normalizeCategoryIcon(r.categoryIcon)
     };
     const arr = byYear.get(year);
     if (arr) arr.push(entry);
@@ -73,9 +77,10 @@ export interface PublicArticle {
   slug:      string;
   head: {
     category: string;
+    categoryIcon: CategoryIconName;
     title:    { pre: string; em: string; post: string };
     dek:      string;
-    meta:     { author: string; date: string; readTime: string };
+    meta:     { author: string; date: string };
   };
   bodyHtml:  string;
   footnotes: Array<{ html: string }>;
@@ -85,7 +90,7 @@ export interface PublicArticle {
 export interface RelatedEntry {
   href:     string;
   category: string;
-  readTime: string;
+  categoryIcon: CategoryIconName;
   title:    string;
   blurb:    string;
 }
@@ -108,7 +113,8 @@ export async function loadPublicArticle(
       bodyHtml:    posts.bodyHtml,
       footnotes:   posts.footnotesJson,
       category:    posts.category,
-      categoryLabel: categories.label
+      categoryLabel: categories.label,
+      categoryIcon: categories.icon
     })
     .from(posts)
     .leftJoin(categories, eq(posts.category, categories.slug))
@@ -126,9 +132,10 @@ export async function loadPublicArticle(
     slug: r.slug,
     head: {
       category: r.categoryLabel ?? r.category,
+      categoryIcon: normalizeCategoryIcon(r.categoryIcon),
       title:    { pre: r.titlePre, em: r.titleEm, post: r.titlePost },
       dek:      r.dek,
-      meta:     { author: r.author, date: metaDate(when), readTime: r.readTime }
+      meta:     { author: r.author, date: metaDate(when) }
     },
     bodyHtml:  r.bodyHtml,
     footnotes: fns,
@@ -144,8 +151,9 @@ export async function loadRelated(slug: string, categorySlug: string): Promise<R
       titleEm:   posts.titleEm,
       titlePost: posts.titlePost,
       dek:       posts.dek,
-      readTime:  posts.readTime,
-      category:  categories.label
+      categorySlug: posts.category,
+      category:  categories.label,
+      categoryIcon: categories.icon
     })
     .from(posts)
     .leftJoin(categories, eq(posts.category, categories.slug))
@@ -158,9 +166,9 @@ export async function loadRelated(slug: string, categorySlug: string): Promise<R
     .limit(SITE.relatedPosts.itemCount);
 
   return rows.map((r) => ({
-    href:     `/article/${r.slug}`,
+    href:     articlePath(r.categorySlug, r.slug),
     category: r.category ?? '',
-    readTime: r.readTime,
+    categoryIcon: normalizeCategoryIcon(r.categoryIcon),
     title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
     blurb:    r.dek
   }));
@@ -176,6 +184,7 @@ export async function loadFeedPosts(limit: number) {
       dek:         posts.dek,
       bodyHtml:    posts.bodyHtml,
       publishedAt: posts.publishedAt,
+      categorySlug: posts.category,
       categoryLabel: categories.label,
       author:      posts.author
     })

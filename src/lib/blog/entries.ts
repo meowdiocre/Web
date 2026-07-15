@@ -1,4 +1,5 @@
 import type { EntryGroup as PublicEntryGroup, PublicEntry } from '$lib/server/db/queries';
+import type { CategoryIconName } from '$lib/icons/icon-names';
 
 export type BlogEntry = PublicEntry & { year: number };
 export type BlogEntryGroup = PublicEntryGroup;
@@ -6,6 +7,7 @@ export type BlogEntryGroup = PublicEntryGroup;
 export interface BlogCategorySummary {
   key: string;
   label: string;
+  icon: CategoryIconName;
   count: number;
 }
 
@@ -32,7 +34,7 @@ export function buildCategorySummaries(entries: BlogEntry[]): BlogCategorySummar
     const key = categoryKey(label);
     const current = byKey.get(key);
     if (current) current.count += 1;
-    else byKey.set(key, { key, label, count: 1 });
+    else byKey.set(key, { key, label, icon: entry.categoryIcon, count: 1 });
   }
 
   return [...byKey.values()].sort((a, b) => {
@@ -67,7 +69,7 @@ export function groupEntriesByYear(entries: BlogEntry[]): BlogEntryGroup[] {
       title: entry.title,
       desc: entry.desc,
       category: entry.category,
-      readTime: entry.readTime
+      categoryIcon: entry.categoryIcon
     };
 
     const current = byYear.get(entry.year);

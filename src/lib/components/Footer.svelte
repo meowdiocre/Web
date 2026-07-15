@@ -19,7 +19,7 @@
       layer
       px-[var(--gutter)] py-[22px]
       border-t border-[var(--line)]
-      font-terminal text-[12px] tracking-[0.10em] lowercase text-muted
+      font-terminal text-[12px] tracking-[0.06em] text-muted
       max-[760px]:text-[10px]
     "
   >
@@ -49,7 +49,7 @@
     class="
       px-[var(--gutter)] pt-9 pb-[30px]
       bg-ink text-bone border-t-2 border-ink
-      font-mono text-[11px] tracking-[0.14em] uppercase
+      font-mono text-[11px] tracking-[0.06em]
     "
   >
     <div class="max-w-[880px] mx-auto flex justify-between gap-[18px] flex-wrap text-muted">
@@ -69,7 +69,7 @@
     class="
       px-[var(--gutter)] py-9
       bg-ink text-bone
-      font-mono text-[11px] tracking-[0.12em] uppercase
+      font-mono text-[11px] tracking-[0.06em]
     "
   >
     <div class="max-w-[1280px] mx-auto flex justify-between gap-[18px] flex-wrap text-muted">

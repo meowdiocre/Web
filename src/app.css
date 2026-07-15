@@ -34,6 +34,10 @@
   --line-strong: rgba(245, 239, 224, 0.32);
   --rule:        rgba(36, 24, 20, 0.16);
   --rule-soft:   rgba(36, 24, 20, 0.08);
+  --admin-accent-wash:        rgb(232 156 146 / 0.06);
+  --admin-accent-wash-strong: rgb(232 156 146 / 0.08);
+  --admin-accent-line:        rgb(232 156 146 / 0.30);
+  --admin-menu-shadow:        0 16px 32px rgb(0 0 0 / 0.35);
 }
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -211,9 +215,8 @@ body[data-page='admin'] {
   .lbl {
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: var(--color-muted-warm);
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
   }
   .field-help {
     margin-top: -2px;
@@ -235,47 +238,15 @@ body[data-page='admin'] {
   .inp:focus { outline: 2px solid var(--color-rose); outline-offset: 2px; }
   textarea.inp { resize: vertical; min-height: 80px; }
 
-  .btn-primary,
-  .btn-ghost,
-  .btn-danger {
-    display: inline-block;
-    padding: 10px 18px;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-  .btn-primary {
-    background: var(--color-crimson);
-    color: var(--color-paper);
-  }
-  .btn-primary:hover { background: var(--color-crimson-deep); }
-  .btn-ghost {
-    border-color: var(--line-soft);
-    color: var(--color-paper);
-    background: transparent;
-  }
-  .btn-ghost:hover { border-color: var(--color-rose); color: var(--color-rose); }
-  .btn-danger {
-    border-color: var(--color-crimson-deep);
-    color: var(--color-crimson);
-    background: transparent;
-  }
-  .btn-danger:hover { background: var(--color-crimson-deep); color: var(--color-paper); }
-
   .status {
     display: inline-block;
     padding: 2px 8px;
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    letter-spacing: 0.1em;
     border: 1px solid currentColor;
   }
-  .status--draft     { color: var(--color-muted-warm); }
+  .status--draft     { color: var(--color-muted); }
   .status--published { color: var(--color-rose); }
 
   .nav-section + .nav-section { margin-top: 18px; }
@@ -286,9 +257,8 @@ body[data-page='admin'] {
     margin: 0 0 6px;
     font-family: var(--font-mono);
     font-size: 9px;
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--color-muted-warm);
+    letter-spacing: 0.14em;
+    color: var(--color-muted);
   }
   .nav-section__label::after {
     content: '';
@@ -307,34 +277,31 @@ body[data-page='admin'] {
   .nav-item {
     position: relative;
     display: grid;
-    grid-template-columns: 14px 1fr;
+    grid-template-columns: 16px 1fr;
     gap: 8px;
     align-items: center;
+    min-height: 44px;
     padding: 8px 10px 8px 12px;
-    color: var(--color-paper);
-    opacity: 0.65;
+    color: var(--color-muted);
     font-family: var(--font-mono);
     font-size: 12px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    letter-spacing: 0.06em;
     text-decoration: none;
-    transition: color 0.12s, opacity 0.12s, background 0.12s;
+    transition: color 0.12s, background 0.12s;
   }
-  .nav-item__caret {
-    color: var(--color-muted-warm);
-    font-family: var(--font-display);
-    font-size: 13px;
+  .nav-item__icon {
+    display: inline-flex;
+    align-items: center;
+    color: currentColor;
     line-height: 1;
   }
   .nav-item:hover {
     color: var(--color-rose);
-    opacity: 1;
     background: rgb(232 156 146 / 0.04);
   }
-  .nav-item:hover .nav-item__caret { color: var(--color-rose); }
+  .nav-item:hover .nav-item__icon { color: var(--color-rose); }
   .nav-item--active {
     color: var(--color-rose);
-    opacity: 1;
     background: rgb(232 156 146 / 0.06);
   }
   .nav-item--active::before {
@@ -345,7 +312,7 @@ body[data-page='admin'] {
     background: var(--color-crimson);
   }
   .nav-item--active .nav-item__caret { color: var(--color-crimson); }
-  .nav-item--ext { color: var(--color-muted-warm); }
+  .nav-item--ext { color: var(--color-muted); }
   .nav-item--ext:hover { color: var(--color-rose); }
 }
 

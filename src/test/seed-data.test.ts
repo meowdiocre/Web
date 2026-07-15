@@ -9,6 +9,16 @@ describe('seed data', () => {
     expect(plan.posts.length).toBeGreaterThan(0);
     expect(plan.posts.some((post) => post.slug === FULL_ARTICLE_SLUG && post.bodyHtml.length > 0)).toBe(true);
     expect(plan.posts.every((post) => typeof post.category === 'string' && post.category.length > 0)).toBe(true);
+    expect(plan.categories.every((category) => typeof category.icon === 'string' && category.icon.length > 0)).toBe(true);
+    expect(Object.fromEntries(
+      plan.categories.map((category) => [category.label, category.icon])
+    )).toEqual({
+      Reverse: 'debug',
+      Windows: 'app-windows',
+      ML: 'ai-scan',
+      Web: 'globe',
+      'Anti-cheat': 'shield'
+    });
   });
 
   it('splits emphasized titles predictably', () => {

@@ -69,10 +69,6 @@
 {/if}
 
 <style>
-  /* Hallmark · component: action menu item · genre: editorial · theme: existing admin
-   * states: default · hover · focus · active · disabled · loading · error · success
-   * contrast: project-token pairings
-   */
   .action-menu-item {
     display: flex;
     width: 100%;
@@ -94,7 +90,7 @@
   }
 
   .action-menu-item--danger,
-  .action-menu-item[data-state='error'] { color: var(--color-crimson); }
+  .action-menu-item[data-state='error'] { color: var(--color-rose); }
   .action-menu-item[data-state='success'] { color: var(--color-paper-2); }
 
   .action-menu-item:focus-visible {
@@ -111,7 +107,7 @@
 
   @media (hover: hover) and (pointer: fine) {
     .action-menu-item:hover {
-      background: rgb(232 156 146 / 0.08);
+      background: var(--admin-accent-wash-strong);
       color: var(--color-rose);
     }
   }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { SITE } from '$lib/config/site.js';
+import { isCategoryIconName } from '$lib/icons/icon-names';
 
 export const slugRegex = /^[a-z0-9](?:[a-z0-9-]{0,126}[a-z0-9])?$/;
 
@@ -15,7 +16,6 @@ export const postMetadataSchema = z.object({
   titlePost:     z.string().max(256).default(''),
   category:      z.string().min(1).max(64),
   dek:           z.string().max(4096).default(''),
-  readTime:      z.string().max(24).default(''),
   author:        z.string().max(64).default(SITE.brand),
   coverImageUrl: z.string().url().max(1024).nullable().default(null),
   publishAt:     z.union([z.string().datetime({ offset: true }), z.string().length(0)]).default('')
@@ -41,7 +41,11 @@ export const categorySlugSchema = z.string()
   .max(64)
   .regex(/^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?$/, 'Category slugs must be lowercase letters, digits and hyphens.');
 
+export const categoryIconSchema = z.string()
+  .refine(isCategoryIconName, 'Choose an available category icon.');
+
 export const newCategorySchema = z.object({
   label: z.string().min(1).max(64),
-  slug:  z.union([categorySlugSchema, z.string().length(0)]).default('')
+  slug:  z.union([categorySlugSchema, z.string().length(0)]).default(''),
+  icon:  categoryIconSchema
 });

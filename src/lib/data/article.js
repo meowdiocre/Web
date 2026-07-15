@@ -3,7 +3,7 @@
  * @property {string} category
  * @property {{ pre: string, em: string, post: string }} title
  * @property {string} dek
- * @property {{ author: string, date: string, readTime: string }} meta
+ * @property {{ author: string, date: string }} meta
  *
  * @typedef {Object} Footnote
  * @property {string} html
@@ -18,7 +18,7 @@ export const article = {
       "What you actually need is not an emulator. It's a dispatch graph, three known handlers, " +
       "and patience for fixed points. The IR comes out of the trace if you stop trying to " +
       'instrument the binary and start trusting the shape of the dispatch.',
-    meta: { author: 'meowdiocre', date: '2026 · 03 · 14', readTime: '22 min read' }
+    meta: { author: 'meowdiocre', date: '2026 · 03 · 14' }
   },
 
   body: [
@@ -212,8 +212,6 @@ export const article = {
         'The lifter ships under MIT in a few weeks, after I clean up the trace recorder. It is ' +
         'not the only path; it is the path I had patience for.'
     },
-
-    { type: 'end-slug', text: '4,720 words · 2026 · 03 · 14' }
   ],
 
   footnotes: [

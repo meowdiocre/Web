@@ -32,7 +32,7 @@
       <PageTitle text="about" id="about-title" />
 
       <p class="tagline" aria-hidden="true">
-        <span class="bar"></span>present day. <em>present time.</em>
+        present day. <em>present time.</em>
       </p>
 
       <Lede>
@@ -78,16 +78,8 @@
     color: var(--color-muted);
   }
   .tagline em  { color: var(--color-rose); font-style: italic; }
-  .tagline .bar {
-    display: inline-block;
-    width: 16px; height: 1px;
-    background: var(--color-rose);
-    opacity: 0.6;
-    transform: translateY(-6px);
-  }
   @media (max-width: 600px) {
     .tagline      { font-size: 20px; gap: 8px; margin-top: 14px; }
-    .tagline .bar { width: 12px; transform: translateY(-4px); }
   }
 
   :global(body[data-page='about']) main :global(.lede a),

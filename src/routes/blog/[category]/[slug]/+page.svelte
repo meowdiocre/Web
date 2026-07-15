@@ -1,14 +1,14 @@
 <script>
   import { SITE } from '$lib/config/site.js';
 
-  import Nav             from '$lib/components/Nav.svelte';
-  import Footer          from '$lib/components/Footer.svelte';
-  import SkipLink        from '$lib/components/SkipLink.svelte';
-  import ReaderControls  from '$lib/components/ReaderControls.svelte';
-  import ScrollProgress  from '$lib/components/article/ScrollProgress.svelte';
-  import ArticleHead     from '$lib/components/article/ArticleHead.svelte';
-  import Essay           from '$lib/components/article/Essay.svelte';
-  import RelatedGrid     from '$lib/components/article/RelatedGrid.svelte';
+  import Nav from '$lib/components/Nav.svelte';
+  import Footer from '$lib/components/Footer.svelte';
+  import SkipLink from '$lib/components/SkipLink.svelte';
+  import ReaderControls from '$lib/components/ReaderControls.svelte';
+  import ScrollProgress from '$lib/components/article/ScrollProgress.svelte';
+  import ArticleHead from '$lib/components/article/ArticleHead.svelte';
+  import Essay from '$lib/components/article/Essay.svelte';
+  import RelatedGrid from '$lib/components/article/RelatedGrid.svelte';
   import ArticlePageSkeleton from '$lib/components/loading/ArticlePageSkeleton.svelte';
   import { composeTitle } from '$lib/util/strings';
 

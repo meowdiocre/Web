@@ -1,5 +1,6 @@
 <script>
   import Modal from '$lib/components/Modal.svelte';
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
   import DialogFooter from './DialogFooter.svelte';
   import { LANG_OPTIONS, detectLang, normaliseLang } from '$lib/editor/lang';
 
@@ -57,14 +58,12 @@
       </label>
 
       <div class="self-end">
-        <button
-          type="button"
-          class="btn-ghost w-full"
-          onclick={autoDetect}
+        <AdminButton
+          icon="cpu"
+          label="auto-detect"
           disabled={!source.trim()}
-        >
-          auto-detect ↻
-        </button>
+          onclick={autoDetect}
+        />
       </div>
     </div>
 

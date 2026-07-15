@@ -1,6 +1,7 @@
 import { json, error } from '@sveltejs/kit';
 import { timingSafeEqual } from 'node:crypto';
 
+import { articlePath } from '$lib/blog/urls';
 import { loadDuePosts } from '$lib/server/db/queries';
 import { publishPost } from '$lib/server/db/admin-queries';
 import { revalidatePaths } from '$lib/server/publish';
@@ -38,7 +39,7 @@ export async function GET({ request }) {
   await revalidatePaths([
     '/blog',
     '/feed.xml',
-    ...due.map((p) => `/article/${p.slug}`)
+    ...due.map((post) => articlePath(post.category, post.slug))
   ]);
 
   return json({ ok: true, flipped: due.length, slugs: due.map((p) => p.slug) });

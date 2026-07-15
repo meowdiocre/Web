@@ -17,7 +17,7 @@
     <p class="font-mono text-[11px] tracking-[0.22em] uppercase text-muted-warm mt-4 mb-2">
       // signal lost
     </p>
-    <h1 class="font-display text-[clamp(48px,9vw,128px)] uppercase tracking-[-0.02em] leading-[0.95] mb-4">
+    <h1 class="font-display text-[clamp(32px,5vw,56px)] tracking-[-0.02em] leading-[0.95] mb-4">
       <span class="text-crimson">{$page.status}</span><br />no signal.
     </h1>
     <p class="font-italic italic text-[clamp(20px,2.5vw,28px)] text-paper mb-8 leading-[1.3]">

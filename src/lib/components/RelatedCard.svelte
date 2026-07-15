@@ -1,19 +1,16 @@
 <script>
   import PixelIcon from '$lib/components/PixelIcon.svelte';
-  import { categoryIcon } from '$lib/config/category-icons.js';
 
   /**
    * @typedef {Object} Props
    * @property {string} href
    * @property {string} category
-   * @property {string} readTime
+   * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
    * @property {string} title
    * @property {string} blurb
    */
   /** @type {Props} */
-  let { href, category, readTime, title, blurb } = $props();
-
-  const iconName = $derived(categoryIcon(category));
+  let { href, category, categoryIcon, title, blurb } = $props();
 </script>
 
 <a
@@ -32,7 +29,7 @@
       font-mono text-[10px] tracking-[0.18em] uppercase
       text-[var(--accent)]
     "
-  ><PixelIcon name={iconName} size={11} />{category} · {readTime}</span>
+  ><PixelIcon name={categoryIcon} size={11} />{category}</span>
   <h6
     class="
       mb-2

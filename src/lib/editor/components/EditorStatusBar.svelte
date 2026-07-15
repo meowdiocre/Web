@@ -16,7 +16,7 @@
   } = $props();
 </script>
 
-<footer class="status-bar font-mono text-[10px] tracking-[0.16em] uppercase">
+<footer class="status-bar font-mono text-[10px] tracking-[0.06em] ">
   <span>{words} word{words === 1 ? '' : 's'}</span>
   <span class="sep" aria-hidden="true">·</span>
   <span>{chars} char{chars === 1 ? '' : 's'}</span>

@@ -1,5 +1,6 @@
 <script>
   import Modal from '$lib/components/Modal.svelte';
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
 
   /**
    * @typedef {Object} Props
@@ -32,10 +33,15 @@
   {/if}
 
   {#snippet footer()}
-    <button type="button" class="btn-ghost" onclick={onclose}>{cancelLabel}</button>
-    <button type="button" class="ml-auto {tone === 'danger' ? 'btn-danger' : 'btn-primary'}" onclick={onconfirm}>
-      {confirmLabel}
-    </button>
+    <AdminButton icon="close" label={cancelLabel} onclick={onclose} />
+    <div class="ml-auto">
+      <AdminButton
+        icon={tone === 'danger' ? 'trash' : 'check'}
+        label={confirmLabel}
+        variant={tone === 'danger' ? 'danger' : 'primary'}
+        onclick={onconfirm}
+      />
+    </div>
   {/snippet}
 </Modal>
 

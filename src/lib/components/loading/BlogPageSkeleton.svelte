@@ -1,5 +1,6 @@
 <script>
   import SkeletonBlock from './SkeletonBlock.svelte';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
 
   const groups = [4, 3, 2];
 </script>
@@ -9,7 +10,7 @@
     <div class="head__inner">
       <div class="head__main min-w-0">
         <div class="head__flag">
-          <SkeletonBlock width="12px" height="12px" radius="0" />
+          <PixelIcon name="script" size={16} />
         </div>
         <SkeletonBlock width="min(360px, 80%)" height="68px" radius="0" />
         <SkeletonBlock width="100%" height="18px" radius="0" />
@@ -21,6 +22,7 @@
       </div>
 
       <div class="epigraph">
+        <PixelIcon name="script" size={16} />
         <SkeletonBlock width="100%" height="22px" radius="0" />
         <SkeletonBlock width="80%" height="22px" radius="0" />
       </div>
@@ -30,23 +32,24 @@
   <section class="entries">
     <div class="entries__inner">
       <div class="search">
-        <SkeletonBlock width="12px" height="16px" radius="0" />
+        <PixelIcon name="arrow-right" size={14} />
         <SkeletonBlock width="min(280px, 70%)" height="20px" radius="0" />
         <SkeletonBlock width="60px" height="11px" radius="0" />
       </div>
 
       <div class="cats">
-        <SkeletonBlock width="22px" height="12px" radius="0" />
-        <SkeletonBlock width="64px" height="12px" radius="0" />
-        <SkeletonBlock width="80px" height="12px" radius="0" />
-        <SkeletonBlock width="48px" height="12px" radius="0" />
-        <SkeletonBlock width="20px" height="12px" radius="0" />
+        <PixelIcon name="book-open" size={13} />
+        <PixelIcon name="bug" size={13} />
+        <PixelIcon name="terminal" size={13} />
+        <PixelIcon name="script" size={13} />
+        <PixelIcon name="radio" size={13} />
       </div>
 
       {#each groups as count, groupIndex}
         <div class="year-row">
           <SkeletonBlock width="48px" height="12px" radius="0" />
           <div class="year-count">
+            <PixelIcon name="script" size={11} />
             <SkeletonBlock width="64px" height="12px" radius="0" />
           </div>
         </div>
@@ -62,8 +65,8 @@
             </div>
 
             <div class="entry__meta">
-              <SkeletonBlock width="88px" height="11px" radius="0" />
-              <SkeletonBlock width="64px" height="11px" radius="0" />
+              <PixelIcon name="bug" size={11} />
+              <PixelIcon name="cpu" size={11} />
             </div>
           </div>
         {/each}
@@ -71,14 +74,30 @@
 
       <div class="tail">
         <SkeletonBlock width="36px" height="11px" radius="0" />
-        <SkeletonBlock width="28px" height="11px" radius="0" />
+        <PixelIcon name="script" size={12} />
       </div>
     </div>
   </section>
 </div>
 
 <style>
-  .blog-skeleton { color: #2a1c14; }
+  .blog-skeleton {
+    color: #2a1c14;
+    --skel-icon: var(--color-muted-warm);
+  }
+  .blog-skeleton :global(.pixel-icon) {
+    opacity: 0.35;
+    animation: skel-pulse 1.6s ease-in-out infinite;
+  }
+
+  @keyframes skel-pulse {
+    0%, 100% { opacity: 0.25; }
+    50%      { opacity: 0.45; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blog-skeleton :global(.pixel-icon) { animation: none; opacity: 0.3; }
+  }
 
   .head { padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px); }
 
@@ -94,10 +113,8 @@
   .head__main { display: grid; gap: 14px; }
 
   .head__flag {
-    display: flex;
-    align-items: center;
-    gap: 12px;
     margin-bottom: 6px;
+    color: var(--color-crimson-deep);
   }
 
   .head__pol {
@@ -112,9 +129,11 @@
     padding-left: clamp(16px, 1.8vw, 22px);
     border-left: 2px solid var(--rule);
     display: grid;
+    grid-template-columns: 20px 1fr;
     gap: 10px;
     max-width: 58ch;
   }
+  .epigraph :global(.pixel-icon) { align-self: start; }
 
   .entries { padding: clamp(20px, 3vw, 32px) var(--gutter) clamp(72px, 9vw, 112px); }
 
@@ -131,8 +150,8 @@
   .cats {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
     padding: 10px 0 4px;
   }
 
@@ -145,7 +164,12 @@
     border-bottom: 1px solid var(--rule);
   }
   .year-row:first-child { margin-top: 0; }
-  .year-count { margin-left: auto; }
+  .year-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
 
   .entry {
     display: grid;

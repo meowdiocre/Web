@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Smoke pass against the static landing pages. The DB-backed routes
- * (/blog, /article/[slug]) need a configured DATABASE_URL to be
+ * (/blog, /blog/[category]/[slug]) need a configured DATABASE_URL to be
  * exercised; the full happy-path flow (login → create → edit →
  * publish → public render) is documented in docs/EDITING.md and
  * gated behind `E2E_FULL=1`.

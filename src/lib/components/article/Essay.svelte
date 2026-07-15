@@ -57,10 +57,9 @@
   }
   .essay :global(h2) {
     font-family: var(--font-display);
-    font-size: clamp(28px, 3.2vw, 38px);
-    line-height: 1.05;
-    letter-spacing: -0.015em;
-    text-transform: uppercase;
+    font-size: clamp(24px, 2.8vw, 32px);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
     color: var(--fg);
     margin: 60px 0 18px;
     padding-top: 20px;
@@ -68,9 +67,8 @@
   }
   .essay :global(h3) {
     font-family: var(--font-display);
-    font-size: 20px;
-    letter-spacing: -0.01em;
-    text-transform: uppercase;
+    font-size: 18px;
+    letter-spacing: -0.005em;
     color: var(--fg);
     margin: 32px 0 12px;
   }
@@ -144,26 +142,7 @@
   }
 
   .essay :global(.end) {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin: 60px 0 0;
-    padding-top: 28px;
-    border-top: 2px solid var(--fg);
-  }
-  .essay :global(.end .glyph) {
-    font-family: var(--font-display);
-    font-size: 40px;
-    color: var(--accent);
-    transform: rotate(-8deg);
-    line-height: 1;
-  }
-  .essay :global(.end > span:last-child) {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    color: var(--color-muted);
-    text-transform: uppercase;
+    display: none;
   }
 
   .essay :global(code) {

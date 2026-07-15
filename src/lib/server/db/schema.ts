@@ -20,6 +20,7 @@ export const categories = pgTable(
   {
     slug:  varchar('slug', { length: 64 }).primaryKey(),
     label: varchar('label', { length: 64 }).notNull(),
+    icon:  varchar('icon', { length: 64 }).notNull().default('book-open'),
     tone:  varchar('tone', { length: 32 }).notNull().default('crimson-deep'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
   }

@@ -61,7 +61,6 @@
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.18em;
-    text-transform: uppercase;
     color: var(--color-muted-warm);
   }
 </style>

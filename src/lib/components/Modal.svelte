@@ -1,5 +1,6 @@
 <script>
   import { BRAND_GLYPH } from '$lib/config/motif.js';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
 
   /**
    * @typedef {Object} Props
@@ -54,7 +55,7 @@
           class="x"
           aria-label="Close dialog"
           onclick={() => onclose?.()}
-        >×</button>
+        ><PixelIcon name="close" size={16} /></button>
       </header>
     {/if}
 
@@ -141,14 +142,13 @@
     font-family: var(--font-mono);
     font-size: 12px;
     letter-spacing: 0.16em;
-    text-transform: uppercase;
     color: var(--color-paper);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .x {
-    width: 30px; height: 30px;
+    width: 44px; height: 44px;
     display: grid; place-items: center;
     color: var(--color-paper);
     background: transparent;

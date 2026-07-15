@@ -1,5 +1,7 @@
 <script>
-  /** @typedef {{ key: string, label: string, count: number }} Category */
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
+
+  /** @typedef {{ key: string, label: string, icon: import('$lib/icons/icon-names').CategoryIconName, count: number }} Category */
   /** @typedef {{ categories?: Category[], selected?: string }} Props */
 
   /** @type {Props} */
@@ -24,7 +26,7 @@
       class:selected={selected === category.key}
       aria-pressed={selected === category.key}
       onclick={() => (selected = category.key)}
-    >{category.label}</button>
+    ><PixelIcon name={category.icon} size={11} />{category.label}</button>
   {/each}
 </nav>
 
@@ -41,6 +43,9 @@
   }
 
   .cats button {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 2px 0;
     border: 0;
     background: transparent;

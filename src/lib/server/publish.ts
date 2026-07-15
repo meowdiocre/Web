@@ -1,5 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { encodeBase64url, decodeBase64url } from '@oslojs/encoding';
+import { articlePath } from '$lib/blog/urls';
 
 const TE = new TextEncoder();
 const TD = new TextDecoder();
@@ -87,6 +88,6 @@ export async function revalidatePaths(paths: string[]): Promise<void> {
   );
 }
 
-export function revalidatePost(slug: string): Promise<void> {
-  return revalidatePaths(['/blog', `/article/${slug}`, '/feed.xml']);
+export function revalidatePost(category: string, slug: string): Promise<void> {
+  return revalidatePaths(['/blog', articlePath(category, slug), '/feed.xml']);
 }

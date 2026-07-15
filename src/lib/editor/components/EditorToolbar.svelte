@@ -147,7 +147,6 @@
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.18em;
-    text-transform: uppercase;
     cursor: pointer;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }

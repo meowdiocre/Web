@@ -36,7 +36,7 @@ export function findWindowByKey(key) {
 }
 
 export function findWindowByPath(path) {
-  if (path?.startsWith('/article')) return NAV_WINDOWS[1];
+  if (path === '/blog' || path?.startsWith('/blog/')) return NAV_WINDOWS[1];
   return NAV_WINDOWS.find((w) => w.path === path) ?? NAV_WINDOWS[0];
 }
 

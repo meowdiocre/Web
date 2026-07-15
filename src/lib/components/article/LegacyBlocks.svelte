@@ -1,7 +1,6 @@
 <script>
   import CodeBlock from './CodeBlock.svelte';
   import PullQuote from './PullQuote.svelte';
-  import EndSlug from './EndSlug.svelte';
 
   /** @type {{ body: any[] }} */
   let { body } = $props();
@@ -24,7 +23,5 @@
     <CodeBlock html={block.html} caption={block.caption} />
   {:else if block.type === 'pull-quote'}
     <PullQuote text={block.text} />
-  {:else if block.type === 'end-slug'}
-    <EndSlug text={block.text} />
   {/if}
 {/each}

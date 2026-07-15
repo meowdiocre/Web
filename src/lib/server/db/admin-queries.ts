@@ -3,6 +3,8 @@ import { db } from './client';
 import { categories, posts } from './schema';
 import type { Doc } from '$lib/editor/types';
 import { composeTitle } from '$lib/util/strings';
+import { normalizeCategoryIcon } from '$lib/icons/icon-names';
+import type { CategoryIconName } from '$lib/icons/icon-names';
 import { asInsert, asUpdate } from './write';
 
 export interface AdminPostListRow {
@@ -15,6 +17,7 @@ export interface AdminPostListRow {
   updatedAt:   Date;
   categorySlug: string;
   categoryLabel: string;
+  categoryIcon: CategoryIconName;
 }
 
 export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
@@ -30,7 +33,8 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
       publishedAt: posts.publishedAt,
       updatedAt: posts.updatedAt,
       categorySlug: posts.category,
-      categoryLabel: categories.label
+      categoryLabel: categories.label,
+      categoryIcon: categories.icon
     })
     .from(posts)
     .leftJoin(categories, eq(posts.category, categories.slug))
@@ -45,7 +49,8 @@ export async function listPostsForAdmin(): Promise<AdminPostListRow[]> {
     publishedAt: r.publishedAt,
     updatedAt:   r.updatedAt,
     categorySlug: r.categorySlug,
-    categoryLabel: r.categoryLabel ?? r.categorySlug
+    categoryLabel: r.categoryLabel ?? r.categorySlug,
+    categoryIcon: normalizeCategoryIcon(r.categoryIcon)
   }));
 }
 
@@ -63,17 +68,18 @@ export async function isCategorySlugTaken(slug: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-export async function createCategory(input: { slug: string; label: string; tone?: string }) {
+export async function createCategory(input: { slug: string; label: string; icon: string; tone?: string }) {
   const values = {
     slug: input.slug,
     label: input.label,
+    icon: input.icon,
     tone: input.tone ?? 'crimson-deep'
   };
 
   const [row] = await db
     .insert(categories)
     .values(asInsert(values))
-    .returning({ slug: categories.slug, label: categories.label });
+    .returning({ slug: categories.slug, label: categories.label, icon: categories.icon });
 
   return row;
 }
@@ -93,7 +99,6 @@ export interface CreateDraftInput {
   titlePost: string;
   category:  string;
   dek:       string;
-  readTime:  string;
   author:    string;
 }
 
@@ -105,7 +110,6 @@ export async function createDraft(input: CreateDraftInput) {
     titlePost: input.titlePost,
     category:  input.category,
     dek:       input.dek,
-    readTime:  input.readTime,
     author:    input.author,
     status:    'draft',
     docJson:   { type: 'doc', content: [] },
@@ -127,7 +131,6 @@ export interface UpdateMetadataInput {
   titlePost:     string;
   category:      string;
   dek:           string;
-  readTime:      string;
   author:        string;
   coverImageUrl: string | null;
   publishAt:     Date | null;
@@ -141,7 +144,6 @@ export async function updatePostMetadata(id: string, input: UpdateMetadataInput)
     titlePost:     input.titlePost,
     category:      input.category,
     dek:           input.dek,
-    readTime:      input.readTime,
     author:        input.author,
     coverImageUrl: input.coverImageUrl,
     publishAt:     input.publishAt,
@@ -158,7 +160,7 @@ export async function deletePost(id: string) {
   const [row] = await db
     .delete(posts)
     .where(eq(posts.id, id))
-    .returning({ slug: posts.slug, status: posts.status });
+    .returning({ slug: posts.slug, status: posts.status, category: posts.category });
   return row ?? null;
 }
 
@@ -169,7 +171,7 @@ export async function publishPost(id: string) {
     .update(posts)
     .set(asUpdate(changes))
     .where(eq(posts.id, id))
-    .returning({ slug: posts.slug });
+    .returning({ slug: posts.slug, category: posts.category });
   return row;
 }
 
@@ -180,7 +182,7 @@ export async function unpublishPost(id: string) {
     .update(posts)
     .set(asUpdate(changes))
     .where(eq(posts.id, id))
-    .returning({ slug: posts.slug });
+    .returning({ slug: posts.slug, category: posts.category });
   return row;
 }
 

@@ -1,10 +1,12 @@
 <script>
   import { page } from '$app/stores';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
 
   /**
    * @typedef {Object} NavLink
    * @property {string}                  href
    * @property {string}                  label
+   * @property {import('$lib/icons/icon-names').IconName} icon
    * @property {boolean}                 [external]   external/site link
    * @property {(path: string)=>boolean} [match]      custom active matcher
    *
@@ -28,16 +30,19 @@
         {
           href: '/admin',
           label: 'posts',
+          icon: 'article',
           match: (p) => p === '/admin' || (p.startsWith('/admin/posts/') && p !== '/admin/posts/new')
         },
         {
           href: '/admin/posts/new',
           label: 'new post',
+          icon: 'plus',
           match: (p) => p === '/admin/posts/new'
         },
         {
           href: '/admin/categories',
           label: 'categories',
+          icon: 'folder',
           match: (p) => p === '/admin/categories'
         }
       ]
@@ -45,7 +50,7 @@
     {
       label: 'external',
       links: [
-        { href: '/', label: 'view site', external: true }
+        { href: '/', label: 'view site', icon: 'external-link', external: true }
       ]
     }
   ];
@@ -75,9 +80,7 @@
               class:nav-item--ext={link.external}
               aria-current={active ? 'page' : undefined}
             >
-              <span class="nav-item__caret" aria-hidden="true">
-                {#if link.external}↗{:else if active}▸{:else}·{/if}
-              </span>
+              <span class="nav-item__icon" aria-hidden="true"><PixelIcon name={link.icon} size={14} /></span>
               <span class="nav-item__text">{link.label}</span>
             </a>
           </li>
@@ -94,9 +97,9 @@
     data-sveltekit-preload-code="hover"
     class="block leading-tight no-underline"
   >
-    <p class="font-mono tracking-[0.22em] uppercase text-muted-warm
+    <p class="font-mono tracking-[0.1em] text-muted
               {small ? 'text-[9px]' : 'text-[10px] mb-1'}">~/admin</p>
-    <h2 class="font-display uppercase tracking-[-0.01em] text-paper
+    <h2 class="font-display tracking-[-0.01em] text-paper
                {small ? 'text-[15px]' : 'text-[18px]'}">meowdiocre</h2>
   </a>
 {/snippet}
@@ -106,7 +109,10 @@
     <div class="account">
       <p class="account__handle">@{user.githubLogin}</p>
       <form method="POST" action="/admin/logout">
-        <button class="account__signout" type="submit">sign out</button>
+        <button class="account__signout" type="submit">
+          <PixelIcon name="logout" size={14} />
+          <span>sign out</span>
+        </button>
       </form>
     </div>
   {/if}
@@ -124,11 +130,12 @@
     aria-controls="admin-menu"
     aria-label={open ? 'Close menu' : 'Open menu'}
     onclick={() => (open = !open)}
-    class="font-mono text-[11px] tracking-[0.18em] uppercase
+    class="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] tracking-[0.08em]
            border border-[var(--line-soft)] px-3 py-2 text-paper
            hover:text-rose hover:border-rose transition-colors"
   >
-    {open ? 'close ×' : 'menu ≡'}
+    <PixelIcon name={open ? 'close' : 'menu'} size={16} />
+    <span>{open ? 'close' : 'menu'}</span>
   </button>
 </header>
 
@@ -165,23 +172,22 @@
   :global(.account__handle) {
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-muted-warm);
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
     margin: 0 0 8px;
   }
   :global(.account__signout) {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    min-height: 44px;
     padding: 6px 10px;
     background: transparent;
     color: var(--color-rose);
-    border: 1px solid rgb(232 156 146 / 0.30);
+    border: 1px solid var(--admin-accent-line);
     font-family: var(--font-mono);
     font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    letter-spacing: 0.1em;
     cursor: pointer;
     transition: background 0.12s, color 0.12s, border-color 0.12s;
   }

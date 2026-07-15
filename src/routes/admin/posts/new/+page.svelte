@@ -1,5 +1,6 @@
 <script>
   import PageHeader from '$lib/components/admin/PageHeader.svelte';
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
   import PostDraftForm from '$lib/components/admin/PostDraftForm.svelte';
 
   /** @type {import('./$types').PageProps} */
@@ -9,6 +10,7 @@
 <svelte:head><title>New Post | Admin</title></svelte:head>
 
 <PageHeader
+  icon="plus"
   eyebrow="~/admin/posts/new"
   title="new post"
   description="Create a draft and jump straight into the editor. You can finish metadata later."
@@ -21,8 +23,8 @@
     message={form?.ok === false ? form.message : ''}
   >
     {#snippet footer()}
-      <a href="/admin" class="btn-ghost">cancel</a>
-      <a href="/admin/categories" class="btn-ghost">manage categories</a>
+      <AdminButton href="/admin" icon="close" label="cancel" />
+      <AdminButton href="/admin/categories" icon="folder" label="manage categories" />
     {/snippet}
   </PostDraftForm>
 </div>
