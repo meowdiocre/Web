@@ -48,10 +48,15 @@ describe('admin controls', () => {
     expect(trigger).toHaveFocus();
   });
 
-  it('checks the submitted category icon', () => {
-    render(CategoryIconPicker, { value: 'bug' });
-    expect(screen.getByRole('radio', { name: 'Bug' })).toBeChecked();
-    expect(screen.getAllByRole('radio')).toHaveLength(8);
+  it('searches all installed icons from the category picker', async () => {
+    const { container } = render(CategoryIconPicker, { value: 'bug' });
+    const picker = within(container);
+
+    await fireEvent.input(picker.getByRole('searchbox', { name: 'search icons' }), {
+      target: { value: 'alien' }
+    });
+
+    expect(picker.getByRole('radio', { name: 'alien' })).toBeInTheDocument();
   });
 
   it('keeps the selected icon in the category form', () => {

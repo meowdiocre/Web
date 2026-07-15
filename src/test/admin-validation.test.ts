@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { postMetadataSchema, newPostSchema, normalisePublishAt, slugRegex } from '$lib/server/validation';
+import {
+  newCategorySchema,
+  newPostSchema,
+  normalisePublishAt,
+  postMetadataSchema,
+  slugRegex
+} from '$lib/server/validation';
 import { slugify } from '$lib/util/strings';
 
 describe('validation', () => {
@@ -20,6 +26,13 @@ describe('validation', () => {
     expect(newPostSchema.safeParse({ title: '', category: 'reverse' }).success).toBe(false);
     expect(newPostSchema.safeParse({ title: 'A',  category: ''       }).success).toBe(false);
     expect(newPostSchema.safeParse({ title: 'A',  category: 'reverse' }).success).toBe(true);
+  });
+
+  it('newCategorySchema accepts installed icons and rejects unknown names', () => {
+    expect(newCategorySchema.safeParse({ label: 'Reverse', slug: 'reverse', icon: 'bug' }).success).toBe(true);
+    expect(newCategorySchema.safeParse({ label: 'Space', slug: 'space', icon: 'alien' }).success).toBe(true);
+    expect(newCategorySchema.safeParse({ label: 'Reverse', slug: 'reverse', icon: 'not-an-installed-icon' }).success).toBe(false);
+    expect(newCategorySchema.safeParse({ label: 'Reverse', slug: 'reverse', icon: '' }).success).toBe(false);
   });
 
   it('normalisePublishAt handles empty / iso / datetime-local', () => {
