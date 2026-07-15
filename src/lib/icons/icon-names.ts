@@ -1,35 +1,9 @@
-export const ICON_NAMES = [
-  'skull',
-  'book-open',
-  'mail',
-  'terminal',
-  'cpu',
-  'script',
-  'bug',
-  'arrow-right',
-  'moon',
-  'radio',
-  'rss',
-  'article',
-  'plus',
-  'folder',
-  'external-link',
-  'logout',
-  'menu',
-  'close',
-  'more-vertical',
-  'pencil',
-  'send',
-  'archive',
-  'trash',
-  'eye',
-  'check',
-  'save'
-] as const;
+import { ALL_ICON_NAMES } from './icon-names.generated';
 
+export const ICON_NAMES = ALL_ICON_NAMES;
 export type IconName = (typeof ICON_NAMES)[number];
 
-// ponytail: curated category icons only; add an option and asset import when editors need another choice.
+// ponytail: recommendations only; search covers the complete generated registry.
 export const CATEGORY_ICON_OPTIONS = [
   { value: 'book-open', label: 'Book' },
   { value: 'bug', label: 'Bug' },
@@ -41,15 +15,27 @@ export const CATEGORY_ICON_OPTIONS = [
   { value: 'folder', label: 'Folder' }
 ] as const satisfies ReadonlyArray<{ value: IconName; label: string }>;
 
-export type CategoryIconName = (typeof CATEGORY_ICON_OPTIONS)[number]['value'];
-export const DEFAULT_CATEGORY_ICON: CategoryIconName = 'book-open';
+export type CategoryIconName = IconName;
+export const DEFAULT_CATEGORY_ICON = 'book-open' satisfies CategoryIconName;
 
-const categoryIconNames = new Set<string>(CATEGORY_ICON_OPTIONS.map((option) => option.value));
+const iconNames = new Set<string>(ICON_NAMES);
+
+export function isIconName(value: unknown): value is IconName {
+  return typeof value === 'string' && iconNames.has(value);
+}
 
 export function isCategoryIconName(value: unknown): value is CategoryIconName {
-  return typeof value === 'string' && categoryIconNames.has(value);
+  return isIconName(value);
+}
+
+export function normalizeIconName(value: unknown): IconName {
+  return isIconName(value) ? value : DEFAULT_CATEGORY_ICON;
 }
 
 export function normalizeCategoryIcon(value: unknown): CategoryIconName {
-  return isCategoryIconName(value) ? value : DEFAULT_CATEGORY_ICON;
+  return normalizeIconName(value);
+}
+
+export function formatIconLabel(value: IconName): string {
+  return value.replaceAll('-', ' ');
 }
