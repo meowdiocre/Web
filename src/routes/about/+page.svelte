@@ -1,26 +1,20 @@
 <script>
-  import { SITE }    from '$lib/config/site.js';
-  import { facts }    from '$lib/data/facts.js';
-  import { contacts } from '$lib/data/contacts.js';
+  import { SITE }   from '$lib/config/site.js';
 
-  import Nav         from '$lib/components/Nav.svelte';
-  import Footer      from '$lib/components/Footer.svelte';
-  import SkipLink    from '$lib/components/SkipLink.svelte';
-  import PageKicker  from '$lib/components/PageKicker.svelte';
-  import PageTitle   from '$lib/components/PageTitle.svelte';
-  import Lede        from '$lib/components/Lede.svelte';
-  import RowHead     from '$lib/components/RowHead.svelte';
-  import NaviSigil   from '$lib/components/NaviSigil.svelte';
-  import FactsGrid   from '$lib/components/about/FactsGrid.svelte';
-  import ContactList from '$lib/components/about/ContactList.svelte';
-  import PgpBlock    from '$lib/components/about/PgpBlock.svelte';
+  import Nav        from '$lib/components/Nav.svelte';
+  import Footer     from '$lib/components/Footer.svelte';
+  import SkipLink   from '$lib/components/SkipLink.svelte';
+  import PageKicker from '$lib/components/PageKicker.svelte';
+  import PageTitle  from '$lib/components/PageTitle.svelte';
+  import Lede       from '$lib/components/Lede.svelte';
+  import PixelIcon  from '$lib/components/PixelIcon.svelte';
 </script>
 
 <svelte:head>
   <title>About | {SITE.brand}</title>
   <meta
     name="description"
-    content="About {SITE.brand}, independent researcher in Berlin. Windows internals, anti-cheat, browser sandboxes, large model behavior."
+    content="About {SITE.brand}. Independent researcher working on Windows internals, anti-cheat, browser sandboxes, and large model behavior."
   />
 </svelte:head>
 
@@ -28,54 +22,29 @@
 
 <Nav current="about" />
 
-<main class="layer text-bone text-[16px] leading-[1.55]">
+<main class="layer flex-1 text-bone text-[16px] leading-[1.55]">
   <section class="head" aria-labelledby="about-title">
     <div class="head__inner">
-      <div class="min-w-0">
+      <div class="head__iconrow">
+        <PixelIcon name="terminal" size={16} />
         <PageKicker label="About" />
-        <PageTitle text="about" id="about-title" />
-
-        <p class="tagline" aria-hidden="true">
-          <span class="bar"></span>present day. <em>present time.</em>
-        </p>
-
-        <Lede>
-          I take software apart to see how it works, then write about what I find. Currently focused on
-          <em>OS internals</em>, web technologies/exploit, anti-cheat / cheat ecosystems,  browser fingerprinting.
-        </Lede>
-        <Lede tone="secondary">
-          Work alone, take roughly two long-form contracts a year. Anything that can be written up
-          publicly ends up in <a href="/blog">the journal</a>.
-        </Lede>
       </div>
+      <PageTitle text="about" id="about-title" />
 
-      <NaviSigil />
+      <p class="tagline" aria-hidden="true">
+        <span class="bar"></span>present day. <em>present time.</em>
+      </p>
+
+      <Lede>
+        I take software apart to see how it works, then write about what I find. Currently focused on OS internals, web exploitation, virtualization whether is hypervisor or vm obfuscation, anti-cheat / cheat ecosystems,  browser fingerprinting.
+      </Lede>
+      <Lede tone="secondary">
+        Work alone, mostly in private projects. Anything that can be written up
+        publicly ends up in <a href="/blog">this blog</a>.
+      </Lede>
     </div>
   </section>
 
-  <section class="meta" aria-label="Quick facts">
-    <div class="meta__inner">
-      <RowHead title="Facts" aside="at a glance" />
-      <FactsGrid items={facts} />
-    </div>
-  </section>
-
-  <section class="meta" aria-label="Contact" id="contact">
-    <div class="meta__inner">
-      <RowHead title="Contact" aside="cold email is fine" />
-      <ContactList items={contacts} />
-    </div>
-  </section>
-
-  <section class="meta" aria-label="PGP fingerprint">
-    <div class="meta__inner">
-      <RowHead title="PGP" aside="RSA-4096 · valid through 2027" />
-      <PgpBlock
-        fingerprint={SITE.pgpFingerprint}
-        display={SITE.pgpFingerprintDisplay}
-      />
-    </div>
-  </section>
 </main>
 
 <Footer variant="minimal" />
@@ -85,12 +54,19 @@
   .head__inner {
     max-width: 720px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: clamp(20px, 4vw, 48px);
-    align-items: start;
+    min-width: 0;
   }
-  @media (max-width: 600px) { .head__inner { grid-template-columns: 1fr; gap: 18px; } }
+
+  .head__iconrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    color: var(--color-rose);
+    opacity: 0.8;
+  }
+  .head__iconrow :global(.pixel-icon) { opacity: 0.85; }
+  .head__iconrow :global(p) { margin: 0; }
 
   .tagline {
     margin-top: 18px;
@@ -113,9 +89,6 @@
     .tagline      { font-size: 20px; gap: 8px; margin-top: 14px; }
     .tagline .bar { width: 12px; transform: translateY(-4px); }
   }
-
-  .meta { padding: clamp(20px, 3vw, 32px) var(--gutter); }
-  .meta__inner { max-width: 720px; margin: 0 auto; }
 
   :global(body[data-page='about']) main :global(.lede a),
   main :global(p) > :global(a) {

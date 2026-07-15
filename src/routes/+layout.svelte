@@ -2,13 +2,29 @@
   import '../app.css';
   import { page } from '$app/stores';
   import { navigating } from '$app/stores';
+  import { onNavigate } from '$app/navigation';
   import TmuxKeymap from '$lib/components/TmuxKeymap.svelte';
   import RouteProgress from '$lib/components/RouteProgress.svelte';
   import BlogPageSkeleton from '$lib/components/loading/BlogPageSkeleton.svelte';
   import ArticlePageSkeleton from '$lib/components/loading/ArticlePageSkeleton.svelte';
   import { pageKey } from '$lib/util/page';
+  import { prefersReducedMotion } from '$lib/motion/reduced-motion';
 
   let { children } = $props();
+
+  // Crossfade between pages with the View Transitions API. Falls back to a
+  // normal navigation where the API is missing or motion is reduced.
+  onNavigate((navigation) => {
+    if (typeof document === 'undefined' || !document.startViewTransition) return;
+    if (prefersReducedMotion()) return;
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+    });
+  });
 
   let dataPage = $derived(pageKey($page.url.pathname));
   let navPending = $derived(Boolean($navigating));

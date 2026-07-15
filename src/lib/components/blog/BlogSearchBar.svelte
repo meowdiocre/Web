@@ -1,156 +1,114 @@
 <script>
-  /** @typedef {{ query?: string, resultCount?: number, totalCount?: number, visibleCount?: number, selectedCategoryLabel?: string }} Props */
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
+
+  /** @typedef {{ query?: string, resultCount?: number, totalCount?: number, selectedCategoryLabel?: string }} Props */
 
   /** @type {Props} */
   let {
     query = $bindable(''),
     resultCount = 0,
     totalCount = 0,
-    visibleCount = 0,
-    selectedCategoryLabel = 'All categories'
+    selectedCategoryLabel = 'all'
   } = $props();
 
   const filtered = $derived(resultCount !== totalCount);
-  const statusText = $derived(filtered ? `${resultCount} matches` : `${totalCount} posts`);
+  const status = $derived(filtered ? `${resultCount}/${totalCount}` : `${totalCount} total`);
 </script>
 
-<section class="search-panel" aria-labelledby="blog-search-title">
-  <div class="search-row">
-    <p id="blog-search-title" class="eyebrow">archive</p>
-    <label class="sr-only" for="blog-search-input">Search posts</label>
-    <input
-      id="blog-search-input"
-      class="search-input"
-      type="search"
-      placeholder="Search posts"
-      bind:value={query}
-      autocomplete="off"
-      spellcheck="false"
-    />
+<div class="search">
+  <span class="search__prompt" aria-hidden="true">$</span>
+  <label class="sr-only" for="blog-search-input">Search the archive</label>
+  <input
+    id="blog-search-input"
+    class="search__input"
+    type="search"
+    placeholder="grep the archive"
+    bind:value={query}
+    autocomplete="off"
+    spellcheck="false"
+  />
 
-    <p class="meta"><span>{statusText}</span><span>{selectedCategoryLabel}</span></p>
-
+  {#if query.trim()}
     <button
       type="button"
-      class="clear-btn"
+      class="search__clear"
       onclick={() => (query = '')}
-      disabled={!query.trim()}
       aria-label="Clear search"
     >
-      reset
+      <PixelIcon name="arrow-right" size={12} class="rotate-45" />
     </button>
-  </div>
-</section>
+  {/if}
+
+  <span class="search__reg" aria-live="polite">{status}</span>
+</div>
 
 <style>
-  .search-panel {
-    min-width: 0;
-  }
-
-  .eyebrow {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.24em;
-    text-transform: uppercase;
-    color: var(--color-muted-warm);
-    align-self: center;
-  }
-
-  .search-row {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
-    gap: 10px;
+  .search {
+    display: flex;
     align-items: center;
-    padding: 12px 14px;
-    border: 1px solid var(--rule);
-    background: rgb(255 255 255 / 0.26);
+    gap: 10px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid var(--rule);
   }
 
-  .search-input {
-    width: 100%;
+  .search__prompt {
+    font-family: var(--font-terminal);
+    font-size: 16px;
+    color: var(--color-crimson-deep);
+    opacity: 0.85;
+    flex-shrink: 0;
+  }
+
+  .search__input {
+    flex: 1;
     min-width: 0;
-    min-height: 40px;
-    padding: 8px 12px;
-    border: 1px solid var(--rule-soft);
-    background: rgb(255 255 255 / 0.5);
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
     color: #241814;
-    font-family: var(--font-sans);
+    font-family: var(--font-mono);
     font-size: 14px;
     line-height: 1.4;
+    letter-spacing: 0.02em;
   }
-
-  .search-input::placeholder { color: var(--color-muted-warm); }
-  .search-input:focus-visible {
-    outline: 2px solid var(--color-crimson);
-    outline-offset: 2px;
-  }
-
-  .meta {
-    display: inline-flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px 12px;
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+  .search__input::placeholder {
     color: var(--color-muted-warm);
+    opacity: 0.7;
   }
-
-  .meta span:last-child {
-    color: var(--color-crimson-deep);
-  }
-
-  .clear-btn {
-    min-height: 40px;
-    padding: 0 12px;
-    border: 1px solid var(--rule);
-    background: transparent;
-    color: #2a1c14;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
-  }
-
-  .clear-btn:hover,
-  .clear-btn:focus-visible {
-    background: rgb(200 58 61 / 0.08);
-    color: var(--color-crimson-deep);
-    border-color: rgb(142 42 39 / 0.34);
+  .search__input:focus { outline: none; }
+  .search__input:focus-visible {
     outline: none;
   }
-
-  .clear-btn:disabled {
-    opacity: 0.45;
-    cursor: default;
+  .search:focus-within .search__prompt {
+    color: var(--color-crimson);
+    opacity: 1;
   }
 
-  @media (max-width: 820px) {
-    .search-row {
-      grid-template-columns: auto minmax(0, 1fr) auto;
-    }
-    .meta {
-      grid-column: 2 / -1;
-      justify-content: flex-start;
-      padding-top: 2px;
-    }
+  .search__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px; height: 22px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted-warm);
+    cursor: pointer;
+    transition: color 0.12s ease;
+  }
+  .search__clear:hover { color: var(--color-crimson); }
+
+  .search__reg {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-muted-warm);
+    opacity: 0.8;
+    flex-shrink: 0;
   }
 
   @media (max-width: 600px) {
-    .search-row {
-      grid-template-columns: 1fr auto;
-    }
-    .eyebrow {
-      grid-column: 1 / -1;
-    }
-    .meta {
-      grid-column: 1 / -1;
-      gap: 6px 10px;
-    }
+    .search__reg { display: none; }
   }
 </style>

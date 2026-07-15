@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import { fly } from 'svelte/transition';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
   import { STORAGE_KEYS } from '$lib/config/site.js';
 
   const SIZES = ['16px', '18px', '20px'];
@@ -123,9 +124,7 @@
             title="Cool slate"
             onclick={() => applyTheme('slate')}
           >
-            <svg class="h-4 w-4" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="9" fill="#2a2530" stroke="currentColor" stroke-width="1.6" />
-            </svg>
+            <PixelIcon name="moon" size={16} />
           </button>
         </div>
       </div>

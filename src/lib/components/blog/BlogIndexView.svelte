@@ -2,6 +2,7 @@
   import BlogSearchBar from './BlogSearchBar.svelte';
   import BlogCategoryFilters from './BlogCategoryFilters.svelte';
   import BlogEntryFeed from './BlogEntryFeed.svelte';
+  import { reveal } from '$lib/motion/reveal';
   import {
     buildCategorySummaries,
     categoryKey,
@@ -38,11 +39,6 @@
   const visibleGroups = $derived(groupEntriesByYear(visibleEntries));
   const filteredCount = $derived(filteredEntries.length);
   const remainingCount = $derived(Math.max(filteredCount - visibleEntries.length, 0));
-  const selectedCategoryLabel = $derived(
-    activeCategory === 'all'
-      ? 'All categories'
-      : categories.find((category) => category.key === activeCategory)?.label ?? 'All categories'
-  );
   const filterKey = $derived(`${activeCategory}::${query.trim().toLowerCase()}`);
 
   $effect(() => {
@@ -75,14 +71,12 @@
   }
 </script>
 
-<section class="browse" aria-label="Browse tools">
-  <div class="browse__inner">
+<section class="browse" aria-label="Filter entries">
+  <div class="browse__inner" use:reveal={{ y: 12 }}>
     <BlogSearchBar
       bind:query
       resultCount={filteredCount}
       {totalCount}
-      visibleCount={visibleEntries.length}
-      {selectedCategoryLabel}
     />
 
     <BlogCategoryFilters bind:selected={selectedCategory} {categories} />

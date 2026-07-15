@@ -7,74 +7,72 @@
 <div class="blog-skeleton" aria-hidden="true">
   <section class="head">
     <div class="head__inner">
-      <div class="copy">
-        <SkeletonBlock width="160px" height="11px" radius="999px" />
-        <div class="title">
-          <SkeletonBlock width="min(420px, 90%)" height="70px" radius="18px" />
+      <div class="head__main min-w-0">
+        <div class="head__flag">
+          <SkeletonBlock width="12px" height="12px" radius="0" />
         </div>
-        <SkeletonBlock width="100%" height="18px" radius="999px" />
-        <SkeletonBlock width="86%" height="18px" radius="999px" />
-        <SkeletonBlock width="68%" height="18px" radius="999px" />
+        <SkeletonBlock width="min(360px, 80%)" height="68px" radius="0" />
+        <SkeletonBlock width="100%" height="18px" radius="0" />
+        <SkeletonBlock width="86%" height="18px" radius="0" />
       </div>
 
-      <div class="polaroid">
-        <SkeletonBlock width="100%" height="320px" radius="18px" />
+      <div class="head__pol">
+        <SkeletonBlock width="100%" height="320px" radius="0" />
       </div>
 
       <div class="epigraph">
-        <SkeletonBlock width="100%" height="24px" radius="999px" />
-        <SkeletonBlock width="82%" height="24px" radius="999px" />
+        <SkeletonBlock width="100%" height="22px" radius="0" />
+        <SkeletonBlock width="80%" height="22px" radius="0" />
       </div>
     </div>
   </section>
 
   <section class="entries">
     <div class="entries__inner">
-      <div class="tools">
-        <div class="tools__search">
-          <SkeletonBlock width="120px" height="10px" radius="999px" />
-          <SkeletonBlock width="220px" height="24px" radius="12px" />
-          <SkeletonBlock width="100%" height="52px" radius="12px" />
-          <SkeletonBlock width="78%" height="12px" radius="999px" />
-        </div>
+      <div class="search">
+        <SkeletonBlock width="12px" height="16px" radius="0" />
+        <SkeletonBlock width="min(280px, 70%)" height="20px" radius="0" />
+        <SkeletonBlock width="60px" height="11px" radius="0" />
+      </div>
 
-        <div class="tools__filters">
-          <SkeletonBlock width="110px" height="10px" radius="999px" />
-          <SkeletonBlock width="220px" height="24px" radius="12px" />
-          <div class="tools__chips">
-            <SkeletonBlock width="88px" height="40px" radius="999px" />
-            <SkeletonBlock width="118px" height="40px" radius="999px" />
-            <SkeletonBlock width="104px" height="40px" radius="999px" />
-            <SkeletonBlock width="132px" height="40px" radius="999px" />
-          </div>
-        </div>
+      <div class="cats">
+        <SkeletonBlock width="22px" height="12px" radius="0" />
+        <SkeletonBlock width="64px" height="12px" radius="0" />
+        <SkeletonBlock width="80px" height="12px" radius="0" />
+        <SkeletonBlock width="48px" height="12px" radius="0" />
+        <SkeletonBlock width="20px" height="12px" radius="0" />
       </div>
 
       {#each groups as count, groupIndex}
         <div class="year-row">
-          <SkeletonBlock width="72px" height="12px" radius="999px" />
+          <SkeletonBlock width="48px" height="12px" radius="0" />
           <div class="year-count">
-            <SkeletonBlock width="84px" height="12px" radius="999px" />
+            <SkeletonBlock width="64px" height="12px" radius="0" />
           </div>
         </div>
 
         {#each Array.from({ length: count }) as _, itemIndex}
           <div class="entry" data-key={`${groupIndex}-${itemIndex}`}>
-            <SkeletonBlock width="58px" height="12px" radius="999px" />
+            <SkeletonBlock width="58px" height="12px" radius="0" />
 
             <div class="entry__copy">
-              <SkeletonBlock width="min(420px, 92%)" height="28px" radius="14px" />
-              <SkeletonBlock width="100%" height="16px" radius="999px" />
-              <SkeletonBlock width="74%" height="16px" radius="999px" />
+              <SkeletonBlock width="min(380px, 90%)" height="24px" radius="0" />
+              <SkeletonBlock width="100%" height="14px" radius="0" />
+              <SkeletonBlock width="72%" height="14px" radius="0" />
             </div>
 
             <div class="entry__meta">
-              <SkeletonBlock width="96px" height="12px" radius="999px" />
-              <SkeletonBlock width="70px" height="12px" radius="999px" />
+              <SkeletonBlock width="88px" height="11px" radius="0" />
+              <SkeletonBlock width="64px" height="11px" radius="0" />
             </div>
           </div>
         {/each}
       {/each}
+
+      <div class="tail">
+        <SkeletonBlock width="36px" height="11px" radius="0" />
+        <SkeletonBlock width="28px" height="11px" radius="0" />
+      </div>
     </div>
   </section>
 </div>
@@ -82,9 +80,7 @@
 <style>
   .blog-skeleton { color: #2a1c14; }
 
-  .head {
-    padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px);
-  }
+  .head { padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px); }
 
   .head__inner {
     max-width: 880px;
@@ -95,17 +91,16 @@
     align-items: start;
   }
 
-  .copy {
-    display: grid;
-    gap: 14px;
-    min-width: 0;
+  .head__main { display: grid; gap: 14px; }
+
+  .head__flag {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
   }
 
-  .title {
-    margin: 8px 0 2px;
-  }
-
-  .polaroid {
+  .head__pol {
     width: 100%;
     max-width: 360px;
     justify-self: end;
@@ -113,42 +108,32 @@
 
   .epigraph {
     grid-column: 1 / -1;
-    margin-top: 38px;
-    padding-top: 22px;
-    border-top: 1px dashed var(--rule);
+    margin-top: clamp(28px, 3.6vw, 44px);
+    padding-left: clamp(16px, 1.8vw, 22px);
+    border-left: 2px solid var(--rule);
     display: grid;
-    gap: 12px;
+    gap: 10px;
     max-width: 58ch;
   }
 
-  .entries {
-    padding: clamp(20px, 3vw, 32px) var(--gutter) clamp(72px, 9vw, 112px);
-  }
+  .entries { padding: clamp(20px, 3vw, 32px) var(--gutter) clamp(72px, 9vw, 112px); }
 
-  .entries__inner {
-    max-width: 880px;
-    margin: 0 auto;
-  }
+  .entries__inner { max-width: 880px; margin: 0 auto; }
 
-  .tools {
-    display: grid;
+  .search {
+    display: flex;
+    align-items: center;
     gap: 10px;
-    margin-bottom: 14px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid var(--rule);
   }
 
-  .tools__search,
-  .tools__filters {
-    display: grid;
-    gap: 10px;
-    padding: 14px;
-    border: 1px solid var(--rule);
-    background: rgb(255 255 255 / 0.2);
-  }
-
-  .tools__chips {
+  .cats {
     display: flex;
     flex-wrap: wrap;
+    align-items: baseline;
     gap: 10px;
+    padding: 10px 0 4px;
   }
 
   .year-row {
@@ -159,40 +144,46 @@
     padding: 18px 0 14px;
     border-bottom: 1px solid var(--rule);
   }
-
   .year-row:first-child { margin-top: 0; }
   .year-count { margin-left: auto; }
 
   .entry {
     display: grid;
-    grid-template-columns: 72px minmax(0, 1fr) auto;
-    gap: 24px;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 22px;
     align-items: start;
     padding: 22px 4px 22px 0;
     border-bottom: 1px solid var(--rule-soft);
   }
 
   .entry__copy,
-  .entry__meta {
-    display: grid;
-    gap: 10px;
-  }
+  .entry__meta { display: grid; gap: 10px; }
 
   .entry__meta {
     justify-items: end;
-    min-width: 96px;
+    min-width: 88px;
     padding-top: 4px;
+  }
+
+  .tail {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 28px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
   }
 
   @media (max-width: 900px) {
     .head__inner { grid-template-columns: 1fr; gap: 36px; }
-    .polaroid { justify-self: start; max-width: 280px; }
+    .head__pol { justify-self: start; max-width: 280px; }
   }
 
   @media (max-width: 600px) {
     .head { padding-top: clamp(40px, 8vw, 64px); }
-    .polaroid { max-width: 240px; }
-    .epigraph { margin-top: 28px; padding-top: 18px; }
+    .head__pol { max-width: 240px; }
+    .epigraph { margin-top: 24px; padding-left: 12px; }
     .entry {
       grid-template-columns: 56px minmax(0, 1fr);
       gap: 14px;

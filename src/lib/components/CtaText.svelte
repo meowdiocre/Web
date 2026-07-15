@@ -1,22 +1,24 @@
 <script>
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
+
   /**
    * @typedef {Object} Props
    * @property {string} href
-   * @property {string} [arrow]
    * @property {import('svelte').Snippet} children
    */
 
   /** @type {Props} */
-  let { href, arrow = '→', children } = $props();
+  let { href, children } = $props();
 </script>
 
 <a class="cta" {href}>
-  <span class="arrow" aria-hidden="true">{arrow}</span> {@render children()}
+  <span class="arrow" aria-hidden="true"><PixelIcon name="arrow-right" size={14} /></span>
+  {@render children()}
 </a>
 
 <style>
   .cta {
-    display: inline-flex; align-items: baseline; gap: 8px;
+    display: inline-flex; align-items: center; gap: 8px;
     padding: 6px 2px;
     font-family: var(--font-terminal); font-size: 13px;
     letter-spacing: 0.08em; text-transform: lowercase;

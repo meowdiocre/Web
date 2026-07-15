@@ -1,9 +1,9 @@
 export const SITE = Object.freeze({
   brand:           'meowdiocre',
   session:         'meowdiocre',
-  host:            'berlin',
+  host:            'CPUID(1).ECX[31]',
   email:           'meowdiocre@proton.me',
-  github:          'devirtz',
+  github:          'meowdiocre',
   copyrightYear:   new Date().getFullYear(),
   feed: Object.freeze({
     description: 'Long-form essays and lab notes on reverse engineering, Windows internals, anti-cheat infrastructure, browser sandbox internals, and the strange behavior of large language models.',
@@ -11,9 +11,7 @@ export const SITE = Object.freeze({
   }),
   relatedPosts: Object.freeze({
     itemCount: 3
-  }),
-  pgpFingerprint:  'A0F4 8E12 9BCD 7654 3210 FEDC BA98 7654 3210 EFAB',
-  pgpFingerprintDisplay: ['A0F4 8E12 9BCD 7654 3210', 'FEDC BA98 7654 3210 EFAB']
+  })
 });
 
 /**

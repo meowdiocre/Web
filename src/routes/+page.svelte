@@ -9,7 +9,7 @@
   import BtnPrimary   from '$lib/components/BtnPrimary.svelte';
   import CtaText      from '$lib/components/CtaText.svelte';
 
-  const TAGS = ['reverse', 'anti-cheat', 'web', 'ai'];
+  const TAGS = ['reversing', 'virtualization', 'web', 'os'];
 </script>
 
 <svelte:head>
@@ -34,7 +34,7 @@
     <div class="body">
       <p class="eyebrow">
         {#each TAGS as tag, i}
-          {#if i > 0}<span class="sep">·</span>{/if}<b>{tag}</b>
+          {#if i > 0}<span class="sep" aria-hidden="true">/</span>{/if}<b>{tag}</b>
         {/each}
       </p>
 
@@ -42,8 +42,13 @@
         <span class="line">Take&nbsp;it</span>
         <span class="line"><span class="stamp">apart.</span></span>
         <span class="line">Then write</span>
-        <span class="line">what's <em>inside.</em><span class="cur" aria-hidden="true">_</span></span>
+        <span class="line">what's <span class="mark">inside.</span></span>
       </h1>
+
+      <div class="cta">
+        <BtnPrimary href="/blog">read my writing</BtnPrimary>
+        <CtaText href="/about">about me</CtaText>
+      </div>
     </div>
 
     <aside class="emblem" aria-hidden="true">
@@ -56,17 +61,6 @@
         pixelated
       />
     </aside>
-
-    <div class="foot">
-      <p class="kicker">
-        An independent researcher <b>dissecting</b> OS internals, anti-cheat and cheat ecosystems, virtualization, 
-        and the things that nobody is looking at.
-      </p>
-      <div class="cta">
-        <BtnPrimary href="/blog">read the writing</BtnPrimary>
-        <CtaText href="/about">about the author</CtaText>
-      </div>
-    </div>
   </section>
 </main>
 
@@ -80,36 +74,23 @@
     padding: clamp(48px, 7vw, 96px) var(--gutter) clamp(48px, 6vw, 80px);
     display: grid;
     grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
-    grid-template-rows: 1fr auto;
     column-gap: clamp(32px, 4vw, 64px);
-    row-gap: clamp(28px, 4vw, 56px);
     align-items: center;
   }
 
   .body {
-    grid-column: 1; grid-row: 1;
-    align-self: center;
+    grid-column: 1;
     max-width: 1180px;
     position: relative; z-index: 2;
     display: flex; flex-direction: column;
     align-items: flex-start;
-    gap: clamp(16px, 2vw, 28px);
+    gap: clamp(20px, 2.4vw, 32px);
   }
   .emblem {
-    grid-column: 2; grid-row: 1;
+    grid-column: 2;
     position: relative; z-index: 2;
     justify-self: center;
     width: min(100%, 420px);
-  }
-  .foot {
-    grid-column: 1 / -1; grid-row: 2;
-    position: relative; z-index: 2;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: clamp(28px, 4vw, 56px);
-    align-items: end;
-    padding-top: clamp(20px, 3vw, 36px);
-    border-top: 1px solid var(--line);
   }
 
   .eyebrow {
@@ -120,86 +101,46 @@
     line-height: 1.3;
     font-family: var(--font-terminal);
     font-size: clamp(11px, 1.05vw, 13px);
-    letter-spacing: 0.16em;
+    letter-spacing: 0.18em;
     text-transform: lowercase;
     color: var(--color-muted);
   }
-  .eyebrow .sep   { color: var(--color-crimson); opacity: 0.88; }
-  .eyebrow b      { color: var(--color-bone);    font-weight: 400; }
+  .eyebrow .sep { color: var(--color-muted); opacity: 0.5; }
+  .eyebrow b    { color: var(--color-bone);  font-weight: 400; }
 
   .title {
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: -0.04em;
-    line-height: 0.88;
-    font-size: clamp(40px, 6.4vw, 96px);
+    line-height: 0.92;
+    font-size: clamp(36px, 5.4vw, 80px);
     color: var(--color-paper);
     display: flex;
     flex-direction: column;
-    gap: clamp(2px, 0.4vw, 8px);
-    text-shadow:
-      0 0 1px rgb(245 239 224 / 0.18),
-      0 0 16px rgb(245 239 224 / 0.05);
+    gap: clamp(2px, 0.3vw, 6px);
   }
-  .title .line { display: block; white-space: nowrap; position: relative; }
-
-  .cur {
-    display: inline-block;
-    margin-left: 0.08em;
-    color: var(--color-crimson);
-    font-family: var(--font-display);
-    text-shadow:
-      0 0 2px rgb(200 58 61 / 0.45),
-      0 0 12px rgb(200 58 61 / 0.20);
-    animation: var(--animate-blink);
-    will-change: opacity;
-  }
+  .title .line { display: block; white-space: nowrap; }
 
   .stamp {
     display: inline-block;
     background: var(--color-paper);
     color: var(--color-ink);
-    padding: 0.06em 0.36em 0.04em;
-    margin-left: 0.08em;
+    padding: 0.04em 0.32em 0.02em;
+    margin-left: 0.06em;
     transform: rotate(-1.4deg);
     clip-path: polygon(2% 0, 100% 0, 98% 100%, 0 100%);
-    box-shadow: 5px 6px 0 var(--color-ink);
+    box-shadow: 4px 5px 0 rgb(0 0 0 / 0.4);
   }
 
-  .title em {
-    font-family: var(--font-italic);
-    font-style: italic;
-    font-weight: 400;
-    color: var(--color-paper);
-    margin-left: 0.08em;
-    position: relative;
-    display: inline-block;
-  }
-  .title em::after {
-    content: '';
-    position: absolute;
-    left: -3%; right: -3%; top: 54%;
-    height: 0.09em;
-    background: var(--color-crimson);
-    transform: rotate(-2.4deg);
-    pointer-events: none;
+  .title .mark {
+    color: var(--color-rose);
   }
 
-  .kicker {
-    max-width: 54ch;
-    font-family: var(--font-italic);
-    font-style: italic;
-    font-size: clamp(17px, 1.8vw, 24px);
-    line-height: 1.36;
-    color: var(--color-bone);
-    text-wrap: pretty;
-  }
-  .kicker b { color: var(--color-paper); font-weight: 700; font-style: italic; }
   .cta {
     display: inline-flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 14px;
+    align-items: center;
+    gap: clamp(20px, 2.4vw, 32px);
+    margin-top: clamp(8px, 1vw, 16px);
   }
 
   @media (max-width: 1100px) {
@@ -207,30 +148,23 @@
     .emblem { max-width: 360px; }
   }
   @media (max-width: 900px) {
-    .hero   { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
-    .body   { grid-column: 1; grid-row: 1; }
-    .emblem { grid-column: 1; grid-row: 2; max-width: 280px; justify-self: start; }
-    .foot   { grid-column: 1; grid-row: 3; }
+    .hero   { grid-template-columns: 1fr; row-gap: clamp(28px, 4vw, 48px); }
+    .body   { grid-column: 1; }
+    .emblem { grid-column: 1; max-width: 280px; justify-self: start; }
   }
   @media (max-width: 760px) {
-    .hero   { padding: 36px 22px 32px; gap: 28px; }
-    .title  { font-size: clamp(36px, 9vw, 72px); }
-    .foot   { grid-template-columns: 1fr; gap: 22px; }
-    .kicker { font-size: 16px; }
-    .cta    { align-items: stretch; flex-direction: row; flex-wrap: wrap; }
+    .hero   { padding: 36px 22px 32px; }
+    .title  { font-size: clamp(32px, 8vw, 60px); }
+    .cta    { flex-wrap: wrap; gap: 16px; }
     .emblem { max-width: 240px; }
   }
   @media (max-width: 440px) {
-    .title  { font-size: clamp(28px, 8vw, 52px); }
+    .title  { font-size: clamp(26px, 7.5vw, 44px); }
     .emblem { max-width: 200px; }
   }
   @media (max-width: 360px) {
-    .title  { font-size: clamp(26px, 7.5vw, 36px); letter-spacing: -0.02em; }
+    .title  { font-size: clamp(24px, 7vw, 32px); letter-spacing: -0.02em; }
     .hero   { padding: 28px 18px 28px; }
     .emblem { max-width: 180px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .cur { animation: none; opacity: 1; }
   }
 </style>

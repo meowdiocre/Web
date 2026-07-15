@@ -1,5 +1,6 @@
 <script>
-  import { SITE } from '$lib/config/site.js';
+  import { SITE }     from '$lib/config/site.js';
+  import PixelIcon    from '$lib/components/PixelIcon.svelte';
 
   /**
    * @typedef {'minimal'|'paper'|'article'} Variant
@@ -28,10 +29,17 @@
         max-[760px]:flex-col max-[760px]:items-start max-[760px]:gap-3
       "
     >
-      <span>{copyright} · Berlin</span>
+      <span class="inline-flex items-center gap-2">
+        <PixelIcon name="skull" size={14} />
+        {copyright}
+      </span>
       <nav aria-label="Footer" class="inline-flex gap-[clamp(14px,2vw,28px)] flex-wrap">
-        <a class="link" href="/blog">Writing</a>
-        <a class="link" href="/about">About</a>
+        <a class="link inline-flex items-center gap-1.5" href="/blog">
+          <PixelIcon name="book-open" size={13} />writing
+        </a>
+        <a class="link inline-flex items-center gap-1.5" href="/about">
+          <PixelIcon name="terminal" size={13} />about
+        </a>
       </nav>
     </div>
   </footer>
@@ -45,11 +53,13 @@
     "
   >
     <div class="max-w-[880px] mx-auto flex justify-between gap-[18px] flex-wrap text-muted">
-      <span>{copyright} · hand-set in Berlin</span>
-      <span>
-        <a class="link" href="/feed.xml" type="application/rss+xml" rel="alternate">RSS</a>
-        <span class="mx-1.5 text-muted opacity-50">·</span>
-        <a class="link" href="#top" aria-label="Back to top">↑ top</a>
+      <span class="inline-flex items-center gap-4">
+        <a class="link inline-flex items-center gap-1.5" href="/feed.xml" type="application/rss+xml" rel="alternate">
+          <PixelIcon name="rss" size={13} />RSS
+        </a>
+        <a class="link inline-flex items-center gap-1.5" href="#top" aria-label="Back to top">
+          <PixelIcon name="arrow-right" size={13} class="-rotate-90" />top
+        </a>
       </span>
     </div>
   </footer>
@@ -63,7 +73,7 @@
     "
   >
     <div class="max-w-[1280px] mx-auto flex justify-between gap-[18px] flex-wrap text-muted">
-      <span>{copyright} · Berlin</span>
+      <span>{copyright} · CPUID(1).ECX[31]</span>
       <span><a class="link" href="/blog">↑ Back to writing</a></span>
     </div>
   </footer>

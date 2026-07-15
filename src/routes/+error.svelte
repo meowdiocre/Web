@@ -2,6 +2,7 @@
   import { page } from '$app/stores';
   import Nav     from '$lib/components/Nav.svelte';
   import Footer  from '$lib/components/Footer.svelte';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
 </script>
 
 <svelte:head>
@@ -12,7 +13,8 @@
 
 <main class="layer min-h-[60vh] px-[var(--gutter)] py-[clamp(64px,10vw,128px)]">
   <div class="mx-auto max-w-[640px]">
-    <p class="font-mono text-[11px] tracking-[0.22em] uppercase text-muted-warm mb-2">
+    <PixelIcon name="skull" size={32} />
+    <p class="font-mono text-[11px] tracking-[0.22em] uppercase text-muted-warm mt-4 mb-2">
       // signal lost
     </p>
     <h1 class="font-display text-[clamp(48px,9vw,128px)] uppercase tracking-[-0.02em] leading-[0.95] mb-4">

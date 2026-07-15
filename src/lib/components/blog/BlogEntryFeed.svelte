@@ -1,6 +1,8 @@
 <script>
   import EntryItem from '$lib/components/EntryItem.svelte';
   import EntriesYear from '$lib/components/EntriesYear.svelte';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
+  import { hoverSpring } from '$lib/motion/hover';
 
   /** @typedef {import('$lib/server/db/queries').EntryGroup} EntryGroup */
   /** @typedef {{ entryGroups?: EntryGroup[], filteredCount?: number, visibleCount?: number, remainingCount?: number, onShowMore?: () => void }} Props */
@@ -19,27 +21,27 @@
   <div class="entries__inner">
     {#if filteredCount === 0}
       <div class="empty" role="status" aria-live="polite">
-        <p class="empty__eyebrow">No matches</p>
-        <h2>Nothing matched that search.</h2>
-        <p>Try a broader keyword or switch back to all categories.</p>
+        <p class="empty__reg">0/{filteredCount}</p>
+        <p class="empty__msg">nothing matched. try a broader keyword or clear the filter.</p>
       </div>
     {:else}
       {#each entryGroups as group}
         <EntriesYear year={group.year} count={group.entries.length} />
-        {#each group.entries as entry (entry.href)}
-          <EntryItem {...entry} />
+        {#each group.entries as entry, i (entry.href)}
+          <EntryItem {...entry} revealDelay={Math.min(i, 4) * 0.05} />
         {/each}
       {/each}
 
-      <div class="footer">
-        <p>Loaded {visibleCount} of {filteredCount} matching entries.</p>
-
+      <div class="tail">
         {#if remainingCount > 0}
-          <button type="button" class="show-more" onclick={onShowMore}>
-            show {Math.min(remainingCount, 12)} more
+          <span class="tail__reg">{visibleCount}/{filteredCount}</span>
+          <button type="button" class="more" onclick={onShowMore} use:hoverSpring={{ scale: 1.02, press: 0.98 }}>
+            <span>load {Math.min(remainingCount, 12)} more</span>
+            <PixelIcon name="arrow-right" size={12} />
           </button>
         {:else}
-          <p class="footer__done">Archive segment complete.</p>
+          <span class="tail__reg">{visibleCount}/{filteredCount}</span>
+          <span class="tail__eof" aria-label="end of feed">eof</span>
         {/if}
       </div>
     {/if}
@@ -58,102 +60,83 @@
 
   .empty {
     display: grid;
-    gap: 8px;
-    padding: 22px;
-    border: 1px dashed var(--rule);
-    background: rgb(255 255 255 / 0.24);
-    text-align: left;
+    gap: 6px;
+    padding: 32px 0 8px;
+    border-top: 1px solid var(--rule);
   }
 
-  .empty__eyebrow,
-  .footer,
-  .footer__done {
+  .empty__reg {
+    margin: 0;
     font-family: var(--font-mono);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .empty__eyebrow {
-    margin: 0;
     font-size: 10px;
-    color: var(--color-muted-warm);
-  }
-
-  .empty h2 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(20px, 2.2vw, 28px);
-    line-height: 1.02;
-    color: #2a1c14;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    color: var(--color-crimson-deep);
   }
 
-  .empty p:last-child {
+  .empty__msg {
     margin: 0;
-    max-width: 48ch;
+    max-width: 52ch;
     font-family: var(--font-serif);
-    font-size: 16px;
+    font-size: 17px;
     line-height: 1.45;
     color: var(--color-muted-warm);
+    text-wrap: pretty;
   }
 
-  .footer {
+  .tail {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 10px 16px;
-    margin-top: 22px;
+    gap: 16px;
+    margin-top: 28px;
     padding-top: 14px;
-    border-top: 1px dashed var(--rule);
-    font-size: 10px;
+    border-top: 1px solid var(--rule);
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-muted-warm);
   }
 
-  .footer p {
-    margin: 0;
-  }
-
-  .footer__done {
-    color: var(--color-crimson-deep);
-  }
-
-  .show-more {
-    min-height: 36px;
-    padding: 0 12px;
-    border: 1px solid var(--rule);
-    background: transparent;
-    color: #2a1c14;
-    font-family: var(--font-mono);
-    font-size: 10px;
+  .tail__reg {
     letter-spacing: 0.14em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    opacity: 0.75;
   }
 
-  .show-more:hover,
-  .show-more:focus-visible {
-    background: rgb(200 58 61 / 0.08);
+  .tail__eof {
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
     color: var(--color-crimson-deep);
-    border-color: rgb(142 42 39 / 0.34);
+    opacity: 0.85;
+  }
+
+  .more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-crimson-deep);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: color 0.12s ease, transform 0.12s ease;
+  }
+  .more :global(.pixel-icon) { transition: transform 0.12s ease; }
+  .more:hover,
+  .more:focus-visible {
+    color: var(--color-crimson);
     outline: none;
   }
+  .more:hover :global(.pixel-icon),
+  .more:focus-visible :global(.pixel-icon) { transform: translateX(2px); }
 
   @media (max-width: 600px) {
-    .footer {
+    .tail {
       align-items: flex-start;
       flex-direction: column;
-      gap: 10px;
-      font-size: 10px;
-    }
-
-    .show-more {
-      width: 100%;
-    }
-
-    .empty p:last-child {
-      font-size: 16px;
+      gap: 12px;
     }
   }
 </style>

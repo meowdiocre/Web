@@ -14,14 +14,6 @@ function getHighlighter(): Promise<Highlighter> {
   return _hl;
 }
 
-/**
- * Map a token's TextMate scopes to one of five palette classes, or null for
- * the plain foreground color.
- *
- * Scopes run outermost -> innermost, so the most specific scope wins. This
- * keeps operators, punctuation, and interpolated identifiers at the foreground
- * color instead of inheriting an outer string or keyword scope.
- */
 function classFor(scopes: string[]): string | null {
   for (let i = scopes.length - 1; i >= 0; i--) {
     const s = scopes[i];

@@ -13,30 +13,30 @@
   <section class="mast">
     <div class="mast__inner">
       <div class="crumbs">
-        <SkeletonBlock width="56px" height="11px" radius="999px" />
-        <SkeletonBlock width="10px" height="11px" radius="999px" />
-        <SkeletonBlock width="68px" height="11px" radius="999px" />
+        <SkeletonBlock width="56px" height="11px" radius="0" />
+        <SkeletonBlock width="10px" height="11px" radius="0" />
+        <SkeletonBlock width="68px" height="11px" radius="0" />
       </div>
 
       <div class="kicker">
-        <SkeletonBlock width="110px" height="28px" radius="6px" />
+        <SkeletonBlock width="110px" height="28px" radius="0" />
       </div>
 
       <div class="title">
-        <SkeletonBlock width="100%" height="54px" radius="18px" />
-        <SkeletonBlock width="88%" height="54px" radius="18px" />
+        <SkeletonBlock width="100%" height="54px" radius="0" />
+        <SkeletonBlock width="88%" height="54px" radius="0" />
       </div>
 
       <div class="dek">
-        <SkeletonBlock width="100%" height="20px" radius="999px" />
-        <SkeletonBlock width="94%" height="20px" radius="999px" />
-        <SkeletonBlock width="74%" height="20px" radius="999px" />
+        <SkeletonBlock width="100%" height="20px" radius="0" />
+        <SkeletonBlock width="94%" height="20px" radius="0" />
+        <SkeletonBlock width="74%" height="20px" radius="0" />
       </div>
 
       <div class="meta">
-        <SkeletonBlock width="120px" height="12px" radius="999px" />
-        <SkeletonBlock width="92px" height="12px" radius="999px" />
-        <SkeletonBlock width="74px" height="12px" radius="999px" />
+        <SkeletonBlock width="120px" height="12px" radius="0" />
+        <SkeletonBlock width="92px" height="12px" radius="0" />
+        <SkeletonBlock width="74px" height="12px" radius="0" />
       </div>
     </div>
   </section>
@@ -46,28 +46,28 @@
       {#each paragraphs as lines, blockIndex}
         {#if blockIndex === 1}
           <div class="section-title">
-            <SkeletonBlock width={lines[0]} height="34px" radius="12px" />
+            <SkeletonBlock width={lines[0]} height="34px" radius="0" />
           </div>
         {:else}
           <div class="paragraph">
             {#each lines as width}
-              <SkeletonBlock {width} height="18px" radius="999px" />
+              <SkeletonBlock {width} height="18px" radius="0" />
             {/each}
           </div>
         {/if}
       {/each}
 
       <div class="code-block">
-        <SkeletonBlock width="26%" height="12px" radius="999px" />
-        <SkeletonBlock width="100%" height="12px" radius="999px" />
-        <SkeletonBlock width="94%" height="12px" radius="999px" />
-        <SkeletonBlock width="82%" height="12px" radius="999px" />
+        <SkeletonBlock width="26%" height="12px" radius="0" />
+        <SkeletonBlock width="100%" height="12px" radius="0" />
+        <SkeletonBlock width="94%" height="12px" radius="0" />
+        <SkeletonBlock width="82%" height="12px" radius="0" />
       </div>
 
       <div class="paragraph">
-        <SkeletonBlock width="100%" height="18px" radius="999px" />
-        <SkeletonBlock width="96%" height="18px" radius="999px" />
-        <SkeletonBlock width="84%" height="18px" radius="999px" />
+        <SkeletonBlock width="100%" height="18px" radius="0" />
+        <SkeletonBlock width="96%" height="18px" radius="0" />
+        <SkeletonBlock width="84%" height="18px" radius="0" />
       </div>
     </div>
   </section>

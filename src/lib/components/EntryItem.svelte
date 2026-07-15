@@ -1,4 +1,8 @@
 <script>
+  import { reveal } from '$lib/motion/reveal';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
+  import { categoryIcon } from '$lib/config/category-icons.js';
+
   /**
    * @typedef {Object} Props
    * @property {string} href
@@ -7,13 +11,17 @@
    * @property {string} desc
    * @property {string} category
    * @property {string} readTime
+   * @property {number} [revealDelay]
    */
   /** @type {Props} */
-  let { href, date, title, desc, category, readTime } = $props();
+  let { href, date, title, desc, category, readTime, revealDelay = 0 } = $props();
+
+  const iconName = $derived(categoryIcon(category));
 </script>
 
 <a
   {href}
+  use:reveal={{ delay: revealDelay, y: 12 }}
   class="entry
     relative grid
     grid-cols-[64px_1fr_auto] gap-4 items-baseline
@@ -58,10 +66,10 @@
   >
     <span
       class="
-        cat block text-crimson-deep
-        max-[600px]:inline max-[600px]:after:content-['_·_'] max-[600px]:after:text-muted-warm
+        cat inline-flex items-center gap-1 text-crimson-deep
+        max-[600px]:inline
       "
-    >{category}</span>{readTime}
+    ><PixelIcon name={iconName} size={11} />{category}</span>
   </span>
 </a>
 

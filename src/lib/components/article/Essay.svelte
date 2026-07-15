@@ -1,6 +1,7 @@
 <script>
   import Footnotes from './Footnotes.svelte';
   import LegacyBlocks from './LegacyBlocks.svelte';
+  import { revealWithin } from '$lib/motion/reveal';
 
   /**
    * @typedef {Object} Footnote
@@ -17,7 +18,10 @@
 </script>
 
 <article class="essay relative px-[var(--gutter)] pt-4 pb-[clamp(48px,6vw,96px)]">
-  <div class="essay__inner mx-auto max-w-[760px] relative">
+  <div
+    class="essay__inner mx-auto max-w-[760px] relative"
+    use:revealWithin={{ selector: 'h2, h3, figure, pre, blockquote.pull, .end' }}
+  >
     {#if html !== undefined}
       <!-- eslint-disable-next-line svelte/no-at-html-tags -->
       {@html html}

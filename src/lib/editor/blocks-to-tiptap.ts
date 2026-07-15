@@ -7,6 +7,7 @@ import type {
   ParagraphNode
 } from './types';
 import { parseInline } from './parse-inline';
+import { detectLang } from './lang';
 
 export type SrcBlock =
   | { type: 'p';          html: string }
@@ -21,22 +22,35 @@ export interface ConvertOptions {
   langFor?: (caption: string, html: string, idx: number) => string;
 }
 
-function sniffLang(caption: string, html: string): string {
-  const c = caption.toLowerCase();
-  if (/\.py($|\b)/.test(c) || /python/.test(c))     return 'python';
-  if (/\.ts($|\b)/.test(c) || /typescript/.test(c)) return 'typescript';
-  if (/\.js($|\b)/.test(c) || /javascript/.test(c)) return 'javascript';
-  if (/\.rs($|\b)/.test(c) || /rust/.test(c))       return 'rust';
-  if (/dispatch|x86|asm|assembly|listing/.test(c))  return 'asm';
-  if (/\bdef\s+\w+\(/.test(html))                   return 'python';
-  if (/\bmov\s+r[abcd]x/.test(html))                return 'asm';
-  return 'plaintext';
+const NAMED_ENTITIES: Record<string, string> = {
+  '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&amp;': '&'
+};
+
+function decodeEntities(s: string): string {
+  return s.replace(/&(?:lt|gt|quot|#39|amp);/g, (m) => NAMED_ENTITIES[m] ?? m);
 }
 
+// Recover raw source from hand-authored highlight HTML: drop the token spans
+// and decode entities so the highlighter sees real code, not `&gt;`.
 function stripCodeSpans(html: string): string {
-  return html
+  const text = html
     .replace(/<span class="(kw|fn|str|com|num)">/g, '')
     .replace(/<\/span>/g, '');
+  return decodeEntities(text);
+}
+
+// Caption hints win when they name a language or file extension. Otherwise
+// detect from the recovered source. Generic caption words like "listing" or
+// "dispatch" say nothing about the language, so they are not used.
+function sniffLang(caption: string, source: string): string {
+  const c = caption.toLowerCase();
+  if (/\.py\b/.test(c)  || /\bpython\b/.test(c))     return 'python';
+  if (/\.tsx\b/.test(c) || /\btsx\b/.test(c))        return 'tsx';
+  if (/\.ts\b/.test(c)  || /\btypescript\b/.test(c)) return 'typescript';
+  if (/\.js\b/.test(c)  || /\bjavascript\b/.test(c)) return 'javascript';
+  if (/\.rs\b/.test(c)  || /\brust\b/.test(c))       return 'rust';
+  if (/\bx86\b|\basm\b|\bassembly\b/.test(c))        return 'asm';
+  return detectLang(source);
 }
 
 export function blocksToTiptap(blocks: SrcBlock[], opts: ConvertOptions = {}): Doc {
@@ -84,11 +98,12 @@ export function blocksToTiptap(blocks: SrcBlock[], opts: ConvertOptions = {}): D
         break;
       }
       case 'code': {
-        const lang = opts.langFor?.(b.caption, b.html, idx) ?? sniffLang(b.caption, b.html);
+        const source = stripCodeSpans(b.html);
+        const lang = opts.langFor?.(b.caption, b.html, idx) ?? sniffLang(b.caption, source);
         const node: CodeBlockNode = {
           type: 'codeBlock',
           attrs: {
-            source:  stripCodeSpans(b.html),
+            source,
             lang,
             caption: b.caption,
             html:    b.html
