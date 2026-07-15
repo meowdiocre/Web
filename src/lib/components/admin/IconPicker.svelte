@@ -29,13 +29,14 @@
   } = $props();
 
   let query = $state('');
+  /** @type {import('$lib/icons/icon-names').IconName} */
   let selected = $state(DEFAULT_CATEGORY_ICON);
 
   $effect(() => {
     selected = normalizeIconName(value);
   });
 
-  const normalizedQuery = $derived(query.trim().toLowerCase());
+  const normalizedQuery = $derived(query.trim().toLowerCase().replace(/\s+/g, '-'));
   const recommendedNames = $derived(recommended.map((option) => option.value));
   const matches = $derived.by(() => normalizedQuery
     ? ICON_NAMES.filter((iconName) => iconName.includes(normalizedQuery))

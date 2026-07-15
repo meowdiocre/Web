@@ -79,6 +79,17 @@ describe('admin controls', () => {
     expect(picker.getByRole('radio', { name: 'alien' })).toBeChecked();
   });
 
+  it('matches displayed icon labels with spaces', async () => {
+    const { container } = render(IconPicker, { value: 'book-open' });
+    const picker = within(container);
+
+    await fireEvent.input(picker.getByRole('searchbox', { name: 'search icons' }), {
+      target: { value: 'alarm clock' }
+    });
+
+    expect(picker.getByRole('radio', { name: 'alarm clock' })).toBeInTheDocument();
+  });
+
   it('keeps the selected icon available when it does not match the search', async () => {
     const { container } = render(IconPicker, { value: 'alien' });
     const picker = within(container);
