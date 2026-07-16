@@ -5,6 +5,7 @@ export const SITE = Object.freeze({
   host:            'CPUID(1).ECX[31]',
   email:           'meowdiocre@proton.me',
   github:          'meowdiocre',
+  discord:         'meowdiocre',
   copyrightYear:   new Date().getFullYear(),
   feed: Object.freeze({
     description: 'Long-form essays and lab notes on reverse engineering, Windows internals, anti-cheat infrastructure, browser sandbox internals, and the strange behavior of large language models.',

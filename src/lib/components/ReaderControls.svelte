@@ -104,7 +104,7 @@
 
 <svelte:window onkeydown={onKey} />
 
-<div class="fixed right-[clamp(14px,2.4vw,24px)] bottom-[clamp(14px,2.4vw,24px)] z-[55] flex flex-col items-end gap-2 max-[600px]:right-2.5 max-[600px]:bottom-2.5">
+<div class="fixed right-[clamp(14px,2.4vw,24px)] bottom-[clamp(14px,2.4vw,24px)] z-[55] flex flex-col items-end gap-2 max-[900px]:bottom-[calc(78px+env(safe-area-inset-bottom))] max-[600px]:right-2.5">
   {#if open}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div

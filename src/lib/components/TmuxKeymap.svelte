@@ -27,6 +27,7 @@
 
   let hintOpen = $state(false);
   let helpOpen = $state(false);
+  let mobileUiSuppressed = $state(false);
 
   function startPrefix() {
     prefixActive = true;
@@ -64,6 +65,7 @@
 
   /** @param {KeyboardEvent} e */
   function onKey(e) {
+    if (mobileUiSuppressed) return;
     const t = /** @type {HTMLElement} */ (e.target);
     if (t?.matches?.('input, textarea, select, [contenteditable=""], [contenteditable="true"]')) return;
 
@@ -90,9 +92,22 @@
   let hintTimer;
 
   onMount(() => {
-    if (!hasSeenHint()) {
-      hintTimer = setTimeout(() => { hintOpen = true; }, 700);
-    }
+    const media = window.matchMedia?.('(max-width: 900px) and (pointer: coarse)');
+    const sync = () => {
+      mobileUiSuppressed = Boolean(media?.matches);
+      clearTimeout(hintTimer);
+      if (mobileUiSuppressed) {
+        hintOpen = false;
+        helpOpen = false;
+        endPrefix();
+      } else if (!hasSeenHint()) {
+        hintTimer = setTimeout(() => { hintOpen = true; }, 700);
+      }
+    };
+
+    sync();
+    media?.addEventListener?.('change', sync);
+    return () => media?.removeEventListener?.('change', sync);
   });
 
   onDestroy(() => {
@@ -103,7 +118,7 @@
 
 <svelte:window onkeydown={onKey} />
 
-{#if prefixActive}
+{#if prefixActive && !mobileUiSuppressed}
   <div class="fixed bottom-[clamp(14px,2.4vw,24px)] left-[clamp(14px,2.4vw,24px)] z-[70] inline-flex items-center gap-2 bg-rose px-2.5 py-1.5 font-terminal text-xs tracking-[0.1em] text-ink lowercase shadow-hard-sm [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_8px),calc(100%_-_8px)_100%,0_100%)] max-[460px]:bottom-2.5 max-[460px]:left-2.5 max-[460px]:px-2 max-[460px]:py-[5px] max-[460px]:text-xs-plus" role="status" aria-live="polite" transition:fade={{ duration: 120 }}>
     <span class="bg-ink px-1.5 py-px font-mono tracking-[0.02em] text-rose">C-b</span>
     <span class="opacity-85">prefix</span>
@@ -112,7 +127,7 @@
 {/if}
 
 <Toast
-  open={hintOpen}
+  open={hintOpen && !mobileUiSuppressed}
   tag="tmux"
   autoCloseMs={HINT_AUTOCLOSE_MS}
   onclose={() => { hintOpen = false; markHintSeen(); }}
@@ -127,7 +142,7 @@
 </Toast>
 
 <Toast
-  open={helpOpen}
+  open={helpOpen && !mobileUiSuppressed}
   tag="bindings"
   autoCloseMs={HELP_AUTOCLOSE_MS}
   onclose={() => { helpOpen = false; }}

@@ -173,6 +173,12 @@ select:focus-visible {
   border-color: var(--color-rose);
 }
 
+@media (max-width: 900px) {
+  body:not([data-page='admin']) {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+}
+
 body[data-page='blog'] :focus-visible,
 body[data-page='article']:not([data-theme='slate']) :focus-visible {
   outline-color: var(--color-crimson);
