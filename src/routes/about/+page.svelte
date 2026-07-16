@@ -22,17 +22,23 @@
 
 <Nav current="about" />
 
-<main class="layer flex-1 text-bone text-[16px] leading-[1.55]">
-  <section class="head" aria-labelledby="about-title">
-    <div class="head__inner">
-      <div class="head__iconrow">
-        <PixelIcon name="terminal" size={16} />
+<main class="layer relative z-[1] flex-1 text-bone text-[16px] leading-[1.55]">
+  <section
+    class="px-[var(--gutter)] pt-[clamp(56px,9vw,112px)] pb-[clamp(28px,4vw,48px)]"
+    aria-labelledby="about-title"
+  >
+    <div class="mx-auto min-w-0 max-w-[720px]">
+      <div class="head__iconrow mb-[18px] inline-flex items-center gap-2.5 text-rose opacity-80">
+        <PixelIcon name="terminal" size={16} class="opacity-85" />
         <PageKicker label="About" />
       </div>
       <PageTitle text="about" id="about-title" />
 
-      <p class="tagline" aria-hidden="true">
-        present day. <em>present time.</em>
+      <p
+        class="mt-[18px] flex flex-wrap items-baseline gap-3 font-italic text-[clamp(20px,2.8vw,30px)] leading-[1.2] italic text-muted max-[600px]:mt-3.5 max-[600px]:gap-2 max-[600px]:text-xl"
+        aria-hidden="true"
+      >
+        present day. <em class="italic text-rose">present time.</em>
       </p>
 
       <Lede>
@@ -50,37 +56,8 @@
 <Footer variant="minimal" />
 
 <style>
-  .head { padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px); }
-  .head__inner {
-    max-width: 720px;
-    margin: 0 auto;
-    min-width: 0;
-  }
-
-  .head__iconrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-    color: var(--color-rose);
-    opacity: 0.8;
-  }
-  .head__iconrow :global(.pixel-icon) { opacity: 0.85; }
+  /* PageKicker owns its element, so reset its standalone margin here. */
   .head__iconrow :global(p) { margin: 0; }
-
-  .tagline {
-    margin-top: 18px;
-    display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap;
-    font-family: var(--font-italic);
-    font-style: italic;
-    font-size: clamp(20px, 2.8vw, 30px);
-    line-height: 1.2;
-    color: var(--color-muted);
-  }
-  .tagline em  { color: var(--color-rose); font-style: italic; }
-  @media (max-width: 600px) {
-    .tagline      { font-size: 20px; gap: 8px; margin-top: 14px; }
-  }
 
   :global(body[data-page='about']) main :global(.lede a),
   main :global(p) > :global(a) {

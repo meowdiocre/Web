@@ -2,6 +2,7 @@
   import Field         from '$lib/components/Field.svelte';
   import AdminButton   from '$lib/components/admin/AdminButton.svelte';
   import FormAlert     from '$lib/components/admin/FormAlert.svelte';
+  import ThumbnailField from '$lib/components/admin/ThumbnailField.svelte';
   import PixelIcon     from '$lib/components/PixelIcon.svelte';
   import StatusPill    from '$lib/components/StatusPill.svelte';
   import ConfirmDialog from '$lib/editor/dialogs/ConfirmDialog.svelte';
@@ -118,12 +119,7 @@
            value={v.get('author', p.author)} />
   </div>
 
-  <Field
-    name="coverImageUrl"
-    label="cover image url (optional)"
-    value={v.get('coverImageUrl', p.coverImageUrl ?? '')}
-    placeholder="https://example.com/image.jpg"
-  />
+  <ThumbnailField value={v.get('coverImageUrl', p.coverImageUrl ?? '')} />
 
   <Field
     name="publishAt"

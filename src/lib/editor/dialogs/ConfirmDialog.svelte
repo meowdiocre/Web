@@ -29,7 +29,7 @@
 
 <Modal {open} {onclose} size="sm" {title}>
   {#if message}
-    <p class="msg">{message}</p>
+    <p class="msg font-sans text-sm leading-6 text-paper">{message}</p>
   {/if}
 
   {#snippet footer()}
@@ -44,12 +44,3 @@
     </div>
   {/snippet}
 </Modal>
-
-<style>
-  .msg {
-    font-family: var(--font-sans);
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--color-paper);
-  }
-</style>

@@ -11,67 +11,24 @@
   } = $props();
 </script>
 
-<nav class="cats" aria-label="Filter by category">
+<nav
+  class="flex flex-wrap items-baseline gap-2 pt-2.5 pb-1 font-mono text-xs tracking-[0.02em]"
+  aria-label="Filter by category"
+>
   <button
     type="button"
-    class:selected={selected === 'all'}
+    class="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-[5px] border-0 bg-transparent py-0.5 font-[inherit] tracking-[inherit] lowercase text-muted-warm transition-colors duration-[120ms] ease-out hover:text-crimson focus-visible:text-crimson focus-visible:outline-none aria-[pressed=true]:text-crimson-deep aria-[pressed=true]:underline aria-[pressed=true]:decoration-crimson-deep/50 aria-[pressed=true]:decoration-1 aria-[pressed=true]:underline-offset-[3px]"
     aria-pressed={selected === 'all'}
     onclick={() => (selected = 'all')}
   >all</button>
 
-  {#each categories as category, i (category.key)}
-    <span class="cats__sep" aria-hidden="true">/</span>
+  {#each categories as category (category.key)}
+    <span class="select-none text-muted-warm opacity-50" aria-hidden="true">/</span>
     <button
       type="button"
-      class:selected={selected === category.key}
+      class="inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center gap-[5px] border-0 bg-transparent py-0.5 font-[inherit] tracking-[inherit] lowercase text-muted-warm transition-colors duration-[120ms] ease-out hover:text-crimson focus-visible:text-crimson focus-visible:outline-none aria-[pressed=true]:text-crimson-deep aria-[pressed=true]:underline aria-[pressed=true]:decoration-crimson-deep/50 aria-[pressed=true]:decoration-1 aria-[pressed=true]:underline-offset-[3px]"
       aria-pressed={selected === category.key}
       onclick={() => (selected = category.key)}
     ><PixelIcon name={category.icon} size={11} />{category.label}</button>
   {/each}
 </nav>
-
-<style>
-  .cats {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px;
-    padding: 10px 0 4px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.02em;
-  }
-
-  .cats button {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 2px 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-muted-warm);
-    font: inherit;
-    letter-spacing: inherit;
-    text-transform: lowercase;
-    cursor: pointer;
-    transition: color 0.12s ease;
-  }
-  .cats button:hover,
-  .cats button:focus-visible {
-    color: var(--color-crimson);
-    outline: none;
-  }
-  .cats button.selected {
-    color: var(--color-crimson-deep);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
-    text-decoration-color: rgb(142 42 39 / 0.5);
-  }
-
-  .cats__sep {
-    color: var(--color-muted-warm);
-    opacity: 0.5;
-    user-select: none;
-  }
-</style>

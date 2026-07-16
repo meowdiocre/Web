@@ -34,154 +34,46 @@
   }
 
   const titleId = `modal-title-${Math.random().toString(36).slice(2, 9)}`;
+  const widthClass = $derived(
+    size === 'sm'
+      ? 'w-[min(420px,calc(100vw-32px))] max-[520px]:w-[calc(100vw-16px)]'
+      : size === 'lg'
+        ? 'w-[min(820px,calc(100vw-32px))] max-[520px]:w-[calc(100vw-16px)]'
+        : 'w-[min(640px,calc(100vw-32px))] max-[520px]:w-[calc(100vw-16px)]'
+  );
 </script>
 
 <dialog
   bind:this={dlg}
-  class="modal modal--{size}"
+  class="fixed top-1/2 left-1/2 m-0 max-h-[calc(100vh-32px)] -translate-x-1/2 -translate-y-1/2 border-0 bg-transparent p-0 text-paper backdrop:bg-black/55 backdrop:backdrop-blur-[2px] motion-reduce:backdrop:backdrop-blur-none {widthClass}"
   aria-labelledby={title ? titleId : undefined}
   oncancel={onCancel}
   onclick={onBackdropClick}
 >
-  <div class="panel">
+  <div class="flex max-h-[calc(100vh-32px)] flex-col border border-accent-line border-b-2 border-b-dashed border-b-accent-line-strong bg-ink-2 font-sans text-paper shadow-modal [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_14px),calc(100%_-_14px)_100%,0_100%)] max-[520px]:max-h-[calc(100vh-16px)]">
     {#if title}
-      <header class="head">
-        <span class="tag">
-          <span class="g" aria-hidden="true">{BRAND_GLYPH}</span>dialog
+      <header class="flex items-center gap-2.5 border-b border-dashed border-rose/20 px-3 py-2.5">
+        <span class="inline-flex h-[22px] items-center gap-1.5 bg-rose px-2.5 font-terminal text-xs tracking-[0.1em] text-ink lowercase">
+          <span class="translate-y-px font-display text-[13px] text-crimson" aria-hidden="true">{BRAND_GLYPH}</span>dialog
         </span>
-        <h2 id={titleId} class="title">{title}</h2>
+        <h2 id={titleId} class="m-0 min-w-0 flex-1 truncate font-mono text-xs tracking-[0.16em] text-paper">{title}</h2>
         <button
           type="button"
-          class="x"
+          class="grid size-11 cursor-pointer place-items-center border border-accent-line bg-transparent font-terminal text-lg leading-none text-paper transition-[background,color,border-color] duration-100 hover:border-rose hover:bg-rose hover:text-ink"
           aria-label="Close dialog"
           onclick={() => onclose?.()}
         ><PixelIcon name="close" size={16} /></button>
       </header>
     {/if}
 
-    <div class="body">
+    <div class="overflow-auto p-4">
       {@render children?.()}
     </div>
 
     {#if footer}
-      <footer class="foot">
+      <footer class="flex flex-wrap gap-2 border-t border-dashed border-rose/20 bg-black/20 px-4 py-3">
         {@render footer()}
       </footer>
     {/if}
   </div>
 </dialog>
-
-<style>
-  .modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    right: auto;
-    bottom: auto;
-    margin: 0;
-    transform: translate(-50%, -50%);
-
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-paper);
-    width: min(640px, calc(100vw - 32px));
-    max-height: calc(100vh - 32px);
-  }
-  .modal--sm { width: min(420px, calc(100vw - 32px)); }
-  .modal--lg { width: min(820px, calc(100vw - 32px)); }
-
-  .modal::backdrop {
-    background: rgb(0 0 0 / 0.55);
-    backdrop-filter: blur(2px);
-  }
-
-  .panel {
-    background: var(--color-ink-2);
-    border: 1px solid rgb(232 156 146 / 0.30);
-    border-bottom: 2px dashed rgb(232 156 146 / 0.45);
-    box-shadow: 0 24px 48px rgb(0 0 0 / 0.55);
-    color: var(--color-paper);
-    font-family: var(--font-sans);
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
-    max-height: calc(100vh - 32px);
-    display: flex;
-    flex-direction: column;
-  }
-
-  .head {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-bottom: 1px dashed rgb(232 156 146 / 0.20);
-  }
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 22px;
-    padding: 0 10px;
-    background: var(--color-rose);
-    color: var(--color-ink);
-    font-family: var(--font-terminal);
-    font-size: 12px;
-    letter-spacing: 0.10em;
-    text-transform: lowercase;
-  }
-  .tag .g {
-    color: var(--color-crimson);
-    font-family: var(--font-display);
-    font-size: 13px;
-    transform: translateY(0.5px);
-  }
-  .title {
-    flex: 1;
-    margin: 0;
-    min-width: 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.16em;
-    color: var(--color-paper);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  .x {
-    width: 44px; height: 44px;
-    display: grid; place-items: center;
-    color: var(--color-paper);
-    background: transparent;
-    border: 1px solid rgb(232 156 146 / 0.30);
-    font-family: var(--font-terminal);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-  .x:hover {
-    background: var(--color-rose);
-    color: var(--color-ink);
-    border-color: var(--color-rose);
-  }
-
-  .body { padding: 16px; overflow: auto; }
-  .foot {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 12px 16px;
-    border-top: 1px dashed rgb(232 156 146 / 0.20);
-    background: rgb(0 0 0 / 0.20);
-  }
-
-  @media (max-width: 520px) {
-    .modal      { width: calc(100vw - 16px); }
-    .modal--sm  { width: calc(100vw - 16px); }
-    .modal--lg  { width: calc(100vw - 16px); }
-    .panel      { max-height: calc(100vh - 16px); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .modal::backdrop { backdrop-filter: none; }
-  }
-</style>

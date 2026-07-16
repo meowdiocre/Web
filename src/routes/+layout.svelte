@@ -55,7 +55,10 @@
 </div>
 
 {#if navPending && publicSkeleton}
-  <div class={`route-skeleton route-skeleton--${publicSkeleton}`} aria-hidden="true">
+  <div
+    class={`route-skeleton route-skeleton--${publicSkeleton} pointer-events-none fixed inset-0 z-30 overflow-auto bg-paper text-paper-ink-strong`}
+    aria-hidden="true"
+  >
     {#if publicSkeleton === 'blog'}
       <BlogPageSkeleton />
     {:else if publicSkeleton === 'article'}
@@ -66,27 +69,3 @@
 
 <RouteProgress />
 <TmuxKeymap />
-
-<style>
-  .route-skeleton {
-    position: fixed;
-    inset: 0;
-    z-index: 30;
-    overflow: auto;
-    pointer-events: none;
-  }
-
-  .route-skeleton--blog,
-  .route-skeleton--article {
-    background: var(--color-paper);
-    color: #241814;
-  }
-  .route-skeleton--blog {
-    background-image: radial-gradient(rgba(42, 28, 20, 0.04) 1px, transparent 1px);
-    background-size: 3px 3px;
-  }
-  .route-skeleton--article {
-    background-image: radial-gradient(rgba(42, 28, 20, 0.04) 1px, transparent 1px);
-    background-size: 3px 3px;
-  }
-</style>

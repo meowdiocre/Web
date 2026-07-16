@@ -28,12 +28,12 @@ describe('/blog/[category]/[slug] load', () => {
   it('returns article + related on hit', async () => {
     (queries.loadPublicArticle as any).mockResolvedValue({
       slug:    'foo',
-      head:    { category: 'Reverse', categoryIcon: 'bug', title: { pre: 'A', em: 'B', post: 'C' }, dek: 'd', meta: { author: 'm', date: '2026 · 01 · 01' } },
+      head:    { category: 'Reverse', categoryIcon: 'bug', coverImageUrl: 'https://example.com/foo.webp', title: { pre: 'A', em: 'B', post: 'C' }, dek: 'd', meta: { author: 'm', date: '2026 · 01 · 01' } },
       bodyHtml:'<p>x</p>',
       footnotes: [],
       category:'reverse'
     });
-    (queries.loadRelated as any).mockResolvedValue([{ href: '/blog/reverse/bar', category: 'Reverse', categoryIcon: 'bug', title: 't', blurb: 'b' }]);
+    (queries.loadRelated as any).mockResolvedValue([{ href: '/blog/reverse/bar', category: 'Reverse', categoryIcon: 'bug', coverImageUrl: 'https://example.com/bar.webp', title: 't', blurb: 'b' }]);
 
     const out = await articleLoad(articleEvent('reverse', 'foo'));
     if (!out) throw new Error('expected article load result');
@@ -45,7 +45,7 @@ describe('/blog/[category]/[slug] load', () => {
   it('redirects a stale category to the canonical article path', async () => {
     (queries.loadPublicArticle as any).mockResolvedValue({
       slug:    'foo',
-      head:    { category: 'Reverse', categoryIcon: 'bug', title: { pre: 'A', em: 'B', post: 'C' }, dek: 'd', meta: { author: 'm', date: '2026 · 01 · 01' } },
+      head:    { category: 'Reverse', categoryIcon: 'bug', coverImageUrl: 'https://example.com/foo.webp', title: { pre: 'A', em: 'B', post: 'C' }, dek: 'd', meta: { author: 'm', date: '2026 · 01 · 01' } },
       bodyHtml:'<p>x</p>',
       footnotes: [],
       category:'reverse'

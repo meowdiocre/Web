@@ -8,22 +8,4 @@
   let { text } = $props();
 </script>
 
-<blockquote class="pull">{text}</blockquote>
-
-<style>
-  .pull {
-    margin: 56px -16px;
-    padding: 36px 22px;
-    border-block: 2px solid var(--fg);
-    font-family: var(--font-italic);
-    font-style: italic;
-    font-size: clamp(26px, 3.4vw, 36px);
-    line-height: 1.2;
-    color: var(--quote);
-    text-align: center;
-  }
-  .pull::before { content: '«'; color: var(--accent); margin-right: 8px; }
-  .pull::after  { content: '»'; color: var(--accent); margin-left: 8px; }
-
-  @media (max-width: 900px) { .pull { margin-left: 0; margin-right: 0; } }
-</style>
+<blockquote class="mx-[-16px] my-14 border-y-2 border-[var(--fg)] px-[22px] py-9 text-center font-italic text-[clamp(26px,3.4vw,36px)] leading-[1.2] text-[var(--quote)] italic before:mr-2 before:text-[var(--accent)] before:content-['«'] after:ml-2 after:text-[var(--accent)] after:content-['»'] max-[900px]:mx-0">{text}</blockquote>

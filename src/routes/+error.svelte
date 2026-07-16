@@ -11,7 +11,7 @@
 
 <Nav current="home" />
 
-<main class="layer min-h-[60vh] px-[var(--gutter)] py-[clamp(64px,10vw,128px)]">
+<main class="layer relative z-[1] min-h-[60vh] px-[var(--gutter)] py-[clamp(64px,10vw,128px)]">
   <div class="mx-auto max-w-[640px]">
     <PixelIcon name="skull" size={32} />
     <p class="font-mono text-[11px] tracking-[0.22em] uppercase text-muted-warm mt-4 mb-2">

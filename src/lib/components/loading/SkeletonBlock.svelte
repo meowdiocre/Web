@@ -9,7 +9,7 @@
 </script>
 
 <div
-  class={`skeleton-block ${className}`.trim()}
+  class={`skeleton-block relative overflow-hidden bg-skeleton ${className}`.trim()}
   style={`--skeleton-width:${width}; --skeleton-height:${height}; --skeleton-radius:${radius};`}
   aria-hidden="true"
 ></div>
@@ -19,9 +19,6 @@
     width: var(--skeleton-width);
     height: var(--skeleton-height);
     border-radius: var(--skeleton-radius);
-    background: rgb(122 106 90 / 0.10);
-    position: relative;
-    overflow: hidden;
   }
   .skeleton-block::after {
     content: '';
@@ -30,7 +27,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgb(255 255 255 / 0.32) 50%,
+      var(--color-skeleton-shimmer) 50%,
       transparent 100%
     );
     transform: translateX(-100%);

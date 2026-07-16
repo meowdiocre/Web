@@ -35,9 +35,9 @@
     nav sticky top-0 z-50
     grid grid-cols-[auto_auto_1fr_auto] items-stretch
     h-11
-    bg-[rgba(10,9,8,0.92)] backdrop-blur-md backdrop-saturate-150
+    bg-nav-overlay backdrop-blur-md backdrop-saturate-150
     border-b border-dashed border-rose/[0.24]
-    [box-shadow:0_1px_0_rgba(10,9,8,0.92),0_2px_0_rgba(232,156,146,0.07)]
+    shadow-nav
     font-terminal text-[13px] leading-none tracking-[0.02em] text-bone
     [overflow-x:clip] overflow-y-visible
     max-[900px]:grid-cols-[auto_1fr_auto] max-[900px]:h-[46px]
@@ -86,11 +86,11 @@
         hidden max-[900px]:flex
         absolute inset-x-0 top-full
         flex-col gap-0 pt-[6px]
-        bg-[rgb(15_11_14_/_0.985)]
+        bg-overlay-strong
         backdrop-saturate-150 backdrop-blur-[18px]
         border-t border-b
         border-t-rose/[0.30] border-b-rose/[0.18]
-        [box-shadow:0_18px_36px_rgb(0_0_0_/_0.6)]
+        shadow-drawer
         z-[60]
       "
       aria-label="Primary"
@@ -110,12 +110,12 @@
 
 <style>
   :global(body[data-page='article']) .nav {
-    background: rgb(22 17 21 / 0.94);
-    box-shadow: 0 1px 0 rgb(22 17 21 / 0.94), 0 2px 0 rgb(232 156 146 / 0.07);
+    background: var(--color-article-nav);
+    box-shadow: var(--shadow-article-nav);
   }
 
   @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .nav { background: rgb(10 9 8 / 0.985); }
-    :global(body[data-page='article']) .nav { background: rgb(22 17 21 / 0.985); }
+    .nav { background: var(--color-overlay-strong); }
+    :global(body[data-page='article']) .nav { background: var(--color-article-nav-strong); }
   }
 </style>

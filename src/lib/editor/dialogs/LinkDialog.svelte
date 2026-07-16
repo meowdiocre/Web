@@ -28,18 +28,18 @@
 
 <Modal {open} {onclose} title="link">
   <form onsubmit={submit} class="grid gap-3">
-    <label class="field">
-      <span class="lbl">url</span>
+    <label class="grid min-w-0 gap-2">
+      <span class="font-mono text-2xs tracking-meta text-muted">url</span>
       <input
         bind:value={href}
-        class="inp"
+        class="w-full rounded-none border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5 font-sans text-[15px] text-paper focus:outline-2 focus:outline-offset-2 focus:outline-rose"
         type="url"
         placeholder="https://example.com"
         autocomplete="off"
         spellcheck="false"
       />
     </label>
-    <p class="hint">leave empty + apply to remove the link.</p>
+    <p class="hint font-mono text-[10px] tracking-[0.18em] text-muted-warm">leave empty + apply to remove the link.</p>
   </form>
 
   {#snippet footer()}
@@ -55,12 +55,3 @@
     />
   {/snippet}
 </Modal>
-
-<style>
-  .hint {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    color: var(--color-muted-warm);
-  }
-</style>

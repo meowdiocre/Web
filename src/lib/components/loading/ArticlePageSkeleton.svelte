@@ -9,31 +9,31 @@
   ];
 </script>
 
-<div class="article-skeleton" aria-hidden="true">
-  <section class="mast">
-    <div class="mast__inner">
-      <div class="crumbs">
+<div aria-hidden="true">
+  <section class="px-[var(--gutter)] pt-[clamp(40px,6vw,80px)] pb-[clamp(28px,4vw,48px)]">
+    <div class="mx-auto max-w-[760px]">
+      <div class="mb-[22px] grid auto-cols-max grid-flow-col justify-start gap-2.5">
         <SkeletonBlock width="56px" height="11px" radius="0" />
         <SkeletonBlock width="10px" height="11px" radius="0" />
         <SkeletonBlock width="68px" height="11px" radius="0" />
       </div>
 
-      <div class="kicker">
+      <div class="mb-[18px]">
         <SkeletonBlock width="110px" height="28px" radius="0" />
       </div>
 
-      <div class="title">
-        <SkeletonBlock width="100%" height="54px" radius="0" />
-        <SkeletonBlock width="88%" height="54px" radius="0" />
+      <div class="mb-6 grid gap-2.5">
+        <SkeletonBlock width="100%" height="54px" radius="0" className="max-[600px]:!h-[42px]" />
+        <SkeletonBlock width="88%" height="54px" radius="0" className="max-[600px]:!h-[42px]" />
       </div>
 
-      <div class="dek">
+      <div class="mb-8 grid max-w-[56ch] gap-3">
         <SkeletonBlock width="100%" height="20px" radius="0" />
         <SkeletonBlock width="94%" height="20px" radius="0" />
         <SkeletonBlock width="74%" height="20px" radius="0" />
       </div>
 
-      <div class="meta">
+      <div class="flex flex-wrap gap-x-7 gap-y-3 border-y border-[var(--rule)] py-[18px]">
         <SkeletonBlock width="120px" height="12px" radius="0" />
         <SkeletonBlock width="92px" height="12px" radius="0" />
         <SkeletonBlock width="74px" height="12px" radius="0" />
@@ -41,15 +41,15 @@
     </div>
   </section>
 
-  <section class="body">
-    <div class="body__inner">
+  <section class="px-[var(--gutter)] pt-4 pb-[clamp(48px,6vw,96px)]">
+    <div class="mx-auto grid max-w-[760px] gap-[34px] max-[600px]:gap-7">
       {#each paragraphs as lines, blockIndex}
         {#if blockIndex === 1}
-          <div class="section-title">
+          <div class="mt-1.5 -mb-1">
             <SkeletonBlock width={lines[0]} height="34px" radius="0" />
           </div>
         {:else}
-          <div class="paragraph">
+          <div class="grid gap-3">
             {#each lines as width}
               <SkeletonBlock {width} height="18px" radius="0" />
             {/each}
@@ -57,14 +57,17 @@
         {/if}
       {/each}
 
-      <div class="code-block">
+      <div
+        class="grid gap-3.5 bg-skeleton-surface p-[22px]
+               [clip-path:polygon(0_0,calc(100%_-_18px)_0,100%_18px,100%_100%,18px_100%,0_calc(100%_-_18px))]"
+      >
         <SkeletonBlock width="26%" height="12px" radius="0" />
         <SkeletonBlock width="100%" height="12px" radius="0" />
         <SkeletonBlock width="94%" height="12px" radius="0" />
         <SkeletonBlock width="82%" height="12px" radius="0" />
       </div>
 
-      <div class="paragraph">
+      <div class="grid gap-3">
         <SkeletonBlock width="100%" height="18px" radius="0" />
         <SkeletonBlock width="96%" height="18px" radius="0" />
         <SkeletonBlock width="84%" height="18px" radius="0" />
@@ -72,67 +75,3 @@
     </div>
   </section>
 </div>
-
-<style>
-  .mast {
-    padding: clamp(40px, 6vw, 80px) var(--gutter) clamp(28px, 4vw, 48px);
-  }
-
-  .mast__inner,
-  .body__inner {
-    max-width: 760px;
-    margin: 0 auto;
-  }
-
-  .crumbs,
-  .title,
-  .dek,
-  .paragraph,
-  .code-block {
-    display: grid;
-  }
-
-  .crumbs {
-    grid-auto-flow: column;
-    justify-content: start;
-    gap: 10px;
-    margin-bottom: 22px;
-  }
-
-  .kicker { margin-bottom: 18px; }
-
-  .title { gap: 10px; margin-bottom: 24px; }
-  .dek { gap: 12px; margin-bottom: 32px; max-width: 56ch; }
-
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 28px;
-    padding: 18px 0;
-    border-block: 1px solid var(--rule);
-  }
-
-  .body {
-    padding: 16px var(--gutter) clamp(48px, 6vw, 96px);
-  }
-
-  .body__inner { display: grid; gap: 34px; }
-  .paragraph { gap: 12px; }
-
-  .section-title {
-    margin-top: 6px;
-    margin-bottom: -4px;
-  }
-
-  .code-block {
-    gap: 14px;
-    padding: 22px;
-    background: rgb(122 106 90 / 0.08);
-    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-  }
-
-  @media (max-width: 600px) {
-    .title :global(.skeleton-block) { height: 42px; }
-    .body__inner { gap: 28px; }
-  }
-</style>

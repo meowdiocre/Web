@@ -6,6 +6,7 @@
    * @property {string} href
    * @property {string} category
    * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
+   * @property {string|null} coverImageUrl
    * @property {string} title
    * @property {string} blurb
    *
@@ -25,7 +26,7 @@
   "
 >
   <div class="mx-auto max-w-[1280px]">
-    <h2 class="head">{heading}</h2>
+    <h2 class="mb-6 border-b-2 border-[var(--fg)] pb-3 font-display text-sm tracking-[0.18em] text-muted uppercase">{heading}</h2>
     <div class="grid grid-cols-3 gap-[18px] max-[900px]:grid-cols-1">
       {#each items as r}
         <RelatedCard {...r} />
@@ -33,16 +34,3 @@
     </div>
   </div>
 </section>
-
-<style>
-  .head {
-    margin-bottom: 24px;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--fg);
-    font-family: var(--font-display);
-    font-size: 14px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-</style>

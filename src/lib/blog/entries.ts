@@ -69,7 +69,8 @@ export function groupEntriesByYear(entries: BlogEntry[]): BlogEntryGroup[] {
       title: entry.title,
       desc: entry.desc,
       category: entry.category,
-      categoryIcon: entry.categoryIcon
+      categoryIcon: entry.categoryIcon,
+      coverImageUrl: entry.coverImageUrl
     };
 
     const current = byYear.get(entry.year);

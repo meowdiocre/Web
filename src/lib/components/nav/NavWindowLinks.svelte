@@ -13,10 +13,20 @@
 
 {#each NAV_WINDOWS as window (window.key)}
   <a
-    class="nav-window"
-    class:nav-window-mobile={mobile}
-    class:nav-window-desktop={!mobile}
-    class:is-current={current === window.key}
+    class="group text-bone transition-[color,background] duration-150
+      {mobile
+        ? 'relative flex min-h-11 w-full items-center gap-2.5 px-[18px] text-sm tracking-[0.04em]'
+        : 'inline-flex h-6 items-center whitespace-nowrap px-[7px] leading-none tracking-[0.04em]'}
+      {current !== window.key
+        ? mobile
+          ? 'hover:bg-accent-wash hover:text-rose focus-visible:bg-accent-wash focus-visible:text-rose'
+          : 'hover:bg-accent-wash-strong hover:text-rose focus-visible:bg-accent-wash-strong focus-visible:text-rose'
+        : ''}
+      {current === window.key
+        ? mobile
+          ? 'bg-accent-wash-strong text-rose'
+          : 'bg-rose text-ink'
+        : ''}"
     href={window.path}
     data-sveltekit-preload-data="tap"
     data-sveltekit-preload-code="hover"
@@ -24,111 +34,13 @@
     onclick={close}
   >
     {#if mobile}
-      <span class="prompt" aria-hidden="true">$</span>
+      <span class="shrink-0 font-terminal text-muted opacity-55 transition-[color,opacity] group-hover:text-rose group-hover:opacity-85 group-focus-visible:text-rose group-focus-visible:opacity-85 {current === window.key ? 'text-rose opacity-85' : ''}" aria-hidden="true">$</span>
     {:else}
-      <span class="idx">{window.idx}:</span>
+      <span class="mr-[5px] transition-colors {current === window.key ? 'text-ink opacity-55' : 'text-muted group-hover:text-rose group-focus-visible:text-rose'}">{window.idx}:</span>
     {/if}
     <span>{window.name}</span>
     {#if current === window.key}
-      <span class="mark-active" aria-hidden="true">*</span>
+      <span class="font-terminal font-bold {mobile ? 'ml-auto text-crimson' : 'ml-[3px] text-ink'}" aria-hidden="true">*</span>
     {/if}
   </a>
 {/each}
-
-<style>
-  .nav-window {
-    color: var(--color-bone);
-    transition: color 0.12s, background 0.12s, border-left-color 0.12s;
-  }
-
-  .nav-window-desktop {
-    display: inline-flex;
-    align-items: baseline;
-    height: 24px;
-    padding: 0 7px;
-    letter-spacing: 0.04em;
-    line-height: 24px;
-    white-space: nowrap;
-  }
-
-  .nav-window-desktop .idx {
-    color: var(--color-muted);
-    margin-right: 5px;
-  }
-
-  .nav-window-desktop .mark-active {
-    color: var(--color-ink);
-    margin-left: 3px;
-    font-weight: 700;
-  }
-
-  .nav-window-desktop:hover {
-    color: var(--color-rose);
-    background: rgb(232 156 146 / 0.08);
-  }
-
-  .nav-window-desktop:hover .idx {
-    color: var(--color-rose);
-  }
-
-  .nav-window-desktop.is-current {
-    background: var(--color-rose);
-    color: var(--color-ink);
-  }
-
-  .nav-window-desktop.is-current .idx {
-    color: var(--color-ink);
-    opacity: 0.55;
-  }
-
-  .nav-window-mobile {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 44px;
-    padding: 0 18px;
-    width: 100%;
-    border-left: 3px solid transparent;
-    font-size: 14px;
-    letter-spacing: 0.04em;
-  }
-
-  .nav-window-mobile .prompt {
-    color: var(--color-muted);
-    opacity: 0.55;
-    font-family: var(--font-terminal);
-    flex-shrink: 0;
-  }
-
-  .nav-window-mobile .mark-active {
-    margin-left: auto;
-    color: var(--color-crimson);
-    font-family: var(--font-terminal);
-    font-weight: 700;
-  }
-
-  .nav-window-mobile:hover,
-  .nav-window-mobile:focus-visible {
-    background: rgb(232 156 146 / 0.06);
-    color: var(--color-rose);
-    border-left-color: var(--color-rose);
-  }
-
-  .nav-window-mobile:hover .prompt,
-  .nav-window-mobile:focus-visible .prompt {
-    color: var(--color-rose);
-    opacity: 0.85;
-  }
-
-  .nav-window-mobile.is-current {
-    background: rgb(232 156 146 / 0.09);
-    color: var(--color-rose);
-    border-left-color: var(--color-rose);
-  }
-
-  .nav-window-mobile.is-current .prompt {
-    color: var(--color-rose);
-    opacity: 0.85;
-  }
-</style>

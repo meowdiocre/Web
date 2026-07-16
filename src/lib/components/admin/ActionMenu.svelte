@@ -69,48 +69,24 @@
     aria-label={label}
     aria-expanded={open}
     onclick={toggle}
-    class="menu-trigger"
+    class="menu-trigger inline-flex size-11 cursor-pointer items-center justify-center gap-1
+           border border-[var(--line-soft)] bg-transparent text-paper
+           transition-[border-color,background-color] duration-[120ms]
+           hover:border-rose hover:bg-accent-wash
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose
+           aria-expanded:border-rose aria-expanded:bg-accent-wash
+           motion-reduce:duration-0"
   >
     <PixelIcon name="more-vertical" size={18} />
   </button>
 
   {#if open}
-    <div class="menu-items menu-items--{align}">
+    <div
+      class="absolute top-[calc(100%+8px)] z-20 min-w-[220px] max-w-[calc(100vw-24px)]
+             border border-accent-line bg-ink-2 p-1.5 shadow-menu
+             {align === 'right' ? 'right-0' : 'left-0'}"
+    >
       {@render children?.()}
     </div>
   {/if}
 </div>
-
-<style>
-  .menu-trigger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--line-soft);
-    background: transparent;
-    color: var(--color-paper);
-    cursor: pointer;
-    transition: border-color 0.12s, background 0.12s;
-  }
-  .menu-trigger:hover,
-  .menu-trigger[aria-expanded='true'] {
-    border-color: var(--color-rose);
-    background: var(--admin-accent-wash);
-  }
-  .menu-items {
-    position: absolute;
-    top: calc(100% + 8px);
-    z-index: 20;
-    min-width: 220px;
-    max-width: calc(100vw - 24px);
-    border: 1px solid var(--admin-accent-line);
-    background: var(--color-ink-2);
-    box-shadow: var(--admin-menu-shadow);
-    padding: 6px;
-  }
-  .menu-items--right { right: 0; }
-  .menu-items--left { left: 0; }
-</style>

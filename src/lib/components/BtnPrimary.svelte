@@ -9,30 +9,9 @@
   let { href, children } = $props();
 </script>
 
-<a class="btn" {href}>
-  <span class="br">[</span>{@render children()}<span class="br">]</span>
+<a
+  class="group inline-flex min-h-11 items-baseline gap-2 whitespace-nowrap bg-paper px-4 pt-[11px] pb-2.5 font-terminal text-sm tracking-[0.1em] text-ink lowercase shadow-hard [clip-path:polygon(0_0,100%_0,100%_70%,94%_100%,0_100%)] transition-[transform,background,color,box-shadow] duration-150 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:bg-crimson hover:text-paper hover:shadow-hard-lg active:translate-0 active:shadow-hard-xs focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ink"
+  {href}
+>
+  <span class="text-ink opacity-55 group-hover:text-paper group-hover:opacity-70">[</span>{@render children()}<span class="text-ink opacity-55 group-hover:text-paper group-hover:opacity-70">]</span>
 </a>
-
-<style>
-  .btn {
-    display: inline-flex; align-items: baseline; gap: 8px;
-    padding: 11px 16px 10px;
-    font-family: var(--font-terminal); font-size: 14px;
-    letter-spacing: 0.10em; text-transform: lowercase;
-    background: var(--color-paper); color: var(--color-ink);
-    clip-path: polygon(0 0, 100% 0, 100% 70%, 94% 100%, 0 100%);
-    box-shadow: 4px 4px 0 rgb(0 0 0 / 0.55);
-    transition: transform 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
-    white-space: nowrap;
-  }
-  .btn .br { color: var(--color-ink); opacity: 0.55; }
-  .btn:hover {
-    background: var(--color-crimson);
-    color: var(--color-paper);
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 rgb(0 0 0 / 0.55);
-  }
-  .btn:hover .br      { color: var(--color-paper); opacity: 0.7; }
-  .btn:active         { transform: translate(0, 0); box-shadow: 2px 2px 0 rgb(0 0 0 / 0.55); }
-  .btn:focus-visible  { outline: 2px solid var(--color-ink); outline-offset: 3px; }
-</style>

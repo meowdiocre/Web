@@ -71,8 +71,8 @@
   }
 </script>
 
-<section class="browse" aria-label="Filter entries">
-  <div class="browse__inner" use:reveal={{ y: 12 }}>
+<section class="px-[var(--gutter)] pt-2.5" aria-label="Filter entries">
+  <div class="mx-auto grid max-w-[880px] gap-2.5" use:reveal={{ y: 12 }}>
     <BlogSearchBar
       bind:query
       resultCount={filteredCount}
@@ -90,16 +90,3 @@
   {remainingCount}
   onShowMore={showMore}
 />
-
-<style>
-  .browse {
-    padding: 10px var(--gutter) 0;
-  }
-
-  .browse__inner {
-    max-width: 880px;
-    margin: 0 auto;
-    display: grid;
-    gap: 10px;
-  }
-</style>

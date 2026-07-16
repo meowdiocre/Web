@@ -27,6 +27,7 @@ export interface PublicEntry {
   desc:     string;
   category: string;
   categoryIcon: CategoryIconName;
+  coverImageUrl: string | null;
 }
 
 export interface EntryGroup {
@@ -43,6 +44,7 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
       titlePost:   posts.titlePost,
       dek:         posts.dek,
       publishedAt: posts.publishedAt,
+      coverImageUrl: posts.coverImageUrl,
       categorySlug: posts.category,
       categoryLabel: categories.label,
       categoryIcon: categories.icon
@@ -62,7 +64,8 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
       title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
       desc:     r.dek,
       category: r.categoryLabel ?? '',
-      categoryIcon: normalizeCategoryIcon(r.categoryIcon)
+      categoryIcon: normalizeCategoryIcon(r.categoryIcon),
+      coverImageUrl: r.coverImageUrl
     };
     const arr = byYear.get(year);
     if (arr) arr.push(entry);
@@ -78,6 +81,7 @@ export interface PublicArticle {
   head: {
     category: string;
     categoryIcon: CategoryIconName;
+    coverImageUrl: string | null;
     title:    { pre: string; em: string; post: string };
     dek:      string;
     meta:     { author: string; date: string };
@@ -91,6 +95,7 @@ export interface RelatedEntry {
   href:     string;
   category: string;
   categoryIcon: CategoryIconName;
+  coverImageUrl: string | null;
   title:    string;
   blurb:    string;
 }
@@ -112,6 +117,7 @@ export async function loadPublicArticle(
       status:      posts.status,
       bodyHtml:    posts.bodyHtml,
       footnotes:   posts.footnotesJson,
+      coverImageUrl: posts.coverImageUrl,
       category:    posts.category,
       categoryLabel: categories.label,
       categoryIcon: categories.icon
@@ -133,6 +139,7 @@ export async function loadPublicArticle(
     head: {
       category: r.categoryLabel ?? r.category,
       categoryIcon: normalizeCategoryIcon(r.categoryIcon),
+      coverImageUrl: r.coverImageUrl,
       title:    { pre: r.titlePre, em: r.titleEm, post: r.titlePost },
       dek:      r.dek,
       meta:     { author: r.author, date: metaDate(when) }
@@ -151,6 +158,7 @@ export async function loadRelated(slug: string, categorySlug: string): Promise<R
       titleEm:   posts.titleEm,
       titlePost: posts.titlePost,
       dek:       posts.dek,
+      coverImageUrl: posts.coverImageUrl,
       categorySlug: posts.category,
       category:  categories.label,
       categoryIcon: categories.icon
@@ -169,6 +177,7 @@ export async function loadRelated(slug: string, categorySlug: string): Promise<R
     href:     articlePath(r.categorySlug, r.slug),
     category: r.category ?? '',
     categoryIcon: normalizeCategoryIcon(r.categoryIcon),
+    coverImageUrl: r.coverImageUrl,
     title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
     blurb:    r.dek
   }));

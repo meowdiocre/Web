@@ -5,28 +5,17 @@
 </script>
 
 {#if isNavigating}
-  <div class="route-progress" aria-hidden="true"></div>
+  <div class="route-progress fixed top-0 left-0 z-[120] h-[3px] w-full overflow-hidden bg-rose/10" aria-hidden="true"></div>
 {/if}
 
 <style>
-  .route-progress {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 120;
-    width: 100%;
-    height: 3px;
-    overflow: hidden;
-    background: rgb(232 156 146 / 0.10);
-  }
-
   .route-progress::after {
     content: '';
     display: block;
     width: 35%;
     height: 100%;
     background: linear-gradient(90deg, var(--color-crimson), var(--color-rose));
-    box-shadow: 0 0 14px rgb(232 156 146 / 0.55);
+    box-shadow: var(--shadow-progress);
     animation: route-progress-slide 0.9s ease-in-out infinite;
   }
 

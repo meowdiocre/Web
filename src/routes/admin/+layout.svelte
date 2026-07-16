@@ -15,21 +15,12 @@
 </svelte:head>
 
 <div
-  class="admin layer min-h-screen flex flex-col
+  class="layer relative z-[1] min-h-screen flex flex-col bg-ink font-sans text-paper
          md:grid md:grid-cols-[240px_1fr]"
 >
   <AdminNav user={data.user} />
 
-  <section class="content flex-1 px-5 py-6 md:px-8 md:py-10">
+  <section class="min-w-0 flex-1 px-5 py-6 md:px-8 md:py-10">
     {@render children()}
   </section>
 </div>
-
-<style>
-  .admin {
-    background: var(--color-ink);
-    color: var(--color-paper);
-    font-family: var(--font-sans);
-  }
-  .content { min-width: 0; }
-</style>

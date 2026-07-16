@@ -28,27 +28,31 @@
     help = '',
     children
   } = $props();
+
+  const inputClass = `min-h-11 w-full rounded-none border border-[var(--line-soft)] bg-ink-2
+    px-3 py-2.5 font-sans text-[15px] text-paper outline outline-2 outline-transparent
+    outline-offset-1 focus-visible:outline-rose disabled:cursor-not-allowed disabled:opacity-[0.55]`;
 </script>
 
-<label class="field">
-  <span class="lbl">{label}</span>
+<label class="grid min-w-0 gap-2">
+  <span class="font-mono text-2xs tracking-meta text-muted">{label}</span>
 
   {#if kind === 'textarea'}
-    <textarea class="inp" {name} {rows} {required} {placeholder}>{value}</textarea>
+    <textarea class="{inputClass} min-h-20 resize-y" {name} {rows} {required} {placeholder}>{value}</textarea>
 
   {:else if kind === 'select'}
-    <select class="inp" {name} {required}>
+    <select class={inputClass} {name} {required}>
       {@render children?.()}
     </select>
 
   {:else if kind === 'datetime'}
-    <input class="inp" type="datetime-local" {name} {value} {required} />
+    <input class={inputClass} type="datetime-local" {name} {value} {required} />
 
   {:else}
-    <input class="inp" {name} {value} {type} {required} {placeholder} />
+    <input class={inputClass} {name} {value} {type} {required} {placeholder} />
   {/if}
 </label>
 
 {#if help}
-  <p class="field-help">{help}</p>
+  <p class="-mt-0.5 font-sans text-[12px] leading-6 text-muted">{help}</p>
 {/if}

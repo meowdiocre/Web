@@ -18,7 +18,7 @@
   let prefixTimer;
 
   const btnClass =
-    'py-1 px-2.5 border-0 bg-transparent font-mono text-[11px] tracking-[0.08em] cursor-pointer transition-[color,background-color] duration-100 aria-[pressed=true]:bg-[var(--accent)] aria-[pressed=true]:text-paper';
+    'inline-flex min-h-11 flex-1 cursor-pointer items-center justify-center gap-1 border-0 bg-transparent px-2.5 py-1 font-mono text-xs-plus tracking-label text-bone transition-[color,background-color] duration-100 hover:bg-accent-wash-strong hover:text-paper focus-visible:bg-accent-wash-strong focus-visible:text-paper focus-visible:outline-none aria-[pressed=true]:bg-[var(--accent)] aria-[pressed=true]:text-paper';
 
   function applyTheme(name) {
     theme = name;
@@ -104,7 +104,7 @@
 
 <svelte:window onkeydown={onKey} />
 
-<div class="pane-wrapper">
+<div class="fixed right-[clamp(14px,2.4vw,24px)] bottom-[clamp(14px,2.4vw,24px)] z-[55] flex flex-col items-end gap-2 max-[600px]:right-2.5 max-[600px]:bottom-2.5">
   {#if open}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
@@ -112,21 +112,21 @@
       role="group"
       aria-label="Reading settings"
       transition:fly={{ duration: 120, y: 6, opacity: 0 }}
-      class="pane"
+      class="w-[min(220px,calc(100vw-20px))] border border-accent-line border-b-2 border-b-crimson bg-ink font-mono text-xs-plus tracking-[0.04em] text-paper shadow-hard-lg"
     >
-      <div class="pane__head">
-        <span class="pane__session">
-          <span class="pane__glyph">◎</span>meowdiocre:<span class="pane__win">reader</span>
+      <div class="flex items-center justify-between border-b border-rose/15 px-2.5 py-1.5 text-2xs tracking-label lowercase">
+        <span class="inline-flex min-w-0 items-center gap-0.5 overflow-hidden whitespace-nowrap text-bone">
+          <span class="text-rose opacity-90">◎</span>meowdiocre:<span class="text-rose">reader</span>
         </span>
-        <span class="pane__close">
-          C-r <button type="button" aria-label="Close panel" class="pane__close-btn" onclick={() => (open = false)}>&times;</button>
+        <span class="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap text-[9px] text-muted">
+          C-r <button type="button" aria-label="Close panel" class="-my-2 grid size-11 cursor-pointer place-items-center border-0 bg-transparent p-0 font-mono text-xs text-muted transition-colors duration-100 hover:text-crimson" onclick={() => (open = false)}>&times;</button>
         </span>
       </div>
 
-      <div class="pane__body">
-        <div class="pane__row">
-          <span class="pane__label">theme</span>
-          <div class="pane__btns" role="group" aria-label="Reader theme">
+      <div class="grid gap-3 p-2.5">
+        <div class="grid grid-cols-[44px_1fr] items-center gap-2">
+          <span class="text-[9px] tracking-[0.14em] text-muted-warm opacity-85">theme</span>
+          <div class="flex gap-0.5" role="group" aria-label="Reader theme">
             <button type="button" class={btnClass} aria-pressed={theme === 'cream'} onclick={() => applyTheme('cream')}>
               cream
             </button>
@@ -136,9 +136,9 @@
           </div>
         </div>
 
-        <div class="pane__row">
-          <span class="pane__label">size</span>
-          <div class="pane__btns" role="group" aria-label="Reading size">
+        <div class="grid grid-cols-[44px_1fr] items-center gap-2">
+          <span class="text-[9px] tracking-[0.14em] text-muted-warm opacity-85">size</span>
+          <div class="flex gap-0.5" role="group" aria-label="Reading size">
             <button type="button" class={btnClass} aria-label="Smaller" onclick={() => applySize(fontSize - STEP)}>&minus;</button>
             <button type="button" class={btnClass} aria-label="Default size" onclick={() => applySize(DEFAULT_PX)}>{fontSize}</button>
             <button type="button" class={btnClass} aria-label="Larger" onclick={() => applySize(fontSize + STEP)}>+</button>
@@ -146,9 +146,9 @@
         </div>
       </div>
 
-      <div class="pane__foot">
-        <span class="pane__status">{theme} · {fontSize}px</span>
-        <span class="pane__date">[reader]</span>
+      <div class="flex items-center justify-between border-t border-rose/15 px-2.5 py-[5px] text-[9px] tracking-meta lowercase">
+        <span class="text-rose opacity-90">{theme} · {fontSize}px</span>
+        <span class="text-muted opacity-65">[reader]</span>
       </div>
     </div>
   {/if}
@@ -161,159 +161,8 @@
     aria-expanded={open}
     aria-controls="reader-pane"
     onclick={toggle}
-    class="fab"
+    class="grid size-11 cursor-pointer place-items-center border border-rose/25 bg-ink p-0 font-display text-xs leading-none text-bone shadow-hard-sm transition-[background,color,border-color] duration-100 hover:border-rose hover:text-rose focus-visible:border-rose focus-visible:text-rose focus-visible:outline-none aria-expanded:border-crimson aria-expanded:bg-crimson-deep aria-expanded:text-paper"
   >
     <PixelIcon name="terminal" size={16} />
   </button>
 </div>
-
-<style>
-  .pane-wrapper {
-    position: fixed;
-    bottom: clamp(14px, 2.4vw, 24px);
-    right: clamp(14px, 2.4vw, 24px);
-    z-index: 55;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 8px;
-  }
-
-  .pane {
-    width: 220px;
-    background: var(--color-ink);
-    color: var(--color-paper);
-    border: 1px solid rgb(232 156 146 / 0.25);
-    border-bottom: 2px solid var(--color-crimson);
-    box-shadow: 6px 6px 0 rgb(0 0 0 / 0.5);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.04em;
-  }
-
-  .pane__head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 10px;
-    border-bottom: 1px solid rgb(232 156 146 / 0.15);
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: lowercase;
-  }
-  .pane__session {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--color-bone);
-  }
-  .pane__glyph { color: var(--color-rose); opacity: 0.9; }
-  .pane__win   { color: var(--color-rose); }
-  .pane__close {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--color-muted);
-    font-size: 9px;
-  }
-  .pane__close-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px; height: 16px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-muted);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    cursor: pointer;
-    transition: color 0.12s;
-  }
-  .pane__close-btn:hover { color: var(--color-crimson); }
-
-  .pane__body {
-    padding: 10px;
-    display: grid;
-    gap: 12px;
-  }
-
-  .pane__row {
-    display: grid;
-    grid-template-columns: 44px 1fr;
-    gap: 8px;
-    align-items: center;
-  }
-  .pane__label {
-    font-size: 9px;
-    letter-spacing: 0.14em;
-    color: var(--color-muted-warm);
-    opacity: 0.85;
-  }
-  .pane__btns {
-    display: flex;
-    gap: 2px;
-  }
-  .pane__btns button {
-    color: var(--color-bone);
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-  }
-  .pane__btns button:hover,
-  .pane__btns button:focus-visible {
-    color: var(--color-paper);
-    background: rgb(232 156 146 / 0.12);
-    outline: none;
-  }
-
-  .pane__foot {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 10px;
-    border-top: 1px solid rgb(232 156 146 / 0.12);
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: lowercase;
-  }
-  .pane__status { color: var(--color-rose); opacity: 0.9; }
-  .pane__date   { color: var(--color-muted); opacity: 0.65; }
-
-  .fab {
-    display: grid;
-    place-items: center;
-    width: 34px; height: 34px;
-    padding: 0;
-    border: 1px solid rgb(232 156 146 / 0.25);
-    background: var(--color-ink);
-    color: var(--color-bone);
-    font-family: var(--font-display);
-    font-size: 12px;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-    box-shadow: 3px 3px 0 rgb(0 0 0 / 0.45);
-  }
-  .fab:hover,
-  .fab:focus-visible {
-    border-color: var(--color-rose);
-    color: var(--color-rose);
-    outline: none;
-  }
-  .fab[aria-expanded='true'] {
-    border-color: var(--color-crimson);
-    background: var(--color-crimson-deep);
-    color: var(--color-paper);
-  }
-
-  @media (max-width: 600px) {
-    .pane-wrapper {
-      bottom: 10px; right: 10px;
-    }
-    .pane { width: 200px; }
-    .fab { width: 36px; height: 36px; font-size: 13px; }
-  }
-</style>

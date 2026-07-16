@@ -25,9 +25,9 @@
 
 <Modal {open} {onclose} title={mode === 'edit' ? 'edit pull quote' : 'insert pull quote'}>
   <form onsubmit={(e) => { e.preventDefault(); commit(); }} class="grid gap-3">
-    <label class="field">
-      <span class="lbl">quote text</span>
-      <textarea bind:value={text} class="inp" rows="4"
+    <label class="grid min-w-0 gap-2">
+      <span class="font-mono text-2xs tracking-meta text-muted">quote text</span>
+      <textarea bind:value={text} class="min-h-20 w-full resize-y rounded-none border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5 font-sans text-[15px] text-paper focus:outline-2 focus:outline-offset-2 focus:outline-rose" rows="4"
                 placeholder="the line worth pulling out"></textarea>
     </label>
   </form>

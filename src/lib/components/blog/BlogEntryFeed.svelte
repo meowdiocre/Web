@@ -17,12 +17,14 @@
   } = $props();
 </script>
 
-<section class="entries" aria-label="Entries">
-  <div class="entries__inner">
+<section class="px-[var(--gutter)] pt-3 pb-[clamp(72px,9vw,112px)]" aria-label="Entries">
+  <div class="mx-auto max-w-[880px]">
     {#if filteredCount === 0}
-      <div class="empty" role="status" aria-live="polite">
-        <p class="empty__reg">0/{filteredCount}</p>
-        <p class="empty__msg">nothing matched. try a broader keyword or clear the filter.</p>
+      <div class="grid gap-1.5 border-t border-[var(--rule)] pt-8 pb-2" role="status" aria-live="polite">
+        <p class="m-0 font-mono text-[10px] tracking-[0.18em] uppercase text-crimson-deep">0/{filteredCount}</p>
+        <p class="m-0 max-w-[52ch] font-serif text-[17px] leading-[1.45] text-muted-warm text-pretty">
+          nothing matched. try a broader keyword or clear the filter.
+        </p>
       </div>
     {:else}
       {#each entryGroups as group}
@@ -32,111 +34,29 @@
         {/each}
       {/each}
 
-      <div class="tail">
+      <div
+        class="mt-7 flex items-center justify-between gap-4 border-t border-[var(--rule)] pt-3.5 font-mono text-[11px] text-muted-warm max-[600px]:flex-col max-[600px]:items-start max-[600px]:gap-3"
+      >
         {#if remainingCount > 0}
-          <span class="tail__reg">{visibleCount}/{filteredCount}</span>
-          <button type="button" class="more" onclick={onShowMore} use:hoverSpring={{ scale: 1.02, press: 0.98 }}>
+          <span class="tracking-[0.14em] opacity-75">{visibleCount}/{filteredCount}</span>
+          <button
+            type="button"
+            class="group/more inline-flex cursor-pointer items-center gap-2 border-0 bg-transparent py-1 font-mono text-[11px] tracking-[0.06em] text-crimson-deep transition-[color,transform] duration-[120ms] ease-out hover:text-crimson focus-visible:text-crimson focus-visible:outline-none"
+            onclick={onShowMore}
+            use:hoverSpring={{ scale: 1.02, press: 0.98 }}
+          >
             <span>load {Math.min(remainingCount, 12)} more</span>
-            <PixelIcon name="arrow-right" size={12} />
+            <PixelIcon
+              name="arrow-right"
+              size={12}
+              class="transition-transform duration-[120ms] ease-out group-hover/more:translate-x-0.5 group-focus-visible/more:translate-x-0.5"
+            />
           </button>
         {:else}
-          <span class="tail__reg">{visibleCount}/{filteredCount}</span>
-          <span class="tail__eof" aria-label="end of feed">eof</span>
+          <span class="tracking-[0.14em] opacity-75">{visibleCount}/{filteredCount}</span>
+          <span class="tracking-[0.32em] uppercase text-crimson-deep opacity-85" aria-label="end of feed">eof</span>
         {/if}
       </div>
     {/if}
   </div>
 </section>
-
-<style>
-  .entries {
-    padding: 12px var(--gutter) clamp(72px, 9vw, 112px);
-  }
-
-  .entries__inner {
-    max-width: 880px;
-    margin: 0 auto;
-  }
-
-  .empty {
-    display: grid;
-    gap: 6px;
-    padding: 32px 0 8px;
-    border-top: 1px solid var(--rule);
-  }
-
-  .empty__reg {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-crimson-deep);
-  }
-
-  .empty__msg {
-    margin: 0;
-    max-width: 52ch;
-    font-family: var(--font-serif);
-    font-size: 17px;
-    line-height: 1.45;
-    color: var(--color-muted-warm);
-    text-wrap: pretty;
-  }
-
-  .tail {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-top: 28px;
-    padding-top: 14px;
-    border-top: 1px solid var(--rule);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--color-muted-warm);
-  }
-
-  .tail__reg {
-    letter-spacing: 0.14em;
-    opacity: 0.75;
-  }
-
-  .tail__eof {
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--color-crimson-deep);
-    opacity: 0.85;
-  }
-
-  .more {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-crimson-deep);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    transition: color 0.12s ease, transform 0.12s ease;
-  }
-  .more :global(.pixel-icon) { transition: transform 0.12s ease; }
-  .more:hover,
-  .more:focus-visible {
-    color: var(--color-crimson);
-    outline: none;
-  }
-  .more:hover :global(.pixel-icon),
-  .more:focus-visible :global(.pixel-icon) { transform: translateX(2px); }
-
-  @media (max-width: 600px) {
-    .tail {
-      align-items: flex-start;
-      flex-direction: column;
-      gap: 12px;
-    }
-  }
-</style>

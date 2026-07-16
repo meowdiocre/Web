@@ -1,16 +1,18 @@
 <script>
   import PixelIcon from '$lib/components/PixelIcon.svelte';
+  import PostThumbnail from '$lib/components/PostThumbnail.svelte';
 
   /**
    * @typedef {Object} Props
    * @property {string} href
    * @property {string} category
    * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
+   * @property {string|null} coverImageUrl
    * @property {string} title
    * @property {string} blurb
    */
   /** @type {Props} */
-  let { href, category, categoryIcon, title, blurb } = $props();
+  let { href, category, categoryIcon, coverImageUrl, title, blurb } = $props();
 </script>
 
 <a
@@ -23,6 +25,10 @@
     [clip-path:polygon(0_0,calc(100%-18px)_0,100%_18px,100%_100%,18px_100%,0_calc(100%-18px))]
   "
 >
+  {#if coverImageUrl}
+    <PostThumbnail src={coverImageUrl} variant="related" />
+  {/if}
+
   <span
     class="
       mb-3 inline-flex items-center gap-1.5

@@ -64,10 +64,14 @@
 </script>
 
 {#snippet navList()}
-  {#each sections as section (section.label)}
-    <div class="nav-section">
-      <p class="nav-section__label">{section.label}</p>
-      <ul class="nav-section__list">
+  <div class="space-y-[18px]">
+    {#each sections as section (section.label)}
+      <div>
+        <p
+          class="mb-1.5 flex items-center gap-2 font-mono text-[9px] tracking-[0.14em] text-muted
+                 after:h-px after:flex-1 after:bg-[var(--line-soft)] after:content-['']"
+        >{section.label}</p>
+        <ul class="m-0 flex list-none flex-col gap-0.5 p-0">
         {#each section.links as link (link.href)}
           {@const active = isActive(link)}
           <li>
@@ -75,19 +79,29 @@
               href={link.href}
               data-sveltekit-preload-data="tap"
               data-sveltekit-preload-code="hover"
-              class="nav-item"
-              class:nav-item--active={active}
-              class:nav-item--ext={link.external}
+              class="group relative grid min-h-11 grid-cols-[16px_1fr] items-center gap-2
+                     py-2 pr-2.5 pl-3 font-mono text-[12px] tracking-[0.06em] no-underline
+                     transition-[color,background-color] duration-[120ms]
+                     hover:bg-accent-wash hover:text-rose
+                     focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2
+                     focus-visible:outline-rose motion-reduce:duration-0
+                     {active
+                       ? `bg-accent-wash text-rose before:absolute before:inset-y-1
+                          before:left-0 before:w-0.5 before:bg-crimson before:content-['']`
+                       : 'text-muted'}"
               aria-current={active ? 'page' : undefined}
             >
-              <span class="nav-item__icon" aria-hidden="true"><PixelIcon name={link.icon} size={14} /></span>
-              <span class="nav-item__text">{link.label}</span>
+              <span class="inline-flex items-center leading-none group-hover:text-rose" aria-hidden="true">
+                <PixelIcon name={link.icon} size={14} />
+              </span>
+              <span>{link.label}</span>
             </a>
           </li>
         {/each}
-      </ul>
-    </div>
-  {/each}
+        </ul>
+      </div>
+    {/each}
+  </div>
 {/snippet}
 
 {#snippet brand(small = false)}
@@ -106,10 +120,18 @@
 
 {#snippet account()}
   {#if user}
-    <div class="account">
-      <p class="account__handle">@{user.githubLogin}</p>
+    <div>
+      <p class="mb-2 font-mono text-[10px] tracking-[0.1em] text-muted">@{user.githubLogin}</p>
       <form method="POST" action="/admin/logout">
-        <button class="account__signout" type="submit">
+        <button
+          class="inline-flex min-h-11 cursor-pointer items-center gap-2 border border-accent-line
+                 bg-transparent px-2.5 py-1.5 font-mono text-[11px] tracking-[0.1em] text-rose
+                 transition-[background-color,border-color,color] duration-[120ms]
+                 hover:border-crimson-deep hover:bg-crimson-deep hover:text-paper
+                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose
+                 motion-reduce:duration-0"
+          type="submit"
+        >
           <PixelIcon name="logout" size={14} />
           <span>sign out</span>
         </button>
@@ -132,7 +154,9 @@
     onclick={() => (open = !open)}
     class="inline-flex min-h-11 items-center gap-2 font-mono text-[11px] tracking-[0.08em]
            border border-[var(--line-soft)] px-3 py-2 text-paper
-           hover:text-rose hover:border-rose transition-colors"
+           hover:text-rose hover:border-rose transition-colors duration-[120ms]
+           focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose
+           motion-reduce:duration-0"
   >
     <PixelIcon name={open ? 'close' : 'menu'} size={16} />
     <span>{open ? 'close' : 'menu'}</span>
@@ -167,33 +191,3 @@
     {@render account()}
   </div>
 </aside>
-
-<style>
-  :global(.account__handle) {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--color-muted);
-    margin: 0 0 8px;
-  }
-  :global(.account__signout) {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 6px 10px;
-    background: transparent;
-    color: var(--color-rose);
-    border: 1px solid var(--admin-accent-line);
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-  :global(.account__signout:hover) {
-    background: var(--color-crimson-deep);
-    color: var(--color-paper);
-    border-color: var(--color-crimson-deep);
-  }
-</style>

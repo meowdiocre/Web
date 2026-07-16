@@ -6,26 +6,16 @@
 
   /** @type {Props} */
   let { pos } = $props();
+
+  const positionClasses = {
+    tl: 'top-[clamp(18px,3vw,32px)] left-[clamp(18px,3vw,32px)]',
+    tr: 'top-[clamp(18px,3vw,32px)] right-[clamp(18px,3vw,32px)] -scale-x-100',
+    bl: 'bottom-[clamp(18px,3vw,32px)] left-[clamp(18px,3vw,32px)] -scale-y-100',
+    br: 'bottom-[clamp(18px,3vw,32px)] right-[clamp(18px,3vw,32px)] scale-[-1]'
+  };
 </script>
 
 <svg
-  class="bracket {pos}"
+  class="pointer-events-none absolute z-[1] size-[26px] text-bone opacity-[0.28] max-[760px]:hidden {positionClasses[pos]}"
   aria-hidden="true"
 ><use href="#bracket" /></svg>
-
-<style>
-  .bracket {
-    position: absolute;
-    width: 26px; height: 26px;
-    color: var(--color-bone);
-    opacity: 0.28;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .tl { top: clamp(18px, 3vw, 32px); left: clamp(18px, 3vw, 32px); }
-  .tr { top: clamp(18px, 3vw, 32px); right: clamp(18px, 3vw, 32px); transform: scaleX(-1); }
-  .bl { bottom: clamp(18px, 3vw, 32px); left: clamp(18px, 3vw, 32px); transform: scaleY(-1); }
-  .br { bottom: clamp(18px, 3vw, 32px); right: clamp(18px, 3vw, 32px); transform: scale(-1, -1); }
-
-  @media (max-width: 760px) { .bracket { display: none; } }
-</style>

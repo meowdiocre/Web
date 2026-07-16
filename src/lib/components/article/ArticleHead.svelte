@@ -12,6 +12,7 @@
    * @typedef {Object} Props
    * @property {string} category
    * @property {import('$lib/icons/icon-names').CategoryIconName} categoryIcon
+   * @property {string|null} coverImageUrl
    * @property {TitleParts} title
    * @property {string} dek
    * @property {Meta} meta
@@ -19,9 +20,10 @@
 
   import { reveal } from '$lib/motion/reveal';
   import PixelIcon from '$lib/components/PixelIcon.svelte';
+  import PostThumbnail from '$lib/components/PostThumbnail.svelte';
 
   /** @type {Props} */
-  let { category, categoryIcon, title, dek, meta } = $props();
+  let { category, categoryIcon, coverImageUrl, title, dek, meta } = $props();
 </script>
 
 <section
@@ -37,12 +39,12 @@
       <a href="/blog" class="hover:text-[var(--accent)]">Writing</a>
     </p>
 
-    <span class="kicker" use:reveal={{ y: 10, delay: 0.06 }}>
+    <span class="mb-[18px] inline-flex -rotate-1 items-center gap-1.5 border border-[var(--rule)] bg-transparent px-[11px] py-[5px] font-display text-2xs tracking-[0.22em] text-[var(--fg)] uppercase [clip-path:polygon(6%_0,100%_0,96%_100%,0_100%)]" use:reveal={{ y: 10, delay: 0.06 }}>
       <PixelIcon name={categoryIcon} size={10} />
       {category}
     </span>
 
-    <h1 id="article-title" class="title" use:reveal={{ y: 16, delay: 0.12 }}>
+    <h1 id="article-title" class="mb-6 min-w-0 font-display text-[clamp(36px,5.2vw,72px)] leading-[1.04] font-normal tracking-[-0.02em] text-[var(--fg)] uppercase [overflow-wrap:anywhere] [&_em]:text-[var(--accent)] [&_em]:not-italic max-[600px]:text-[clamp(34px,9.5vw,58px)] max-[360px]:text-[clamp(28px,9vw,40px)]" use:reveal={{ y: 16, delay: 0.12 }}>
       {title.pre}<em>{title.em}</em>{title.post}
     </h1>
 
@@ -55,63 +57,13 @@
       use:reveal={{ y: 14, delay: 0.18 }}
     >{dek}</p>
 
-    <div class="meta" use:reveal={{ y: 12, delay: 0.24 }}>
+    {#if coverImageUrl}
+      <PostThumbnail src={coverImageUrl} variant="hero" />
+    {/if}
+
+    <div class="flex flex-wrap gap-x-7 gap-y-3 border-y border-[var(--rule)] py-[18px] font-mono text-xs tracking-label text-muted uppercase [&_b]:font-medium [&_b]:text-[var(--fg)] max-[360px]:gap-x-[18px] max-[360px]:gap-y-2 max-[360px]:text-xs-plus" use:reveal={{ y: 12, delay: 0.24 }}>
       <span>By <b>{meta.author}</b></span>
       <span>{meta.date}</span>
     </div>
   </div>
 </section>
-
-<style>
-  .kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 18px;
-    padding: 5px 11px;
-    background: transparent;
-    color: var(--fg);
-    border: 1px solid var(--rule);
-    font-family: var(--font-display);
-    font-size: 10px;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    transform: rotate(-1deg);
-    clip-path: polygon(6% 0, 100% 0, 96% 100%, 0 100%);
-  }
-
-  .title {
-    font-family: var(--font-display);
-    font-weight: 400;
-    font-size: clamp(36px, 5.2vw, 72px);
-    line-height: 1.04;
-    letter-spacing: -0.02em;
-    text-transform: uppercase;
-    color: var(--fg);
-    margin-bottom: 24px;
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-  .title em {
-    font-style: normal;
-    color: var(--accent);
-  }
-
-  @media (max-width: 600px) { .title { font-size: clamp(34px, 9.5vw, 58px); line-height: 1.04; } }
-  @media (max-width: 360px) { .title { font-size: clamp(28px, 9vw, 40px); } }
-
-  .meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px 28px;
-    padding: 18px 0;
-    border-block: 1px solid var(--rule);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    color: var(--color-muted);
-    text-transform: uppercase;
-  }
-  .meta b { color: var(--fg); font-weight: 500; }
-  @media (max-width: 360px) { .meta { font-size: 11px; gap: 8px 18px; } }
-</style>

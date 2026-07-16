@@ -9,7 +9,8 @@ export default defineConfig({
     alias: {
       $lib: resolve('src/lib'),
       $db:  resolve('src/lib/server/db'),
-      $app: resolve('src/test/app-stub')
+      $app: resolve('src/test/app-stub'),
+      '$env/dynamic/private': resolve('src/test/private-env-stub.ts')
     }
   },
   test: {

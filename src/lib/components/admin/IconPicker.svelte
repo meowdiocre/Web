@@ -53,35 +53,40 @@
   function optionLabel(iconName) {
     return recommended.find((option) => option.value === iconName)?.label ?? formatIconLabel(iconName);
   }
+
+  const labelClass = 'font-mono text-[10px] tracking-[0.12em] text-muted';
+  const messageClass = 'min-h-[1lh] font-mono text-[10px] tracking-[0.04em] text-muted';
 </script>
 
-<fieldset class="icon-picker" {disabled}>
-  <legend class="lbl">{label}</legend>
+<fieldset class="group grid min-w-0 gap-2 border-0 p-0" {disabled}>
+  <legend class={labelClass}>{label}</legend>
 
-  <label class="icon-picker__search">
-    <span class="lbl">search icons</span>
+  <label class="grid gap-2">
+    <span class={labelClass}>search icons</span>
     <input
       type="search"
       bind:value={query}
-      class="icon-picker__search-input"
+      class="min-h-11 w-full border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5
+             font-sans text-[15px] text-paper outline outline-2 outline-transparent outline-offset-1
+             focus-visible:outline-rose disabled:cursor-not-allowed disabled:opacity-[0.55]"
       placeholder="type an icon name"
       autocomplete="off"
     />
   </label>
 
-  <p class="icon-picker__count" aria-live="polite">
+  <p class={messageClass} aria-live="polite">
     {normalizedQuery ? `${resultCount} icons found` : `${recommendedNames.length} recommended icons`}
   </p>
 
   {#if normalizedQuery && resultCount === 0}
-    <p class="icon-picker__empty">No icons found.</p>
+    <p class={messageClass}>No icons found.</p>
   {/if}
 
-  <div class="icon-picker__grid">
+  <div class="grid max-h-[360px] grid-cols-2 gap-2 overflow-auto sm:grid-cols-4">
     {#each visibleNames as iconName (iconName)}
-      <label class="icon-picker__option" title={iconName}>
+      <label class="group/option min-w-0 cursor-pointer group-disabled:cursor-not-allowed" title={iconName}>
         <input
-          class="sr-only"
+          class="peer sr-only"
           type="radio"
           {name}
           value={iconName}
@@ -89,137 +94,24 @@
           required
           onchange={() => (selected = iconName)}
         />
-        <span class="icon-picker__content">
+        <span
+          class="flex min-h-11 min-w-0 items-center gap-2 border border-[var(--line-soft)] bg-ink-2
+                 px-2.5 py-[9px] font-mono text-[10px] tracking-[0.04em] text-muted
+                 transition-[background-color,border-color,color,transform] duration-[120ms]
+                 group-hover/option:border-rose group-hover/option:text-rose group-active/option:translate-y-px
+                 group-disabled:pointer-events-none group-disabled:opacity-[0.55]
+                 peer-checked:border-rose peer-checked:bg-accent-wash peer-checked:text-paper
+                 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2
+                 peer-focus-visible:outline-rose motion-reduce:duration-0"
+        >
           <PixelIcon name={iconName} size={20} />
-          <span class="icon-picker__name">{optionLabel(iconName)}</span>
+          <span class="min-w-0 truncate">{optionLabel(iconName)}</span>
         </span>
       </label>
     {/each}
   </div>
 
   {#if resultCount > RESULT_LIMIT}
-    <p class="icon-picker__limit">Showing the first 80 matches. Refine your search.</p>
+    <p class={messageClass}>Showing the first 80 matches. Refine your search.</p>
   {/if}
 </fieldset>
-
-<style>
-  .icon-picker {
-    display: grid;
-    gap: 8px;
-    min-width: 0;
-    padding: 0;
-    border: 0;
-  }
-
-  .icon-picker__search {
-    display: grid;
-    gap: 8px;
-  }
-
-  .icon-picker__search-input {
-    width: 100%;
-    min-height: 44px;
-    padding: 10px 12px;
-    border: 1px solid var(--line-soft);
-    outline: 2px solid transparent;
-    outline-offset: 1px;
-    background: var(--color-ink-2);
-    color: var(--color-paper);
-    font-family: var(--font-sans);
-    font-size: 15px;
-  }
-
-  .icon-picker__search-input:focus-visible {
-    outline-color: var(--color-rose);
-  }
-
-  .icon-picker__count,
-  .icon-picker__empty,
-  .icon-picker__limit {
-    min-height: 1lh;
-    color: var(--color-muted);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.04em;
-  }
-
-  .icon-picker__grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    max-height: 360px;
-    overflow: auto;
-  }
-
-  .icon-picker__option {
-    min-width: 0;
-    cursor: pointer;
-  }
-
-  .icon-picker__content {
-    display: flex;
-    min-height: 44px;
-    min-width: 0;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 10px;
-    border: 1px solid var(--line-soft);
-    background: var(--color-ink-2);
-    color: var(--color-muted);
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.04em;
-    transition:
-      background-color 120ms cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 120ms cubic-bezier(0.16, 1, 0.3, 1),
-      color 120ms cubic-bezier(0.16, 1, 0.3, 1),
-      transform 100ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .icon-picker__name {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .icon-picker__option:has(input:checked) .icon-picker__content {
-    border-color: var(--color-rose);
-    background: var(--admin-accent-wash);
-    color: var(--color-paper);
-  }
-
-  .icon-picker__option:has(input:focus-visible) .icon-picker__content {
-    outline: 2px solid var(--color-rose);
-    outline-offset: 2px;
-  }
-
-  .icon-picker__option:active .icon-picker__content {
-    transform: translateY(1px);
-  }
-
-  .icon-picker:disabled .icon-picker__option {
-    cursor: not-allowed;
-  }
-
-  .icon-picker:disabled .icon-picker__search-input,
-  .icon-picker:disabled .icon-picker__content {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .icon-picker__option:hover .icon-picker__content {
-      border-color: var(--color-rose);
-      color: var(--color-rose);
-    }
-  }
-
-  @media (min-width: 40rem) {
-    .icon-picker__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .icon-picker__content { transition-duration: 0ms; }
-  }
-</style>

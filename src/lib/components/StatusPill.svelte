@@ -9,4 +9,8 @@
   let { value, className = '' } = $props();
 </script>
 
-<span class="status status--{value} {className}">{value}</span>
+<span
+  class="inline-block border border-current px-2 py-0.5 font-mono text-[10px] tracking-[0.1em]
+         {value === 'draft' ? 'text-muted' : value === 'published' ? 'text-rose' : ''}
+         {className}"
+>{value}</span>

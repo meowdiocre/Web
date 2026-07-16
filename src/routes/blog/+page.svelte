@@ -31,28 +31,49 @@
 
 <Nav current="writing" />
 
-<main class="layer">
+<main class="layer relative z-[1]">
   {#await data.entryGroups}
     <BlogPageSkeleton />
   {:then entryGroups}
-    <section class="head" aria-labelledby="journal-title">
-      <div class="head__inner">
+    <section
+      class="px-[var(--gutter)] pt-[clamp(56px,9vw,112px)] pb-[clamp(28px,4vw,48px)] max-[600px]:pt-[clamp(40px,8vw,64px)]"
+      aria-labelledby="journal-title"
+    >
+      <div
+        class="mx-auto grid max-w-[880px] grid-cols-[minmax(0,1.45fr)_minmax(0,0.95fr)] items-start gap-[clamp(28px,4.5vw,64px)] max-[900px]:grid-cols-1 max-[900px]:gap-9"
+      >
         <div class="head__title min-w-0" use:reveal={{ y: 18 }}>
-          <h1 id="journal-title" class="head__title-row">
-            <span class="head__title-inner">writing<span class="dot">.</span></span>
+          <h1
+            id="journal-title"
+            class="mb-[clamp(18px,2vw,26px)] flex min-w-0 items-baseline font-display text-[clamp(48px,8vw,112px)] leading-[0.92] tracking-[-0.035em] lowercase text-paper-ink [overflow-wrap:anywhere]"
+          >
+            <span>writing<span class="text-crimson-deep">.</span></span>
           </h1>
           <Lede palette="ink">
             Long-form essays and lab notes on reverse engineering, OS internals, anti-cheat infrastructure, web exploitation, and breaking the capitalist tech giants.
           </Lede>
         </div>
 
-        <div class="head__pol" use:reveal={{ y: 18, delay: 0.08 }}>
+        <div
+          class="mt-1 w-full max-w-[360px] justify-self-end self-start max-[900px]:order-first max-[900px]:mt-0 max-[900px]:max-w-[280px] max-[900px]:justify-self-start max-[600px]:max-w-[240px]"
+          use:reveal={{ y: 18, delay: 0.08 }}
+        >
           <Polaroid src="/rei.jpg" alt="" prompt=">" caption="page_fault" rotate={-2.4} />
         </div>
 
-        <aside class="epigraph" role="note" aria-label="Epigraph" use:reveal={{ y: 14, delay: 0.16 }}>
-          <span class="pilcrow" aria-hidden="true"><PixelIcon name="script" size={14} /></span>
-          <p class="line">Learn the rules like an expert, <em>so you can break them like an artist.</em></p>
+        <aside
+          class="col-span-full mt-[clamp(28px,3.6vw,44px)] grid max-w-[58ch] grid-cols-[20px_1fr] items-baseline gap-3 border-t border-crimson-deep pt-4 max-[600px]:mt-6 max-[600px]:grid-cols-[16px_1fr] max-[600px]:gap-2.5 max-[600px]:pt-3"
+          role="note"
+          aria-label="Epigraph"
+          use:reveal={{ y: 14, delay: 0.16 }}
+        >
+          <span
+            class="inline-flex translate-y-[0.06em] items-center self-start text-crimson-deep opacity-80"
+            aria-hidden="true"
+          ><PixelIcon name="script" size="clamp(12px, 3vw, 14px)" /></span>
+          <p
+            class="font-italic text-[clamp(19px,2.4vw,26px)] leading-[1.32] italic text-paper-ink-soft text-pretty max-[600px]:text-[19px]"
+          >Learn the rules like an expert, <em class="italic text-crimson-deep">so you can break them like an artist.</em></p>
         </aside>
       </div>
     </section>
@@ -63,8 +84,13 @@
       bind:selectedCategory={categoryFilter}
     />
   {:catch}
-    <section class="head" aria-labelledby="journal-title">
-      <div class="head__inner">
+    <section
+      class="px-[var(--gutter)] pt-[clamp(56px,9vw,112px)] pb-[clamp(28px,4vw,48px)] max-[600px]:pt-[clamp(40px,8vw,64px)]"
+      aria-labelledby="journal-title"
+    >
+      <div
+        class="mx-auto grid max-w-[880px] grid-cols-[minmax(0,1.45fr)_minmax(0,0.95fr)] items-start gap-[clamp(28px,4.5vw,64px)] max-[900px]:grid-cols-1 max-[900px]:gap-9"
+      >
         <div class="min-w-0">
           <PageKicker label="Archive unavailable" tone="muted-warm" />
           <PageTitle text="writing" id="journal-title" tone="ink" dotTone="crimson-deep" />
@@ -78,83 +104,3 @@
 </main>
 
 <Footer variant="paper" />
-
-<style>
-  .head { padding: clamp(56px, 9vw, 112px) var(--gutter) clamp(28px, 4vw, 48px); }
-  .head__inner {
-    max-width: 880px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
-    gap: clamp(28px, 4.5vw, 64px);
-    align-items: start;
-  }
-  .head__title-row {
-    display: flex;
-    align-items: baseline;
-    margin: 0 0 clamp(18px, 2vw, 26px);
-    font-family: var(--font-display);
-    font-size: clamp(48px, 8vw, 112px);
-    line-height: 0.92;
-    letter-spacing: -0.035em;
-    color: #2a1c14;
-    text-transform: lowercase;
-    overflow-wrap: anywhere;
-    min-width: 0;
-  }
-  .head__title-row .dot {
-    color: var(--color-crimson-deep);
-  }
-  .head__pol {
-    align-self: start;
-    margin-top: 4px;
-    width: 100%;
-    max-width: 360px;
-    justify-self: end;
-  }
-
-  .epigraph {
-    grid-column: 1 / -1;
-    margin-top: clamp(28px, 3.6vw, 44px);
-    padding: 4px 0 4px clamp(16px, 1.8vw, 22px);
-    border-left: 2px solid var(--color-crimson-deep);
-    display: grid;
-    grid-template-columns: 20px 1fr;
-    gap: 12px;
-    align-items: baseline;
-    max-width: 58ch;
-  }
-  .epigraph .pilcrow {
-    display: inline-flex;
-    align-items: center;
-    color: var(--color-crimson-deep);
-    opacity: 0.8;
-    align-self: start;
-    transform: translateY(0.06em);
-  }
-  .epigraph .line {
-    font-family: var(--font-italic);
-    font-style: italic;
-    font-size: clamp(19px, 2.4vw, 26px);
-    line-height: 1.32;
-    color: #3a3027;
-    text-wrap: pretty;
-  }
-  .epigraph .line em { color: var(--color-crimson-deep); font-style: italic; }
-  @media (max-width: 900px) {
-    .head__inner { grid-template-columns: 1fr; gap: 36px; }
-    .head__pol   { order: -1; justify-self: start; max-width: 280px; margin-top: 0; }
-  }
-  @media (max-width: 600px) {
-    .head { padding-top: clamp(40px, 8vw, 64px); }
-    .head__pol { max-width: 240px; }
-    .epigraph {
-      grid-template-columns: 16px 1fr;
-      gap: 10px;
-      margin-top: 24px;
-      padding-left: 12px;
-    }
-    .epigraph .pilcrow :global(.pixel-icon) { width: 12px; height: 12px; }
-    .epigraph .line { font-size: 19px; }
-  }
-</style>

@@ -104,10 +104,10 @@
 <svelte:window onkeydown={onKey} />
 
 {#if prefixActive}
-  <div class="prefix" role="status" aria-live="polite" transition:fade={{ duration: 120 }}>
-    <span class="key">C-b</span>
-    <span class="state">prefix</span>
-    <span class="cur" aria-hidden="true">_</span>
+  <div class="fixed bottom-[clamp(14px,2.4vw,24px)] left-[clamp(14px,2.4vw,24px)] z-[70] inline-flex items-center gap-2 bg-rose px-2.5 py-1.5 font-terminal text-xs tracking-[0.1em] text-ink lowercase shadow-hard-sm [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_8px),calc(100%_-_8px)_100%,0_100%)] max-[460px]:bottom-2.5 max-[460px]:left-2.5 max-[460px]:px-2 max-[460px]:py-[5px] max-[460px]:text-xs-plus" role="status" aria-live="polite" transition:fade={{ duration: 120 }}>
+    <span class="bg-ink px-1.5 py-px font-mono tracking-[0.02em] text-rose">C-b</span>
+    <span class="opacity-85">prefix</span>
+    <span class="inline-block w-[0.6ch] animate-blink text-crimson motion-reduce:animate-none motion-reduce:opacity-100" aria-hidden="true">_</span>
   </div>
 {/if}
 
@@ -142,45 +142,3 @@
     <li><code>Esc</code> &nbsp;cancel prefix</li>
   </ul>
 </Toast>
-
-<style>
-  .prefix {
-    position: fixed;
-    bottom: clamp(14px, 2.4vw, 24px);
-    left:   clamp(14px, 2.4vw, 24px);
-    z-index: 70;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    background: var(--color-rose);
-    color: var(--color-ink);
-    font-family: var(--font-terminal);
-    font-size: 12px;
-    letter-spacing: 0.10em;
-    text-transform: lowercase;
-    box-shadow: 4px 4px 0 rgb(0 0 0 / 0.45);
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
-  }
-  .prefix .key {
-    background: var(--color-ink);
-    color: var(--color-rose);
-    font-family: var(--font-mono);
-    padding: 1px 6px;
-    letter-spacing: 0.02em;
-  }
-  .prefix .state { opacity: 0.85; }
-  .prefix .cur {
-    display: inline-block;
-    width: 0.6ch;
-    color: var(--color-crimson);
-    animation: var(--animate-blink);
-  }
-
-  @media (max-width: 460px) {
-    .prefix { font-size: 11px; padding: 5px 8px; bottom: 10px; left: 10px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .prefix .cur { animation: none; opacity: 1; }
-  }
-</style>

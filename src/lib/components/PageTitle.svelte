@@ -10,7 +10,7 @@
   /** @type {Props} */
   let { text, id, dotTone = 'crimson', tone = 'paper' } = $props();
 
-  const textColour = $derived(tone === 'paper' ? 'text-paper' : 'text-[#2a1c14]');
+  const textColour = $derived(tone === 'paper' ? 'text-paper' : 'text-paper-ink');
   const dotColour  = $derived(dotTone === 'crimson-deep' ? 'text-crimson-deep' : 'text-crimson');
 </script>
 

@@ -10,7 +10,8 @@ describe('blog category icons', () => {
       title: 'A',
       desc: 'A post',
       category: 'Reverse',
-      categoryIcon: 'bug' as const
+      categoryIcon: 'bug' as const,
+      coverImageUrl: 'https://example.com/a.webp'
     }]
   }];
 
@@ -20,5 +21,7 @@ describe('blog category icons', () => {
       { key: 'reverse', label: 'Reverse', icon: 'bug', count: 1 }
     ]);
     expect(groupEntriesByYear(entries)[0].entries[0].categoryIcon).toBe('bug');
+    expect(groupEntriesByYear(entries)[0].entries[0].coverImageUrl)
+      .toBe('https://example.com/a.webp');
   });
 });

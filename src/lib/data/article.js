@@ -212,6 +212,7 @@ export const article = {
         'The lifter ships under MIT in a few weeks, after I clean up the trace recorder. It is ' +
         'not the only path; it is the path I had patience for.'
     },
+    { type: 'end-slug', text: '4,720 words · 2026 · 03 · 14' }
   ],
 
   footnotes: [

@@ -11,7 +11,7 @@
 
   const colour = $derived(
     palette === 'ink'
-      ? (tone === 'primary' ? 'text-[#3a3027]' : 'text-muted-warm')
+      ? (tone === 'primary' ? 'text-paper-ink-soft' : 'text-muted-warm')
       : (tone === 'primary' ? 'text-bone'      : 'text-muted')
   );
   const margin = $derived(tone === 'primary' ? 'mt-[26px]' : 'mt-3.5');

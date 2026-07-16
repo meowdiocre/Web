@@ -19,6 +19,9 @@
 
   /** @type {AdminPost|null} */
   let deleteCandidate = $state(null);
+
+  const headingCellClass = 'py-3 pr-4 font-mono text-[10px] tracking-[0.12em] text-muted';
+  const bodyCellClass = 'py-[18px] pr-4 align-top';
 </script>
 
 {#snippet postActions(post)}
@@ -71,17 +74,17 @@
     <table class="hidden md:table w-full text-left">
       <thead>
         <tr class="border-b border-[var(--line-soft)]">
-          <th class="th">title</th>
-          <th class="th w-[120px]">status</th>
-          <th class="th w-[160px]">category</th>
-          <th class="th w-[90px]">updated</th>
-          <th class="th w-[60px]"></th>
+          <th class={headingCellClass}>title</th>
+          <th class="{headingCellClass} w-[120px]">status</th>
+          <th class="{headingCellClass} w-[160px]">category</th>
+          <th class="{headingCellClass} w-[90px]">updated</th>
+          <th class="{headingCellClass} w-[60px]"></th>
         </tr>
       </thead>
       <tbody>
         {#each posts as post (post.id)}
-          <tr class="row">
-            <td class="td">
+          <tr class="border-b border-[var(--line-soft)] transition-colors duration-[120ms] hover:bg-paper/[0.03] motion-reduce:duration-0">
+            <td class={bodyCellClass}>
               <div class="pr-4">
                 <a href="/admin/posts/{post.id}/edit" class="hover:text-rose">
                   <b class="block font-serif font-semibold text-[16px]">{post.title}</b>
@@ -89,16 +92,16 @@
                 <span class="font-mono text-[11px] tracking-[0.1em] text-muted">/{post.slug}</span>
               </div>
             </td>
-            <td class="td"><StatusPill value={post.status} /></td>
-            <td class="td">
+            <td class={bodyCellClass}><StatusPill value={post.status} /></td>
+            <td class={bodyCellClass}>
               <p class="flex items-center gap-2 font-mono text-[11px] tracking-[0.04em]">
                 <PixelIcon name={post.categoryIcon} size={13} />
                 <span>{post.categoryLabel}</span>
               </p>
               <p class="font-mono text-[10px] tracking-[0.1em] text-muted">/{post.categorySlug}</p>
             </td>
-            <td class="td font-mono text-[11px] text-muted">{formatRelativeAge(post.updatedAt)}</td>
-            <td class="td text-right">
+            <td class="{bodyCellClass} font-mono text-[11px] text-muted">{formatRelativeAge(post.updatedAt)}</td>
+            <td class="{bodyCellClass} text-right">
               <ActionMenu label="Post actions">{@render postActions(post)}</ActionMenu>
             </td>
           </tr>
@@ -151,24 +154,3 @@
 <form id="delete-post-form" method="POST" action="?/delete" class="hidden">
   <input type="hidden" name="postId" value={deleteCandidate?.id ?? ''} />
 </form>
-
-<style>
-  :global(.th) {
-    padding: 12px 16px 12px 0;
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    color: var(--color-muted);
-  }
-  :global(.td) {
-    padding: 18px 16px 18px 0;
-    vertical-align: top;
-  }
-  :global(.row) {
-    border-bottom: 1px solid var(--line-soft);
-    transition: background 0.12s;
-  }
-  :global(.row:hover) {
-    background: rgba(245, 239, 224, 0.03);
-  }
-</style>

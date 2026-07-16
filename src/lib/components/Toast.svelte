@@ -43,99 +43,26 @@
 
 {#if open}
   <div
-    class="toast"
+    class="fixed right-[clamp(14px,2.4vw,24px)] bottom-[clamp(14px,2.4vw,24px)] z-[70] min-w-[min(280px,calc(100vw-28px))] max-w-[min(440px,calc(100vw-28px))] border border-accent-line border-b-2 border-b-dashed border-b-accent-line-strong bg-overlay font-terminal text-[13px] leading-[1.45] tracking-[0.02em] text-bone shadow-overlay backdrop-blur-[14px] backdrop-saturate-[1.6] [clip-path:polygon(0_0,100%_0,100%_calc(100%_-_12px),calc(100%_-_12px)_100%,0_100%)] motion-reduce:transition-none max-[460px]:inset-x-2.5 max-[460px]:bottom-2.5 max-[460px]:max-w-none max-[460px]:text-xs"
     role="status"
     aria-live="polite"
     transition:fly={{ y: 14, duration: 220 }}
   >
-    <div class="head">
-      <span class="tag">
-        <span class="g" aria-hidden="true">{glyph}</span>{tag}
+    <div class="flex items-center gap-2 border-b border-dashed border-rose/20 py-2 pr-2 max-[460px]:py-1.5 max-[460px]:pr-1.5">
+      <span class="inline-flex h-[22px] items-center gap-1.5 bg-rose px-[9px] text-xs tracking-[0.1em] text-ink lowercase">
+        <span class="translate-y-px font-display text-[13px] text-crimson" aria-hidden="true">{glyph}</span>{tag}
       </span>
-      <button class="close" type="button" aria-label="Dismiss notification" onclick={dismiss}>
+      <button class="ml-auto grid size-11 cursor-pointer place-items-center border border-accent-line bg-transparent font-terminal text-lg leading-none text-bone transition-[background,color,border-color,transform] duration-100 hover:border-rose hover:bg-rose hover:text-ink focus-visible:border-rose focus-visible:bg-rose focus-visible:text-ink focus-visible:outline-none active:translate-y-px" type="button" aria-label="Dismiss notification" onclick={dismiss}>
         <span aria-hidden="true">×</span>
       </button>
     </div>
-    <div class="body">
+    <div class="body px-3.5 pt-3 pb-3.5 max-[460px]:px-3 max-[460px]:pt-2.5 max-[460px]:pb-3">
       {@render children?.()}
     </div>
   </div>
 {/if}
 
 <style>
-  .toast {
-    position: fixed;
-    bottom: clamp(14px, 2.4vw, 24px);
-    right:  clamp(14px, 2.4vw, 24px);
-    z-index: 70;
-    max-width: min(440px, calc(100vw - 28px));
-    min-width: min(280px, calc(100vw - 28px));
-
-    background: rgb(10 9 8 / 0.96);
-    color: var(--color-bone);
-    border: 1px solid rgb(232 156 146 / 0.30);
-    border-bottom: 2px dashed rgb(232 156 146 / 0.45);
-    backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px);
-    box-shadow: 0 18px 36px rgb(0 0 0 / 0.45);
-
-    font-family: var(--font-terminal);
-    font-size: 13px;
-    line-height: 1.45;
-    letter-spacing: 0.02em;
-
-    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
-  }
-
-  .head {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 8px 8px 0;
-    border-bottom: 1px dashed rgb(232 156 146 / 0.18);
-  }
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 22px;
-    padding: 0 9px;
-    background: var(--color-rose);
-    color: var(--color-ink);
-    letter-spacing: 0.10em;
-    text-transform: lowercase;
-    font-size: 12px;
-  }
-  .tag .g {
-    color: var(--color-crimson);
-    font-family: var(--font-display);
-    font-size: 13px;
-    transform: translateY(0.5px);
-  }
-
-  .close {
-    margin-left: auto;
-    width: 32px; height: 32px;
-    display: grid; place-items: center;
-    color: var(--color-bone);
-    border: 1px solid rgb(232 156 146 / 0.30);
-    background: transparent;
-    font-family: var(--font-terminal);
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    transition: background 0.12s, color 0.12s, border-color 0.12s;
-  }
-  .close:hover,
-  .close:focus-visible {
-    background: var(--color-rose);
-    color: var(--color-ink);
-    border-color: var(--color-rose);
-    outline: none;
-  }
-  .close:active { transform: translateY(1px); }
-
-  .body { padding: 12px 14px 14px; }
   .body :global(p) {
     margin: 0 0 6px;
     color: var(--color-bone);
@@ -166,22 +93,11 @@
   .body :global(code) {
     font-family: var(--font-mono);
     font-size: 12px;
-    background: rgb(232 156 146 / 0.12);
+    background: var(--color-accent-wash-strong);
     color: var(--color-rose);
     padding: 1px 6px;
-    border: 1px solid rgb(232 156 146 / 0.22);
+    border: 1px solid var(--color-accent-line);
   }
   .body :global(em) { color: var(--color-paper); font-style: italic; }
   .body :global(b)  { color: var(--color-paper); font-weight: 500; }
-
-  @media (max-width: 460px) {
-    .toast { font-size: 12px; bottom: 10px; right: 10px; left: 10px; max-width: none; }
-    .head  { padding: 6px 6px 6px 0; }
-    .body  { padding: 10px 12px 12px; }
-    .close { width: 36px; height: 36px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .toast { transition: none; }
-  }
 </style>

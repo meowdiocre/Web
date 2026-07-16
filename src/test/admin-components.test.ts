@@ -1,14 +1,17 @@
 // @vitest-environment happy-dom
 import '@testing-library/jest-dom/vitest';
-import { fireEvent, render, screen, within } from '@testing-library/svelte/pure';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte/pure';
 import { createRawSnippet } from 'svelte';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import AdminButton from '$lib/components/admin/AdminButton.svelte';
 import ActionMenu from '$lib/components/admin/ActionMenu.svelte';
 import ActionMenuItem from '$lib/components/admin/ActionMenuItem.svelte';
 import CategoryForm from '$lib/components/admin/CategoryForm.svelte';
 import CategoryIconPicker from '$lib/components/admin/CategoryIconPicker.svelte';
 import IconPicker from '$lib/components/admin/IconPicker.svelte';
+import ThumbnailField from '$lib/components/admin/ThumbnailField.svelte';
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe('admin controls', () => {
   it('renders a labeled action link', () => {
@@ -112,5 +115,50 @@ describe('admin controls', () => {
 
     expect(picker.getAllByRole('radio')).toHaveLength(80);
     expect(picker.getByText('Showing the first 80 matches. Refine your search.')).toBeInTheDocument();
+  });
+
+  it('uploads a thumbnail and submits its returned URL', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(
+      JSON.stringify({ url: 'https://blob.example/thumb.webp' }),
+      { status: 200, headers: { 'content-type': 'application/json' } }
+    ));
+    vi.stubGlobal('fetch', fetchMock);
+
+    const { container } = render(ThumbnailField, { value: '' });
+    const field = within(container);
+    const file = new File(['image'], 'thumb.webp', { type: 'image/webp' });
+    await fireEvent.change(field.getByLabelText('upload thumbnail'), { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(field.getByRole('img', { name: 'thumbnail preview' }))
+        .toHaveAttribute('src', 'https://blob.example/thumb.webp');
+      expect(field.getByLabelText('thumbnail url')).toHaveValue('https://blob.example/thumb.webp');
+    });
+    const body = fetchMock.mock.calls[0][1].body as FormData;
+    expect(body.get('purpose')).toBe('thumbnail');
+  });
+
+  it('removes a selected thumbnail', async () => {
+    const { container } = render(ThumbnailField, { value: 'https://example.com/thumb.jpg' });
+    const field = within(container);
+
+    await fireEvent.click(field.getByRole('button', { name: 'remove thumbnail' }));
+
+    expect(field.queryByRole('img', { name: 'thumbnail preview' })).not.toBeInTheDocument();
+    expect(field.getByLabelText('thumbnail url')).toHaveValue('');
+  });
+
+  it('keeps the previous URL when thumbnail upload fails', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('upload failed', { status: 500 })));
+    const { container } = render(ThumbnailField, { value: 'https://example.com/old.jpg' });
+    const field = within(container);
+    const file = new File(['image'], 'thumb.webp', { type: 'image/webp' });
+
+    await fireEvent.change(field.getByLabelText('upload thumbnail'), { target: { files: [file] } });
+
+    await waitFor(() => {
+      expect(field.getByRole('alert')).toHaveTextContent('upload failed');
+      expect(field.getByLabelText('thumbnail url')).toHaveValue('https://example.com/old.jpg');
+    });
   });
 });

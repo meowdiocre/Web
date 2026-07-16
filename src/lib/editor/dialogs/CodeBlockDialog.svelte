@@ -48,9 +48,12 @@
 <Modal {open} {onclose} size="lg" title={mode === 'edit' ? 'edit code block' : 'insert code block'}>
   <form onsubmit={(e) => { e.preventDefault(); commit(); }} class="grid gap-3">
     <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
-      <label class="field">
-        <span class="lbl">language</span>
-        <select bind:value={lang} class="inp">
+      <label class="grid min-w-0 gap-2">
+        <span class="font-mono text-2xs tracking-meta text-muted">language</span>
+        <select
+          bind:value={lang}
+          class="w-full rounded-none border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5 font-sans text-[15px] text-paper focus:outline-2 focus:outline-offset-2 focus:outline-rose"
+        >
           {#each LANG_OPTIONS as opt (opt.value)}
             <option value={opt.value}>{opt.label}</option>
           {/each}
@@ -67,11 +70,11 @@
       </div>
     </div>
 
-    <label class="field">
-      <span class="lbl">source</span>
+    <label class="grid min-w-0 gap-2">
+      <span class="font-mono text-2xs tracking-meta text-muted">source</span>
       <textarea
         bind:value={source}
-        class="inp code-area"
+        class="code-area min-h-[220px] w-full resize-y whitespace-pre rounded-none border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5 font-mono text-[13px] leading-[1.55] text-paper focus:outline-2 focus:outline-offset-2 focus:outline-rose [tab-size:2]"
         rows="14"
         spellcheck="false"
         autocomplete="off"
@@ -79,11 +82,11 @@
       ></textarea>
     </label>
 
-    <label class="field">
-      <span class="lbl">caption (optional)</span>
+    <label class="grid min-w-0 gap-2">
+      <span class="font-mono text-2xs tracking-meta text-muted">caption (optional)</span>
       <input
         bind:value={caption}
-        class="inp"
+        class="w-full rounded-none border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5 font-sans text-[15px] text-paper focus:outline-2 focus:outline-offset-2 focus:outline-rose"
         placeholder="figure: e.g. core.py · main entry point"
       />
     </label>
@@ -99,14 +102,3 @@
     />
   {/snippet}
 </Modal>
-
-<style>
-  .code-area {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.55;
-    min-height: 220px;
-    tab-size: 2;
-    white-space: pre;
-  }
-</style>

@@ -23,7 +23,7 @@
 </script>
 
 <span
-  class="pixel-icon {extra}"
+  class="pixel-icon inline-block shrink-0 align-[-0.2em] {extra}"
   style:--pixel-icon-source={`url("${source}")`}
   style:width={dimension}
   style:height={dimension}
@@ -34,9 +34,6 @@
 
 <style>
   .pixel-icon {
-    display: inline-block;
-    vertical-align: -0.2em;
-    flex-shrink: 0;
     background: currentColor;
     -webkit-mask: var(--pixel-icon-source) center / contain no-repeat;
     mask: var(--pixel-icon-source) center / contain no-repeat;

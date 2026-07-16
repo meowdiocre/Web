@@ -35,11 +35,6 @@
       max-[460px]:hidden
     "
   >
-    <span class="at">@</span>dev<span class="at">:</span><span class="path">{meta.hostPath}</span>
+    <span class="text-muted">@</span>dev<span class="text-muted">:</span><span class="text-rose">{meta.hostPath}</span>
   </span>
 </a>
-
-<style>
-  .session .at   { color: var(--color-muted); }
-  .session .path { color: var(--color-rose); }
-</style>
