@@ -8,7 +8,11 @@ The public site presents long-form articles, category archives, tag archives, re
 
 | Homepage | Mobile homepage |
 | --- | --- |
-| ![Desktop homepage with terminal navigation and portfolio hero](./static/readme/01-home-desktop.png) | ![Mobile homepage with compact navigation and responsive hero](./static/readme/04-home-mobile.png) |
+| ![Desktop homepage with terminal navigation and portfolio hero](./static/readme/01-home-desktop.png) | ![Mobile homepage with application bar, responsive hero, compact footer, and bottom navigation](./static/readme/04-home-mobile.png) |
+
+| Mobile article footer | Mobile social menu |
+| --- | --- |
+| ![Mobile article footer with back navigation and fixed application bar](./static/readme/09-mobile-footer.png) | ![Mobile social menu with GitHub and Discord actions](./static/readme/10-mobile-social-menu.png) |
 
 | Writing index | Article page |
 | --- | --- |
