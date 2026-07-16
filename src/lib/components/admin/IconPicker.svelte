@@ -54,20 +54,21 @@
     return recommended.find((option) => option.value === iconName)?.label ?? formatIconLabel(iconName);
   }
 
-  const labelClass = 'font-mono text-[10px] tracking-[0.12em] text-muted';
+  const labelClass = 'font-mono text-[11px] tracking-[0.05em] text-muted';
   const messageClass = 'min-h-[1lh] font-mono text-[10px] tracking-[0.04em] text-muted';
 </script>
 
 <fieldset class="group grid min-w-0 gap-2 border-0 p-0" {disabled}>
   <legend class={labelClass}>{label}</legend>
 
-  <label class="grid gap-2">
+  <label class="grid gap-1.5">
     <span class={labelClass}>search icons</span>
     <input
       type="search"
       bind:value={query}
       class="min-h-11 w-full border border-[var(--line-soft)] bg-ink-2 px-3 py-2.5
              font-sans text-[15px] text-paper outline outline-2 outline-transparent outline-offset-1
+             placeholder:text-muted hover:border-[var(--line-strong)] focus-visible:border-rose
              focus-visible:outline-rose disabled:cursor-not-allowed disabled:opacity-[0.55]"
       placeholder="type an icon name"
       autocomplete="off"
@@ -82,7 +83,7 @@
     <p class={messageClass}>No icons found.</p>
   {/if}
 
-  <div class="grid max-h-[360px] grid-cols-2 gap-2 overflow-auto sm:grid-cols-4">
+  <div class="grid max-h-[360px] grid-cols-2 gap-2 overflow-auto">
     {#each visibleNames as iconName (iconName)}
       <label class="group/option min-w-0 cursor-pointer group-disabled:cursor-not-allowed" title={iconName}>
         <input
@@ -97,7 +98,7 @@
         <span
           class="flex min-h-11 min-w-0 items-center gap-2 border border-[var(--line-soft)] bg-ink-2
                  px-2.5 py-[9px] font-mono text-[10px] tracking-[0.04em] text-muted
-                 transition-[background-color,border-color,color,transform] duration-[120ms]
+                 transition-[background-color,border-color,color,transform] duration-150
                  group-hover/option:border-rose group-hover/option:text-rose group-active/option:translate-y-px
                  group-disabled:pointer-events-none group-disabled:opacity-[0.55]
                  peer-checked:border-rose peer-checked:bg-accent-wash peer-checked:text-paper

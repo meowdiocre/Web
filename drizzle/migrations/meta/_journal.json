@@ -15,6 +15,20 @@
       "when": 1784135582681,
       "tag": "0001_category_icon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784199385279,
+      "tag": "0002_post_seo",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1784209407718,
+      "tag": "0003_mute_the_renegades",
+      "breakpoints": true
     }
   ]
 }

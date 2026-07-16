@@ -2,21 +2,27 @@
   import { SITE }   from '$lib/config/site.js';
 
   import Nav        from '$lib/components/Nav.svelte';
+  import SeoHead    from '$lib/components/SeoHead.svelte';
   import Footer     from '$lib/components/Footer.svelte';
   import SkipLink   from '$lib/components/SkipLink.svelte';
   import PageKicker from '$lib/components/PageKicker.svelte';
   import PageTitle  from '$lib/components/PageTitle.svelte';
   import Lede       from '$lib/components/Lede.svelte';
   import PixelIcon  from '$lib/components/PixelIcon.svelte';
+  import { resolvePageSeo } from '$lib/seo/post';
+
+  const seo = resolvePageSeo({
+    siteUrl: SITE.url,
+    path: '/about',
+    siteName: SITE.brand,
+    title: 'About',
+    description: `About ${SITE.brand}. Independent researcher working on Windows internals, anti-cheat, browser sandboxes, and large model behavior.`,
+    imageUrl: '/lain.png',
+    imageAlt: SITE.brand
+  });
 </script>
 
-<svelte:head>
-  <title>About | {SITE.brand}</title>
-  <meta
-    name="description"
-    content="About {SITE.brand}. Independent researcher working on Windows internals, anti-cheat, browser sandboxes, and large model behavior."
-  />
-</svelte:head>
+<SeoHead {seo} />
 
 <SkipLink target="#about-title" />
 

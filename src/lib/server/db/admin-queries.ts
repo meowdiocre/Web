@@ -1,11 +1,22 @@
-import { and, desc, eq, ne } from 'drizzle-orm';
+import { and, desc, eq, lte, ne, sql } from 'drizzle-orm';
 import { db } from './client';
-import { categories, posts } from './schema';
+import { categories, posts, postTags } from './schema';
 import type { Doc } from '$lib/editor/types';
 import { composeTitle } from '$lib/util/strings';
 import { normalizeCategoryIcon } from '$lib/icons/icon-names';
 import type { CategoryIconName } from '$lib/icons/icon-names';
 import { asInsert, asUpdate } from './write';
+
+export {
+  createCategory,
+  deleteCategoryAndPosts,
+  isCategorySlugTaken,
+  isTagSlugTaken,
+  listCategories,
+  listCategoriesForAdmin,
+  moveCategoryPosts
+} from './admin-taxonomy';
+export type { AffectedPost, AdminCategoryRow } from './admin-taxonomy';
 
 export interface AdminPostListRow {
   id:          string;
@@ -59,31 +70,6 @@ export async function getPostById(id: string) {
   return rows[0] ?? null;
 }
 
-export async function listCategories() {
-  return db.select().from(categories).orderBy(categories.label);
-}
-
-export async function isCategorySlugTaken(slug: string): Promise<boolean> {
-  const rows = await db.select({ slug: categories.slug }).from(categories).where(eq(categories.slug, slug)).limit(1);
-  return rows.length > 0;
-}
-
-export async function createCategory(input: { slug: string; label: string; icon: string; tone?: string }) {
-  const values = {
-    slug: input.slug,
-    label: input.label,
-    icon: input.icon,
-    tone: input.tone ?? 'crimson-deep'
-  };
-
-  const [row] = await db
-    .insert(categories)
-    .values(asInsert(values))
-    .returning({ slug: categories.slug, label: categories.label, icon: categories.icon });
-
-  return row;
-}
-
 export async function isSlugTaken(slug: string, exceptPostId?: string): Promise<boolean> {
   const conds = exceptPostId
     ? and(eq(posts.slug, slug), ne(posts.id, exceptPostId))
@@ -133,10 +119,16 @@ export interface UpdateMetadataInput {
   dek:           string;
   author:        string;
   coverImageUrl: string | null;
+  seoTitle:       string | null;
+  seoDescription: string | null;
+  canonicalUrl:   string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
+  noIndex:        boolean;
   publishAt:     Date | null;
 }
 
-export async function updatePostMetadata(id: string, input: UpdateMetadataInput) {
+export async function updatePostMetadataWithTags(id: string, input: UpdateMetadataInput, tagSlugs: string[]) {
   const changes = {
     slug:          input.slug,
     titlePre:      input.titlePre,
@@ -146,14 +138,26 @@ export async function updatePostMetadata(id: string, input: UpdateMetadataInput)
     dek:           input.dek,
     author:        input.author,
     coverImageUrl: input.coverImageUrl,
+    seoTitle:       input.seoTitle,
+    seoDescription: input.seoDescription,
+    canonicalUrl:   input.canonicalUrl,
+    socialImageUrl: input.socialImageUrl,
+    socialImageAlt: input.socialImageAlt,
+    noIndex:        input.noIndex,
     publishAt:     input.publishAt,
     updatedAt:     new Date()
   };
 
-  await db
+  const updatePost = db
     .update(posts)
     .set(asUpdate(changes))
     .where(eq(posts.id, id));
+  const removeTags = db.delete(postTags).where(eq(postTags.postId, id));
+  const addTags = tagSlugs.length > 0
+    ? db.insert(postTags).values(tagSlugs.map((tagSlug) => ({ postId: id, tagSlug })))
+    : db.select({ postId: posts.id }).from(posts).where(and(eq(posts.id, id), sql`false`));
+
+  await db.batch([updatePost, removeTags, addTags]);
 }
 
 export async function deletePost(id: string) {
@@ -166,7 +170,7 @@ export async function deletePost(id: string) {
 
 export async function publishPost(id: string) {
   const now = new Date();
-  const changes = { status: 'published', publishedAt: now, updatedAt: now };
+  const changes = { status: 'published', publishAt: null, publishedAt: now, updatedAt: now };
   const [row] = await db
     .update(posts)
     .set(asUpdate(changes))
@@ -175,9 +179,18 @@ export async function publishPost(id: string) {
   return row;
 }
 
+export async function publishDuePosts(now: Date) {
+  const changes = { status: 'published', publishAt: null, publishedAt: now, updatedAt: now };
+  return db
+    .update(posts)
+    .set(asUpdate(changes))
+    .where(and(eq(posts.status, 'draft'), lte(posts.publishAt, now)))
+    .returning({ id: posts.id, slug: posts.slug, category: posts.category });
+}
+
 export async function unpublishPost(id: string) {
   const now = new Date();
-  const changes = { status: 'draft', updatedAt: now };
+  const changes = { status: 'draft', publishAt: null, updatedAt: now };
   const [row] = await db
     .update(posts)
     .set(asUpdate(changes))
@@ -193,8 +206,10 @@ export async function savePostContent(id: string, doc: Doc, bodyHtml: string) {
     updatedAt: new Date()
   };
 
-  await db
+  const [row] = await db
     .update(posts)
     .set(asUpdate(changes))
-    .where(eq(posts.id, id));
+    .where(eq(posts.id, id))
+    .returning({ id: posts.id });
+  return row ?? null;
 }

@@ -19,6 +19,15 @@ test.describe('static surface', () => {
     await expect(page.locator('main')).toBeVisible();
   });
 
+  test('error pages keep the footer at the viewport bottom', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1080 });
+    await page.goto('/this-page-does-not-exist');
+
+    const footer = await page.locator('footer').boundingBox();
+    expect(footer).not.toBeNull();
+    expect(Math.round(footer!.y + footer!.height)).toBe(1080);
+  });
+
   test('admin redirects to login', async ({ page }) => {
     await page.goto('/admin');
     const url = new URL(page.url());

@@ -1,10 +1,9 @@
 import { json, error } from '@sveltejs/kit';
 import { timingSafeEqual } from 'node:crypto';
 
-import { articlePath } from '$lib/blog/urls';
-import { loadDuePosts } from '$lib/server/db/queries';
-import { publishPost } from '$lib/server/db/admin-queries';
-import { revalidatePaths } from '$lib/server/publish';
+import { publishDuePosts } from '$lib/server/db/admin-queries';
+import { getPostTagSlugs } from '$lib/server/db/admin-taxonomy';
+import { revalidateTaxonomyChange } from '$lib/server/publish';
 
 export const prerender = false;
 
@@ -26,21 +25,21 @@ export async function GET({ request }) {
   }
 
   const now = new Date();
-  const due = await loadDuePosts(now);
+  const due = await publishDuePosts(now);
 
   if (!due.length) {
     return json({ ok: true, flipped: 0 });
   }
 
-  for (const p of due) {
-    await publishPost(p.id);
-  }
-
-  await revalidatePaths([
-    '/blog',
-    '/feed.xml',
-    ...due.map((post) => articlePath(post.category, post.slug))
-  ]);
+  const tagSlugs = await Promise.all(due.map((post) => getPostTagSlugs(post.id)));
+  await revalidateTaxonomyChange({
+    posts: due.map((post, index) => ({
+      slug: post.slug,
+      status: 'published',
+      category: post.category,
+      tagSlugs: tagSlugs[index]
+    }))
+  });
 
   return json({ ok: true, flipped: due.length, slugs: due.map((p) => p.slug) });
 }

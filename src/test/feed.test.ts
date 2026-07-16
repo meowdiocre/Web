@@ -52,7 +52,8 @@ describe('/feed.xml', () => {
     expect(body).toMatch(/<item>[\s\S]*<\/item>/);
 
     expect(body).toContain('<title>Devirtualizing VMProtect 3.x without a VM.</title>');
-    expect(body).toContain('<link>https://meowdiocre.example/blog/reverse/foo</link>');
+    expect(body).toContain('<link>https://www.meowdiocre.net/blog/reverse/foo</link>');
+    expect(body).not.toContain('meowdiocre.example');
     expect(body).toContain('<guid isPermaLink="false">meowdiocre:2026-03-14:foo</guid>');
     expect(body).toContain('<category>Reverse</category>');
     expect(body).toContain('<![CDATA[<p>body & content</p>]]>');

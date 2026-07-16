@@ -6,8 +6,7 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      // Node 20 LTS on Vercel.
-      runtime: 'nodejs20.x'
+      runtime: 'nodejs24.x'
     }),
     alias: {
       $db: 'src/lib/server/db'

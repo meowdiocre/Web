@@ -1,6 +1,7 @@
 <script>
   import { page } from '$app/stores';
   import PixelIcon from '$lib/components/PixelIcon.svelte';
+  import AdminButton from '$lib/components/admin/AdminButton.svelte';
 
   /**
    * @typedef {Object} NavLink
@@ -44,6 +45,12 @@
           label: 'categories',
           icon: 'folder',
           match: (p) => p === '/admin/categories'
+        },
+        {
+          href: '/admin/tags',
+          label: 'tags',
+          icon: 'bookmark',
+          match: (p) => p === '/admin/tags'
         }
       ]
     },
@@ -64,11 +71,11 @@
 </script>
 
 {#snippet navList()}
-  <div class="space-y-[18px]">
+  <div class="space-y-5">
     {#each sections as section (section.label)}
       <div>
         <p
-          class="mb-1.5 flex items-center gap-2 font-mono text-[9px] tracking-[0.14em] text-muted
+          class="mb-1.5 flex items-center gap-2 font-mono text-[10px] tracking-[0.06em] text-muted
                  after:h-px after:flex-1 after:bg-[var(--line-soft)] after:content-['']"
         >{section.label}</p>
         <ul class="m-0 flex list-none flex-col gap-0.5 p-0">
@@ -80,14 +87,13 @@
               data-sveltekit-preload-data="tap"
               data-sveltekit-preload-code="hover"
               class="group relative grid min-h-11 grid-cols-[16px_1fr] items-center gap-2
-                     py-2 pr-2.5 pl-3 font-mono text-[12px] tracking-[0.06em] no-underline
-                     transition-[color,background-color] duration-[120ms]
+                     px-3 py-2 font-mono text-[12px] tracking-[0.03em] no-underline
+                     transition-[color,background-color] duration-150
                      hover:bg-accent-wash hover:text-rose
                      focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2
                      focus-visible:outline-rose motion-reduce:duration-0
                      {active
-                       ? `bg-accent-wash text-rose before:absolute before:inset-y-1
-                          before:left-0 before:w-0.5 before:bg-crimson before:content-['']`
+                       ? 'bg-accent-wash-medium text-rose'
                        : 'text-muted'}"
               aria-current={active ? 'page' : undefined}
             >
@@ -123,18 +129,12 @@
     <div>
       <p class="mb-2 font-mono text-[10px] tracking-[0.1em] text-muted">@{user.githubLogin}</p>
       <form method="POST" action="/admin/logout">
-        <button
-          class="inline-flex min-h-11 cursor-pointer items-center gap-2 border border-accent-line
-                 bg-transparent px-2.5 py-1.5 font-mono text-[11px] tracking-[0.1em] text-rose
-                 transition-[background-color,border-color,color] duration-[120ms]
-                 hover:border-crimson-deep hover:bg-crimson-deep hover:text-paper
-                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose
-                 motion-reduce:duration-0"
+        <AdminButton
           type="submit"
-        >
-          <PixelIcon name="logout" size={14} />
-          <span>sign out</span>
-        </button>
+          icon="logout"
+          label="sign out"
+          loadingLabel="signing out..."
+        />
       </form>
     </div>
   {/if}

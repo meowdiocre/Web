@@ -1,34 +1,25 @@
 <script>
-  import { SITE } from '$lib/config/site.js';
-
   import Nav from '$lib/components/Nav.svelte';
+  import SeoHead from '$lib/components/SeoHead.svelte';
   import Footer from '$lib/components/Footer.svelte';
   import SkipLink from '$lib/components/SkipLink.svelte';
   import ReaderControls from '$lib/components/ReaderControls.svelte';
   import ScrollProgress from '$lib/components/article/ScrollProgress.svelte';
   import ArticleHead from '$lib/components/article/ArticleHead.svelte';
+  import ArticleTags from '$lib/components/article/ArticleTags.svelte';
   import Essay from '$lib/components/article/Essay.svelte';
   import RelatedGrid from '$lib/components/article/RelatedGrid.svelte';
   import ArticlePageSkeleton from '$lib/components/loading/ArticlePageSkeleton.svelte';
-  import { composeTitle } from '$lib/util/strings';
 
   /** @type {{ data: {
     article: Promise<import('$lib/server/db/queries').PublicArticle> | import('$lib/server/db/queries').PublicArticle,
-    related: Promise<import('$lib/server/db/queries').RelatedEntry[]> | import('$lib/server/db/queries').RelatedEntry[]
+    related: Promise<import('$lib/server/db/queries').RelatedEntry[]> | import('$lib/server/db/queries').RelatedEntry[],
+    seo: import('$lib/seo/post').ResolvedPostSeo
   } }} */
   let { data } = $props();
 </script>
 
-<svelte:head>
-  {#await data.article}
-    <title>Article | {SITE.brand}</title>
-  {:then article}
-    <title>{composeTitle(article.head.title)} | {SITE.brand}</title>
-    <meta name="description" content={article.head.dek} />
-  {:catch}
-    <title>Article unavailable | {SITE.brand}</title>
-  {/await}
-</svelte:head>
+<SeoHead seo={data.seo} />
 
 <SkipLink target="#article-main" label="Skip to article" />
 
@@ -43,6 +34,7 @@
     <ArticlePageSkeleton />
   {:then article}
     <ArticleHead {...article.head} />
+    <ArticleTags tags={article.tags} />
     <Essay html={article.bodyHtml} footnotes={article.footnotes} />
     {#await data.related then related}
       {#if related.length}

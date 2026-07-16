@@ -13,6 +13,7 @@
    * @property {'button'|'submit'|'reset'} [type]
    * @property {boolean} [disabled]
    * @property {ActionState} [state]
+   * @property {string} [loadingLabel]
    * @property {(event: MouseEvent) => void} [onclick]
    */
 
@@ -25,6 +26,7 @@
     type = 'button',
     disabled = false,
     state = 'idle',
+    loadingLabel = 'working...',
     onclick
   } = $props();
 
@@ -55,11 +57,12 @@
            {tone === 'danger' ? 'text-rose' : 'text-paper'}"
     class:action-menu-item--danger={tone === 'danger'}
     data-state={state}
+    data-loading-label={loadingLabel}
     aria-disabled={inactive ? 'true' : undefined}
     onclick={handleClick}
   >
     <PixelIcon name={stateIcon} size={14} />
-    <span>{label}</span>
+    <span data-action-label>{label}</span>
   </a>
 {:else}
   <button
@@ -75,10 +78,23 @@
            motion-reduce:duration-0 {tone === 'danger' ? 'text-rose' : 'text-paper'}"
     class:action-menu-item--danger={tone === 'danger'}
     data-state={state}
+    data-loading-label={loadingLabel}
     aria-busy={state === 'loading' ? 'true' : undefined}
     onclick={handleClick}
   >
     <PixelIcon name={stateIcon} size={14} />
-    <span>{label}</span>
+    <span data-action-label>{label}</span>
   </button>
 {/if}
+
+<style>
+  .action-menu-item[data-state='loading'] :global(.pixel-icon) {
+    animation: action-loading 800ms steps(8) infinite;
+  }
+
+  @keyframes action-loading { to { transform: rotate(1turn); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .action-menu-item[data-state='loading'] :global(.pixel-icon) { animation: none; }
+  }
+</style>

@@ -6,6 +6,7 @@ export interface ActionFailure {
   action?: string;
   fieldErrors?: Record<string, string>;
   values?: FormValues;
+  tagSlugs?: string[];
 }
 
 export type ActionSuccess<T extends Record<string, unknown> = Record<string, unknown>> = {

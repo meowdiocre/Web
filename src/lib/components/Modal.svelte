@@ -6,6 +6,7 @@
    * @typedef {Object} Props
    * @property {boolean} open
    * @property {() => void} [onclose]
+   * @property {boolean} [closeDisabled]
    * @property {string} [title]
    * @property {'sm'|'md'|'lg'} [size]
    * @property {import('svelte').Snippet} [children]
@@ -13,7 +14,15 @@
    */
 
   /** @type {Props} */
-  let { open = false, onclose, title = '', size = 'md', children, footer } = $props();
+  let {
+    open = false,
+    onclose,
+    closeDisabled = false,
+    title = '',
+    size = 'md',
+    children,
+    footer
+  } = $props();
 
   /** @type {HTMLDialogElement|undefined} */
   let dlg = $state();
@@ -26,11 +35,11 @@
 
   function onCancel(/** @type {Event} */ e) {
     e.preventDefault();
-    onclose?.();
+    if (!closeDisabled) onclose?.();
   }
 
   function onBackdropClick(/** @type {MouseEvent} */ e) {
-    if (e.target === dlg) onclose?.();
+    if (!closeDisabled && e.target === dlg) onclose?.();
   }
 
   const titleId = `modal-title-${Math.random().toString(36).slice(2, 9)}`;
@@ -56,11 +65,12 @@
         <span class="inline-flex h-[22px] items-center gap-1.5 bg-rose px-2.5 font-terminal text-xs tracking-[0.1em] text-ink lowercase">
           <span class="translate-y-px font-display text-[13px] text-crimson" aria-hidden="true">{BRAND_GLYPH}</span>dialog
         </span>
-        <h2 id={titleId} class="m-0 min-w-0 flex-1 truncate font-mono text-xs tracking-[0.16em] text-paper">{title}</h2>
+        <h2 id={titleId} class="m-0 min-w-0 flex-1 [overflow-wrap:anywhere] font-sans text-base font-semibold leading-5 tracking-[-0.01em] text-paper">{title}</h2>
         <button
           type="button"
-          class="grid size-11 cursor-pointer place-items-center border border-accent-line bg-transparent font-terminal text-lg leading-none text-paper transition-[background,color,border-color] duration-100 hover:border-rose hover:bg-rose hover:text-ink"
+          class="grid size-11 cursor-pointer place-items-center border border-accent-line bg-transparent font-terminal text-lg leading-none text-paper transition-[background,color,border-color] duration-100 hover:border-rose hover:bg-rose hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
           aria-label="Close dialog"
+          disabled={closeDisabled}
           onclick={() => onclose?.()}
         ><PixelIcon name="close" size={16} /></button>
       </header>

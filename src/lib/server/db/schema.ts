@@ -7,9 +7,11 @@ import {
   timestamp,
   integer,
   bigint,
+  boolean,
   jsonb,
   uniqueIndex,
-  index
+  index,
+  primaryKey
 } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 
@@ -24,6 +26,18 @@ export const categories = pgTable(
     tone:  varchar('tone', { length: 32 }).notNull().default('crimson-deep'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
   }
+);
+
+export const tags = pgTable(
+  'tags',
+  {
+    slug: varchar('slug', { length: 64 }).primaryKey(),
+    label: varchar('label', { length: 64 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow()
+  },
+  (t) => ({
+    labelLowerUnique: uniqueIndex('tags_label_lower_unique').on(sql`lower(${t.label})`)
+  })
 );
 
 export const users = pgTable(
@@ -79,6 +93,13 @@ export const posts = pgTable(
 
     coverImageUrl: text('cover_image_url'),
 
+    seoTitle:        varchar('seo_title', { length: 70 }),
+    seoDescription:  varchar('seo_description', { length: 320 }),
+    canonicalUrl:    text('canonical_url'),
+    socialImageUrl:  text('social_image_url'),
+    socialImageAlt:  varchar('social_image_alt', { length: 256 }),
+    noIndex:         boolean('no_index').notNull().default(false),
+
     docJson:  jsonb('doc_json').notNull().default(sql`'{}'::jsonb`),
     bodyHtml: text('body_html').notNull().default(''),
     footnotesJson: jsonb('footnotes_json').notNull().default(sql`'[]'::jsonb`),
@@ -91,6 +112,18 @@ export const posts = pgTable(
     statusIdx:    index('posts_status_idx').on(t.status),
     publishedIdx: index('posts_published_at_idx').on(t.publishedAt),
     publishAtIdx: index('posts_publish_at_idx').on(t.publishAt)
+  })
+);
+
+export const postTags = pgTable(
+  'post_tags',
+  {
+    postId: uuid('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
+    tagSlug: varchar('tag_slug', { length: 64 }).notNull().references(() => tags.slug, { onDelete: 'cascade' })
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.postId, t.tagSlug] }),
+    tagIdx: index('post_tags_tag_slug_idx').on(t.tagSlug)
   })
 );
 
@@ -112,8 +145,18 @@ export const media = pgTable(
   })
 );
 
-export const postsRelations = relations(posts, ({ one }) => ({
-  category: one(categories, { fields: [posts.category], references: [categories.slug] })
+export const postsRelations = relations(posts, ({ one, many }) => ({
+  category: one(categories, { fields: [posts.category], references: [categories.slug] }),
+  tags: many(postTags)
+}));
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+  posts: many(postTags)
+}));
+
+export const postTagsRelations = relations(postTags, ({ one }) => ({
+  post: one(posts, { fields: [postTags.postId], references: [posts.id] }),
+  tag: one(tags, { fields: [postTags.tagSlug], references: [tags.slug] })
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -127,6 +170,9 @@ export const mediaRelations = relations(media, ({ one }) => ({
 export type Post     = typeof posts.$inferSelect;
 export type NewPost  = typeof posts.$inferInsert;
 export type Category = typeof categories.$inferSelect;
+export type Tag      = typeof tags.$inferSelect;
+export type NewTag   = typeof tags.$inferInsert;
+export type PostTag  = typeof postTags.$inferSelect;
 export type User     = typeof users.$inferSelect;
 export type NewUser  = typeof users.$inferInsert;
 export type Session  = typeof sessions.$inferSelect;

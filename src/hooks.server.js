@@ -37,12 +37,19 @@ export async function handle({ event, resolve }) {
   }
 
   const path = event.url.pathname;
-  if (path.startsWith('/admin') && !ADMIN_PUBLIC.has(path) && !event.locals.user) {
+  const isAdminApi = path.startsWith('/admin/api/');
+  if (path.startsWith('/admin') && !isAdminApi && !ADMIN_PUBLIC.has(path) && !event.locals.user) {
     throw redirect(302, '/admin/login');
   }
 
   const key = pageKey(path);
-  return resolve(event, {
+  const response = await resolve(event, {
     transformPageChunk: ({ html }) => html.replace('%body-page%', key)
   });
+  response.headers.set('content-security-policy', "frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
+  response.headers.set('referrer-policy', 'strict-origin-when-cross-origin');
+  response.headers.set('x-content-type-options', 'nosniff');
+  response.headers.set('x-frame-options', 'DENY');
+  if (path.startsWith('/admin')) response.headers.set('cache-control', 'private, no-store');
+  return response;
 }

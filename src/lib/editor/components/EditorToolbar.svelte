@@ -28,15 +28,17 @@
 
   const chain = () => editor?.chain().focus();
 
-  const toolbarButtonClass = 'tb inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center border border-transparent bg-transparent px-2 font-mono text-[11px] tracking-[0.08em] text-paper transition-[background,color,border-color] duration-150 hover:border-[var(--line-soft)] hover:bg-white/[0.02] hover:text-rose focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-rose [&.on]:border-rose [&.on]:bg-rose/[0.06] [&.on]:text-crimson';
+  const toolbarButtonClass = 'tb inline-flex min-h-11 min-w-11 cursor-pointer items-center justify-center border-0 border-b-2 border-transparent bg-transparent px-2 font-mono text-[11px] tracking-[0.04em] text-paper transition-[background-color,border-color,color] duration-150 hover:bg-white/[0.04] hover:text-rose focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-rose [&.on]:border-rose [&.on]:bg-rose/[0.08] [&.on]:text-rose';
 </script>
 
 {#if editor}
   <div
-    class="toolbar mb-3 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 border border-[var(--line-soft)] border-b-2 border-b-dashed border-b-rose/[0.18] bg-ink-2 px-2.5 py-2"
+    class="toolbar sticky top-[69px] z-20 mb-3 flex items-center border-y border-[var(--line-soft)] bg-ink-2/95 px-1.5 py-1.5 backdrop-blur-sm md:top-0"
     role="toolbar"
     aria-label="Editor formatting"
   >
+    <div class="min-w-0 flex-1 overflow-x-auto">
+      <div class="flex w-max items-center gap-1" role="group" aria-label="Formatting controls">
     <div class="toolbar__group inline-flex items-center gap-0.5">
       <button type="button" class={toolbarButtonClass} use:tooltip={'Bold · Ctrl+B'} class:on={isActive('bold')} aria-pressed={isActive('bold')} onclick={() => chain()?.toggleBold().run()}>B</button>
       <button type="button" class={`${toolbarButtonClass} italic`} use:tooltip={'Italic · Ctrl+I'} class:on={isActive('italic')} aria-pressed={isActive('italic')} onclick={() => chain()?.toggleItalic().run()}>i</button>
@@ -72,9 +74,12 @@
       <button type="button" class={toolbarButtonClass} use:tooltip={'End slug'} class:on={isActive('endSlug')} aria-pressed={isActive('endSlug')} onclick={openEnd}>end-slug</button>
     </div>
 
+      </div>
+    </div>
+
     <button
       type="button"
-      class="tb-save group ml-auto inline-flex min-h-11 cursor-pointer items-center gap-2 border border-rose bg-transparent px-3 font-mono text-[11px] tracking-[0.18em] text-rose transition-[background,color,border-color] duration-150 hover:bg-rose hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-rose disabled:cursor-progress disabled:opacity-60"
+      class="tb-save group ml-2 inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 border border-rose bg-transparent px-3 font-mono text-[11px] tracking-[0.08em] text-rose transition-[background-color,color,border-color] duration-150 hover:bg-rose hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-rose disabled:cursor-progress disabled:opacity-60"
       use:tooltip={'Save · Ctrl+S'}
       onclick={save}
       disabled={saving}

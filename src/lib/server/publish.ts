@@ -1,6 +1,6 @@
 import { createHmac } from 'node:crypto';
 import { encodeBase64url, decodeBase64url } from '@oslojs/encoding';
-import { articlePath } from '$lib/blog/urls';
+import { articlePath, tagPath } from '$lib/blog/urls';
 
 const TE = new TextEncoder();
 const TD = new TextDecoder();
@@ -88,6 +88,32 @@ export async function revalidatePaths(paths: string[]): Promise<void> {
   );
 }
 
-export function revalidatePost(category: string, slug: string): Promise<void> {
-  return revalidatePaths(['/blog', articlePath(category, slug), '/feed.xml']);
+export interface TaxonomyChange {
+  posts: Array<{
+    slug: string;
+    status: 'draft' | 'published';
+    category: string;
+    tagSlugs: string[];
+    nextSlug?: string;
+    nextCategory?: string;
+    nextTagSlugs?: string[];
+  }>;
+}
+
+export function taxonomyRevalidationPaths(change: TaxonomyChange): string[] {
+  const paths = new Set(['/blog', '/feed.xml', '/sitemap.xml']);
+  for (const post of change.posts) {
+    for (const tagSlug of post.tagSlugs) paths.add(tagPath(tagSlug));
+    for (const tagSlug of post.nextTagSlugs ?? []) paths.add(tagPath(tagSlug));
+    if (post.status !== 'published') continue;
+    paths.add(articlePath(post.category, post.slug));
+    if (post.nextCategory || post.nextSlug) {
+      paths.add(articlePath(post.nextCategory ?? post.category, post.nextSlug ?? post.slug));
+    }
+  }
+  return [...paths].sort();
+}
+
+export function revalidateTaxonomyChange(change: TaxonomyChange): Promise<void> {
+  return revalidatePaths(taxonomyRevalidationPaths(change));
 }

@@ -3,7 +3,7 @@
 
   import Toast            from '$lib/components/Toast.svelte';
   import AdminButton      from '$lib/components/admin/AdminButton.svelte';
-  import PixelIcon        from '$lib/components/PixelIcon.svelte';
+  import PageHeader       from '$lib/components/admin/PageHeader.svelte';
   import EditorToolbar    from '$lib/editor/components/EditorToolbar.svelte';
   import EditorCanvas     from '$lib/editor/components/EditorCanvas.svelte';
   import EditorStatusBar  from '$lib/editor/components/EditorStatusBar.svelte';
@@ -203,33 +203,27 @@
 <svelte:window onkeydown={onKey} />
 <svelte:head><title>Edit | {postTitle}</title></svelte:head>
 
-<header class="flex items-baseline justify-between flex-wrap gap-x-6 gap-y-3 mb-4">
-  <div class="min-w-0">
-    <p class="font-mono text-[10px] tracking-[0.12em] text-muted mb-1 truncate">
-      ~/admin/posts/{post.slug}/edit
-    </p>
-    <div class="flex items-center gap-3">
-      <PixelIcon name="pencil" size={20} />
-      <h1 class="min-w-0 [overflow-wrap:anywhere] font-display text-[clamp(22px,2.6vw,32px)] tracking-[-0.015em] leading-[1.05]">
-        {post.titlePre}<em class="not-italic text-rose">{post.titleEm}</em>{post.titlePost}
-      </h1>
-    </div>
-  </div>
-
-  <div class="flex items-center flex-wrap gap-x-3 gap-y-1
-              font-mono text-[11px] tracking-[0.06em]">
-    {#if saveError}
-      <span class="text-crimson">!! {saveError}</span>
-    {:else if saving}
-      <span class="text-muted">saving...</span>
-    {:else if dirty}
-      <span class="text-muted">unsaved</span>
-    {:else if lastSavedAt}
-      <span class="text-rose">saved {lastSavedAt.toLocaleTimeString()}</span>
-    {/if}
+<PageHeader
+  eyebrow={`~/admin/posts/${post.slug}/edit`}
+  title={postTitle}
+  icon="pencil"
+  description="Changes autosave after three seconds. Use Ctrl+S to save immediately."
+>
+  {#snippet actions()}
+    <span class="font-mono text-[11px] tracking-[0.03em]" aria-live="polite">
+      {#if saveError}
+        <span class="text-crimson">!! {saveError}</span>
+      {:else if saving}
+        <span class="text-muted">saving...</span>
+      {:else if dirty}
+        <span class="text-muted">unsaved</span>
+      {:else if lastSavedAt}
+        <span class="text-rose">saved {lastSavedAt.toLocaleTimeString()}</span>
+      {/if}
+    </span>
     <AdminButton href="/admin/posts/{post.id}" icon="article" label="metadata" />
-  </div>
-</header>
+  {/snippet}
+</PageHeader>
 
 <EditorToolbar
   {editor}

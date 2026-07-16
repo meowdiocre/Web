@@ -1,5 +1,7 @@
 # Contributing
 
+By participating, you agree to follow [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
+
 ## First pass
 
 Before you change code:
@@ -16,11 +18,6 @@ Before you change code:
 - Shared server behavior goes in `src/lib/server`
 - Database queries and writes go in `src/lib/server/db`
 
-## Keep things small
-
-- Split files when they start mixing unrelated concerns
-- Do not add helpers that only rename a single obvious line
-- Do add helpers when they remove duplication or isolate a concept
 
 ## Before opening work
 
@@ -36,14 +33,6 @@ If you changed end-to-end behavior, also run:
 ```bash
 npm run test:e2e
 ```
-
-## Writing rules
-
-- No em dash
-- No filler
-- No vague comments
-- No generic AI-style README language
-- Prefer short, direct explanation
 
 ## Pull request checklist
 

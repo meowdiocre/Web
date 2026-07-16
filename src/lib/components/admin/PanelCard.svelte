@@ -14,15 +14,15 @@
   let { title, icon, description = '', actions, children } = $props();
 </script>
 
-<section class="border border-[var(--line-soft)] bg-ink-2 p-5">
-  <header class="flex items-start justify-between gap-4 mb-4">
+<section aria-label={title} class="min-w-0 pt-4">
+  <header class="mb-4 flex items-start justify-between gap-4">
     <div class="min-w-0">
-      <h2 class="flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] text-paper">
-        {#if icon}<PixelIcon name={icon} size={14} />{/if}
+      <h2 class="flex items-center gap-2.5 font-sans text-lg font-semibold leading-6 tracking-[-0.01em] text-paper">
+        {#if icon}<PixelIcon name={icon} size={16} class="text-rose" />{/if}
         <span>{title}</span>
       </h2>
       {#if description}
-        <p class="mt-2 text-[13px] leading-[1.6] text-muted">
+        <p class="mt-1 max-w-[65ch] text-pretty text-sm leading-5 text-muted">
           {description}
         </p>
       {/if}

@@ -19,9 +19,17 @@
 
   /** @type {AdminPost|null} */
   let deleteCandidate = $state(null);
+  let deleting = $state(false);
 
   const headingCellClass = 'py-3 pr-4 font-mono text-[10px] tracking-[0.12em] text-muted';
   const bodyCellClass = 'py-[18px] pr-4 align-top';
+
+  function deleteSelectedPost() {
+    const form = document.getElementById('delete-post-form');
+    if (!(form instanceof HTMLFormElement)) return;
+    deleting = true;
+    form.requestSubmit();
+  }
 </script>
 
 {#snippet postActions(post)}
@@ -31,16 +39,34 @@
   {#if post.status === 'draft'}
     <form method="POST" action="?/publish">
       <input type="hidden" name="postId" value={post.id} />
-      <ActionMenuItem type="submit" icon="send" label="publish now" />
+      <ActionMenuItem
+        type="submit"
+        icon="send"
+        label="publish now"
+        loadingLabel="publishing..."
+      />
     </form>
   {:else}
     <form method="POST" action="?/unpublish">
       <input type="hidden" name="postId" value={post.id} />
-      <ActionMenuItem type="submit" icon="archive" label="move to draft" />
+      <ActionMenuItem
+        type="submit"
+        icon="archive"
+        label="move to draft"
+        loadingLabel="updating..."
+      />
     </form>
   {/if}
 
-  <ActionMenuItem icon="trash" label="delete post" tone="danger" onclick={() => (deleteCandidate = post)} />
+  <ActionMenuItem
+    icon="trash"
+    label="delete post"
+    tone="danger"
+    onclick={() => {
+      deleting = false;
+      deleteCandidate = post;
+    }}
+  />
 {/snippet}
 
 <svelte:head><title>Posts | Admin</title></svelte:head>
@@ -49,6 +75,7 @@
   icon="article"
   eyebrow="~/admin/posts"
   title="posts"
+  description={`${posts.length} ${posts.length === 1 ? 'post' : 'posts'} across drafts, scheduled work, and published articles.`}
 >
   {#snippet actions()}
     <AdminButton href="/admin/posts/new" icon="plus" label="new post" variant="primary" />
@@ -71,7 +98,7 @@
       <AdminButton href="/admin/posts/new" icon="plus" label="create post" variant="primary" />
     </div>
   {:else}
-    <table class="hidden md:table w-full text-left">
+    <table class="hidden w-full table-fixed text-left md:table">
       <thead>
         <tr class="border-b border-[var(--line-soft)]">
           <th class={headingCellClass}>title</th>
@@ -83,7 +110,7 @@
       </thead>
       <tbody>
         {#each posts as post (post.id)}
-          <tr class="border-b border-[var(--line-soft)] transition-colors duration-[120ms] hover:bg-paper/[0.03] motion-reduce:duration-0">
+          <tr class="border-b border-[var(--line-soft)] transition-colors duration-150 hover:bg-paper/[0.03] motion-reduce:duration-0">
             <td class={bodyCellClass}>
               <div class="pr-4">
                 <a href="/admin/posts/{post.id}/edit" class="hover:text-rose">
@@ -109,7 +136,7 @@
       </tbody>
     </table>
 
-    <ul class="md:hidden flex flex-col divide-y divide-[var(--line-soft)] border-y border-[var(--line-soft)]">
+    <ul class="flex flex-col divide-y divide-[var(--line-soft)] border-t border-[var(--line-soft)] md:hidden">
       {#each posts as post (post.id)}
         <li class="py-4 flex flex-col gap-3">
           <div class="flex items-start gap-3">
@@ -143,12 +170,14 @@
     ? `Delete "${deleteCandidate.title}"? This removes the draft or post immediately.`
     : ''}
   confirmLabel="delete"
+  pending={deleting}
+  pendingLabel="deleting..."
   tone="danger"
-  onconfirm={() => {
-    const form = document.getElementById('delete-post-form');
-    if (form instanceof HTMLFormElement) form.requestSubmit();
+  onconfirm={deleteSelectedPost}
+  onclose={() => {
+    deleting = false;
+    deleteCandidate = null;
   }}
-  onclose={() => (deleteCandidate = null)}
 />
 
 <form id="delete-post-form" method="POST" action="?/delete" class="hidden">

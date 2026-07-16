@@ -17,7 +17,7 @@
 </script>
 
 <footer
-  class="status-bar -mx-5 -mb-6 flex flex-wrap items-center gap-2 border-t border-[var(--line-soft)] bg-ink-2 px-5 py-2 font-mono text-[10px] tracking-[0.06em] text-muted-warm md:-mx-8 md:mb-0 md:px-8 md:py-2.5"
+  class="status-bar sticky bottom-0 z-20 -mx-5 -mb-6 flex flex-wrap items-center gap-2 border-t border-[var(--line-soft)] bg-ink-2/95 px-5 py-2 font-mono text-[10px] tracking-[0.04em] text-muted backdrop-blur-sm md:-mx-8 md:mb-0 md:px-8 md:py-2.5"
 >
   <span>{words} word{words === 1 ? '' : 's'}</span>
   <span class="sep text-muted-warm opacity-[0.55]" aria-hidden="true">·</span>

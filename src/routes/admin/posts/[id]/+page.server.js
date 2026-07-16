@@ -7,13 +7,13 @@ import {
   deletePost,
   getPostById,
   isSlugTaken,
-  listCategories,
   publishPost,
   unpublishPost,
-  updatePostMetadata
+  updatePostMetadataWithTags
 } from '$lib/server/db/admin-queries';
+import { getPostTagSlugs, listCategories, listTags } from '$lib/server/db/admin-taxonomy';
 import { postMetadataSchema, normalisePublishAt } from '$lib/server/validation';
-import { revalidatePost, signPreviewToken } from '$lib/server/publish';
+import { revalidateTaxonomyChange, signPreviewToken } from '$lib/server/publish';
 
 export const prerender = false;
 
@@ -21,8 +21,12 @@ export const prerender = false;
 export async function load({ params }) {
   const post = await getPostById(params.id);
   if (!post) error(404, 'Post not found.');
-  const categories = await listCategories();
-  return { post, categories };
+  const [categories, tags, postTagSlugs] = await Promise.all([
+    listCategories(),
+    listTags(),
+    getPostTagSlugs(params.id)
+  ]);
+  return { post, categories, tags, postTagSlugs };
 }
 
 /** @type {import('./$types').Actions} */
@@ -31,6 +35,7 @@ export const actions = {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
     const form = await request.formData();
     const raw = Object.fromEntries(form.entries());
+    const tagSlugs = form.getAll('tags').map(String);
     const values = formValues(raw);
 
     const parsed = postMetadataSchema.safeParse({
@@ -42,21 +47,43 @@ export const actions = {
       dek:           raw.dek,
       author:        raw.author || SITE.brand,
       coverImageUrl: (raw.coverImageUrl ? String(raw.coverImageUrl) : null),
-      publishAt:     raw.publishAt ?? ''
+      seoTitle:        raw.seoTitle ?? '',
+      seoDescription:  raw.seoDescription ?? '',
+      canonicalUrl:    raw.canonicalUrl ?? '',
+      socialImageUrl:  raw.socialImageUrl ?? '',
+      socialImageAlt:  raw.socialImageAlt ?? '',
+      noIndex:         raw.noIndex ?? 'false',
+      publishAt:     raw.publishAt ?? '',
+      tags:          tagSlugs
     });
 
     if (!parsed.success) {
       return fail(400, actionFailure(
         parsed.error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join('; '),
-        { values }
+        { values, tagSlugs }
       ));
     }
 
     if (await isSlugTaken(parsed.data.slug, params.id)) {
-      return fail(409, actionFailure('That slug is already taken by another post.', { values }));
+      return fail(409, actionFailure('That slug is already taken by another post.', { values, tagSlugs }));
     }
 
-    await updatePostMetadata(params.id, {
+    const [before, oldTagSlugs, availableCategories, availableTags] = await Promise.all([
+      getPostById(params.id),
+      getPostTagSlugs(params.id),
+      listCategories(),
+      listTags()
+    ]);
+    if (!before) return fail(404, actionFailure('Post not found.', { values, tagSlugs }));
+    const availableTagSlugs = new Set(availableTags.map((tag) => tag.slug));
+    if (tagSlugs.some((slug) => !availableTagSlugs.has(slug))) {
+      return fail(400, actionFailure('One or more selected tags no longer exist.', { values, tagSlugs }));
+    }
+    if (!availableCategories.some((category) => category.slug === parsed.data.category)) {
+      return fail(400, actionFailure('The selected category no longer exists.', { values, tagSlugs }));
+    }
+
+    const metadata = {
       slug:          parsed.data.slug,
       titlePre:      parsed.data.titlePre,
       titleEm:       parsed.data.titleEm,
@@ -65,32 +92,72 @@ export const actions = {
       dek:           parsed.data.dek,
       author:        parsed.data.author,
       coverImageUrl: parsed.data.coverImageUrl,
+      seoTitle:       parsed.data.seoTitle,
+      seoDescription: parsed.data.seoDescription,
+      canonicalUrl:   parsed.data.canonicalUrl,
+      socialImageUrl: parsed.data.socialImageUrl,
+      socialImageAlt: parsed.data.socialImageAlt,
+      noIndex:        parsed.data.noIndex,
       publishAt:     normalisePublishAt(parsed.data.publishAt)
-    });
+    };
+    await updatePostMetadataWithTags(params.id, metadata, tagSlugs);
+
+    if (before.status === 'published') {
+      await revalidateTaxonomyChange({
+        posts: [{
+          slug: before.slug,
+          status: before.status,
+          category: before.category,
+          tagSlugs: oldTagSlugs,
+          nextSlug: metadata.slug,
+          nextCategory: metadata.category,
+          nextTagSlugs: tagSlugs
+        }]
+      });
+    }
 
     return actionSuccess({ message: 'saved.' });
   },
 
   delete: async ({ params, locals }) => {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
+    const tagSlugs = await getPostTagSlugs(params.id);
     const row = await deletePost(params.id);
     if (row?.status === 'published') {
-      await revalidatePost(row.category, row.slug);
+      await revalidateTaxonomyChange({ posts: [{ ...row, tagSlugs }] });
     }
     redirect(303, '/admin');
   },
 
   publish: async ({ params, locals }) => {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
+    const tagSlugs = await getPostTagSlugs(params.id);
     const row = await publishPost(params.id);
-    if (row) await revalidatePost(row.category, row.slug);
+    if (row) {
+      await revalidateTaxonomyChange({
+        posts: [{ ...row, status: 'published', tagSlugs }]
+      });
+    }
     return actionSuccess({ message: 'saved.', status: 'published' });
   },
 
   unpublish: async ({ params, locals }) => {
     if (!locals.user) return fail(401, actionFailure('Not signed in.'));
+    const [before, tagSlugs] = await Promise.all([
+      getPostById(params.id),
+      getPostTagSlugs(params.id)
+    ]);
     const row = await unpublishPost(params.id);
-    if (row) await revalidatePost(row.category, row.slug);
+    if (row && before) {
+      await revalidateTaxonomyChange({
+        posts: [{
+          slug: before.slug,
+          status: before.status,
+          category: before.category,
+          tagSlugs
+        }]
+      });
+    }
     return actionSuccess({ message: 'saved.', status: 'draft' });
   },
 

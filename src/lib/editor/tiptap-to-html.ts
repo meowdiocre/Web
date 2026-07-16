@@ -9,10 +9,47 @@ import type {
   Mark
 } from './types';
 
+function safeUrl(value: string, protocols: string[]): string | null {
+  const href = value.trim();
+  if (!href) return null;
+  try {
+    const protocol = new URL(href, 'https://local.invalid').protocol;
+    return protocols.includes(protocol) ? href : null;
+  } catch {
+    return null;
+  }
+}
+
+function safeHref(value: string): string | null {
+  return safeUrl(value, ['http:', 'https:', 'mailto:']);
+}
+
+function safeInlineTag(tag: string): string {
+  const simple = tag.match(/^<\s*(\/?)\s*(em|strong|code)\s*>$/i);
+  if (simple) return `<${simple[1]}${simple[2].toLowerCase()}>`;
+  if (/^<\s*\/\s*a\s*>$/i.test(tag)) return '</a>';
+  if (!/^<\s*a\b/i.test(tag)) return '';
+
+  const hrefMatch = tag.match(/\bhref\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+))/i);
+  const href = safeHref(hrefMatch?.[1] ?? hrefMatch?.[2] ?? hrefMatch?.[3] ?? '');
+  return href ? `<a href="${escapeAttr(href)}">` : '';
+}
+
+function sanitizeInlineHtml(value: string): string {
+  let out = '';
+  let offset = 0;
+  for (const match of value.matchAll(/<[^>]*>/g)) {
+    out += escapeHtml(value.slice(offset, match.index));
+    out += safeInlineTag(match[0]);
+    offset = (match.index ?? 0) + match[0].length;
+  }
+  return out + escapeHtml(value.slice(offset));
+}
+
 function renderInlineNode(node: InlineNode): string {
   if (node.type === 'sidenote') {
     const ref      = escapeHtml(node.attrs.ref ?? '');
-    const bodyHtml = node.attrs.bodyHtml ?? '';
+    const bodyHtml = sanitizeInlineHtml(node.attrs.bodyHtml ?? '');
     return `<span class="sidenote-ref">${ref}</span>` +
            `<span class="sidenote">${ref}${bodyHtml ? ' ' + bodyHtml : ''}</span>`;
   }
@@ -30,8 +67,8 @@ function wrapMark(inner: string, mark: Mark): string {
     case 'italic': return `<em>${inner}</em>`;
     case 'code':   return `<code>${inner}</code>`;
     case 'link': {
-      const href = escapeAttr(mark.attrs.href ?? '');
-      return `<a href="${href}">${inner}</a>`;
+      const href = safeHref(mark.attrs.href ?? '');
+      return href ? `<a href="${escapeAttr(href)}">${inner}</a>` : inner;
     }
   }
 }
@@ -50,7 +87,7 @@ function renderBlock(node: BlockNode): string {
     case 'paragraph':
       return `<p>${renderInline(node.content)}</p>`;
     case 'heading': {
-      const level = node.attrs?.level ?? 2;
+      const level = node.attrs?.level === 3 ? 3 : 2;
       return `<h${level}>${renderInline(node.content)}</h${level}>`;
     }
     case 'bulletList':
@@ -71,11 +108,13 @@ function renderBlock(node: BlockNode): string {
     case 'endSlug':
       return `<div class="end"><span class="glyph" aria-hidden="true">${BRAND_GLYPH}</span><span>${escapeHtml(node.attrs.text)}</span></div>`;
     case 'image': {
-      const src   = escapeAttr(node.attrs.src);
+      const safeSrc = safeUrl(node.attrs.src, ['http:', 'https:']);
+      if (!safeSrc) return '';
+      const src   = escapeAttr(safeSrc);
       const alt   = escapeAttr(node.attrs.alt ?? '');
       const title = node.attrs.title  ? ` title="${escapeAttr(node.attrs.title)}"` : '';
-      const w     = node.attrs.width  ? ` width="${node.attrs.width}"`   : '';
-      const h     = node.attrs.height ? ` height="${node.attrs.height}"` : '';
+      const w     = Number.isInteger(node.attrs.width)  ? ` width="${node.attrs.width}"`   : '';
+      const h     = Number.isInteger(node.attrs.height) ? ` height="${node.attrs.height}"` : '';
       return `<figure class="essay-image"><img src="${src}" alt="${alt}"${title}${w}${h} loading="lazy" /></figure>`;
     }
     default:

@@ -1,5 +1,6 @@
 export const SITE = Object.freeze({
   brand:           'meowdiocre',
+  url:             'https://www.meowdiocre.net',
   session:         'meowdiocre',
   host:            'CPUID(1).ECX[31]',
   email:           'meowdiocre@proton.me',

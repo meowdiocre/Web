@@ -36,6 +36,12 @@ export interface SeededPost {
   docJson: unknown;
   bodyHtml: string;
   footnotesJson: unknown;
+  seoTitle: string;
+  seoDescription: string;
+  canonicalUrl: string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
+  noIndex: boolean;
 }
 
 export interface SeededCategory {
@@ -130,7 +136,13 @@ export async function buildSeedPlan(): Promise<SeedPlan> {
         publishedAt,
         docJson: { type: 'doc', content: [] },
         bodyHtml: '',
-        footnotesJson: []
+        footnotesJson: [],
+        seoTitle: entry.title,
+        seoDescription: entry.desc,
+        canonicalUrl: null,
+        socialImageUrl: null,
+        socialImageAlt: null,
+        noIndex: false
       });
     }
   }
@@ -148,7 +160,13 @@ export async function buildSeedPlan(): Promise<SeedPlan> {
     publishedAt: parseEntryDate('Mar 14', 2026),
     docJson: fullDoc,
     bodyHtml,
-    footnotesJson: article.footnotes ?? []
+    footnotesJson: article.footnotes ?? [],
+    seoTitle: `${article.head.title.pre}${article.head.title.em}${article.head.title.post}`,
+    seoDescription: article.head.dek,
+    canonicalUrl: null,
+    socialImageUrl: null,
+    socialImageAlt: null,
+    noIndex: false
   };
 
   const fullIndex = out.findIndex((post) => post.slug === FULL_ARTICLE_SLUG);

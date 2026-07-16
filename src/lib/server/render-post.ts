@@ -8,11 +8,7 @@ async function rehighlightDoc(doc: Doc): Promise<Doc> {
     if (node.type === 'codeBlock') {
       const cb   = node as CodeBlockNode;
       const lang = (cb.attrs.lang || 'plaintext').toLowerCase();
-      if (!cb.attrs.source || lang === 'plaintext') {
-        content.push(cb);
-        continue;
-      }
-      const html = await highlightToClasses(cb.attrs.source, lang);
+      const html = await highlightToClasses(cb.attrs.source ?? '', lang);
       content.push({ ...cb, attrs: { ...cb.attrs, html } });
     } else {
       content.push(node);

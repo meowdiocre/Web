@@ -38,7 +38,14 @@
     if (!open || !root || !(event.target instanceof Node)) return;
 
     const trigger = root.querySelector('.menu-trigger');
-    if (root.contains(event.target) && !trigger?.contains(event.target)) close();
+    if (!root.contains(event.target) || trigger?.contains(event.target)) return;
+
+    const action = event.target instanceof Element
+      ? event.target.closest('button, a')
+      : null;
+    if (action instanceof HTMLButtonElement && action.type === 'submit') return;
+
+    queueMicrotask(close);
   }
 
   /** @param {KeyboardEvent} event */
@@ -71,7 +78,7 @@
     onclick={toggle}
     class="menu-trigger inline-flex size-11 cursor-pointer items-center justify-center gap-1
            border border-[var(--line-soft)] bg-transparent text-paper
-           transition-[border-color,background-color] duration-[120ms]
+           transition-[border-color,background-color] duration-150
            hover:border-rose hover:bg-accent-wash
            focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose
            aria-expanded:border-rose aria-expanded:bg-accent-wash

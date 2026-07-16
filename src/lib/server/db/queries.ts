@@ -1,11 +1,11 @@
-import { and, desc, eq, lte, ne } from 'drizzle-orm';
+import { and, desc, eq, ne } from 'drizzle-orm';
 import { SITE } from '$lib/config/site.js';
 import { articlePath } from '$lib/blog/urls';
 import { composeTitle } from '$lib/util/strings';
 import { normalizeCategoryIcon } from '$lib/icons/icon-names';
 import type { CategoryIconName } from '$lib/icons/icon-names';
 import { db } from './client';
-import { posts, categories } from './schema';
+import { posts, categories, postTags, tags } from './schema';
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -35,6 +35,42 @@ export interface EntryGroup {
   entries: PublicEntry[];
 }
 
+export interface PublicEntryRow {
+  slug: string;
+  titlePre: string;
+  titleEm: string;
+  titlePost: string;
+  dek: string;
+  publishedAt: Date | null;
+  coverImageUrl: string | null;
+  categorySlug: string;
+  categoryLabel: string | null;
+  categoryIcon: string | null;
+}
+
+export function groupPublicEntryRows(rows: PublicEntryRow[]): EntryGroup[] {
+  const byYear = new Map<number, PublicEntry[]>();
+  for (const row of rows) {
+    const when = row.publishedAt ?? new Date(0);
+    const year = when.getUTCFullYear();
+    const entry: PublicEntry = {
+      href: articlePath(row.categorySlug, row.slug),
+      date: shortDate(when),
+      title: composeTitle({ pre: row.titlePre, em: row.titleEm, post: row.titlePost }),
+      desc: row.dek,
+      category: row.categoryLabel ?? '',
+      categoryIcon: normalizeCategoryIcon(row.categoryIcon),
+      coverImageUrl: row.coverImageUrl
+    };
+    const entries = byYear.get(year);
+    if (entries) entries.push(entry);
+    else byYear.set(year, [entry]);
+  }
+  return [...byYear.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([year, entries]) => ({ year, entries }));
+}
+
 export async function loadPublicEntries(): Promise<EntryGroup[]> {
   const rows = await db
     .select({
@@ -54,26 +90,7 @@ export async function loadPublicEntries(): Promise<EntryGroup[]> {
     .where(eq(posts.status, 'published'))
     .orderBy(desc(posts.publishedAt));
 
-  const byYear = new Map<number, PublicEntry[]>();
-  for (const r of rows) {
-    const when  = r.publishedAt ?? new Date(0);
-    const year  = when.getUTCFullYear();
-    const entry: PublicEntry = {
-      href:     articlePath(r.categorySlug, r.slug),
-      date:     shortDate(when),
-      title:    composeTitle({ pre: r.titlePre, em: r.titleEm, post: r.titlePost }),
-      desc:     r.dek,
-      category: r.categoryLabel ?? '',
-      categoryIcon: normalizeCategoryIcon(r.categoryIcon),
-      coverImageUrl: r.coverImageUrl
-    };
-    const arr = byYear.get(year);
-    if (arr) arr.push(entry);
-    else byYear.set(year, [entry]);
-  }
-  return [...byYear.entries()]
-    .sort((a, b) => b[0] - a[0])
-    .map(([year, entries]) => ({ year, entries }));
+  return groupPublicEntryRows(rows);
 }
 
 export interface PublicArticle {
@@ -89,6 +106,17 @@ export interface PublicArticle {
   bodyHtml:  string;
   footnotes: Array<{ html: string }>;
   category:  string;
+  tags: Array<{ slug: string; label: string }>;
+  seo: {
+    title: string | null;
+    description: string | null;
+    canonicalUrl: string | null;
+    socialImageUrl: string | null;
+    socialImageAlt: string | null;
+    noIndex: boolean;
+    publishedAt: Date | null;
+    updatedAt: Date;
+  };
 }
 
 export interface RelatedEntry {
@@ -106,6 +134,7 @@ export async function loadPublicArticle(
 ): Promise<PublicArticle | null> {
   const rows = await db
     .select({
+      id:          posts.id,
       slug:        posts.slug,
       titlePre:    posts.titlePre,
       titleEm:     posts.titleEm,
@@ -118,6 +147,13 @@ export async function loadPublicArticle(
       bodyHtml:    posts.bodyHtml,
       footnotes:   posts.footnotesJson,
       coverImageUrl: posts.coverImageUrl,
+      seoTitle: posts.seoTitle,
+      seoDescription: posts.seoDescription,
+      canonicalUrl: posts.canonicalUrl,
+      socialImageUrl: posts.socialImageUrl,
+      socialImageAlt: posts.socialImageAlt,
+      noIndex: posts.noIndex,
+      updatedAt: posts.updatedAt,
       category:    posts.category,
       categoryLabel: categories.label,
       categoryIcon: categories.icon
@@ -133,6 +169,12 @@ export async function loadPublicArticle(
 
   const when = r.publishedAt ?? new Date();
   const fns  = Array.isArray(r.footnotes) ? r.footnotes as Array<{ html: string }> : [];
+  const articleTags = await db
+    .select({ slug: tags.slug, label: tags.label })
+    .from(postTags)
+    .innerJoin(tags, eq(postTags.tagSlug, tags.slug))
+    .where(eq(postTags.postId, r.id))
+    .orderBy(tags.label);
 
   return {
     slug: r.slug,
@@ -146,7 +188,18 @@ export async function loadPublicArticle(
     },
     bodyHtml:  r.bodyHtml,
     footnotes: fns,
-    category:  r.category
+    category:  r.category,
+    tags: articleTags,
+    seo: {
+      title: r.seoTitle,
+      description: r.seoDescription,
+      canonicalUrl: r.canonicalUrl,
+      socialImageUrl: r.socialImageUrl,
+      socialImageAlt: r.socialImageAlt,
+      noIndex: r.noIndex,
+      publishedAt: r.publishedAt,
+      updatedAt: r.updatedAt
+    }
   };
 }
 
@@ -204,12 +257,22 @@ export async function loadFeedPosts(limit: number) {
     .limit(limit);
 }
 
-export async function loadDuePosts(now: Date) {
+export interface SitemapPost {
+  slug: string;
+  category: string;
+  updatedAt: Date;
+  noIndex: boolean;
+}
+
+export async function loadSitemapPosts(): Promise<SitemapPost[]> {
   return db
-    .select()
+    .select({
+      slug: posts.slug,
+      category: posts.category,
+      updatedAt: posts.updatedAt,
+      noIndex: posts.noIndex
+    })
     .from(posts)
-    .where(and(
-      eq(posts.status, 'draft'),
-      lte(posts.publishAt, now)
-    ));
+    .where(and(eq(posts.status, 'published'), eq(posts.noIndex, false)))
+    .orderBy(desc(posts.updatedAt));
 }

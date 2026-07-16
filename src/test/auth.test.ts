@@ -57,8 +57,9 @@ function fakeEvent(path: string, cookies: FakeCookies) {
 
 async function callHandle(path: string, cookies: FakeCookies) {
   let resolved = false;
+  let response: Response | null = null;
   try {
-    await handle({
+    response = await handle({
       event: fakeEvent(path, cookies),
       resolve: async () => {
         resolved = true;
@@ -74,7 +75,7 @@ async function callHandle(path: string, cookies: FakeCookies) {
     }
     throw e;
   }
-  return { status: 200, resolved };
+  return { status: 200, resolved, headers: response?.headers };
 }
 
 describe('admin gate', () => {
@@ -95,10 +96,22 @@ describe('admin gate', () => {
     expect(r2.status).toBe(200);
   });
 
+  it('lets the cron endpoint perform its own bearer-token authentication', async () => {
+    const result = await callHandle('/admin/api/cron/publish', fakeCookies());
+    expect(result.status).toBe(200);
+    expect(result.resolved).toBe(true);
+  });
+
+  it('lets admin API handlers return API-shaped authentication errors', async () => {
+    const result = await callHandle('/admin/api/media', fakeCookies());
+    expect(result.status).toBe(200);
+    expect(result.resolved).toBe(true);
+  });
+
   it('allows /admin when the cookie validates and yields a user', async () => {
     (auth.validateSessionToken as any).mockResolvedValueOnce({
       session: { id: 'abc', userId: 'u1', expiresAt: new Date(Date.now() + 1_000_000), createdAt: new Date() },
-      user:    { id: 'u1', githubLogin: 'devirtz', githubId: 1, name: null, avatarUrl: null, createdAt: new Date() }
+      user:    { id: 'u1', githubLogin: 'meowdiocre', githubId: 1, name: null, avatarUrl: null, createdAt: new Date() }
     });
     const cookies = fakeCookies({ [SESSION_COOKIE]: 'sometoken' });
     const r = await callHandle('/admin', cookies);
@@ -118,5 +131,23 @@ describe('admin gate', () => {
     const cookies = fakeCookies();
     expect((await callHandle('/',     cookies)).status).toBe(200);
     expect((await callHandle('/blog', cookies)).status).toBe(200);
+  });
+
+  it('sets baseline browser protections and prevents admin caching', async () => {
+    (auth.validateSessionToken as any).mockResolvedValueOnce({
+      session: { id: 'abc', userId: 'u1', expiresAt: new Date(Date.now() + 1_000_000), createdAt: new Date() },
+      user: { id: 'u1', githubLogin: 'meowdiocre', githubId: 1, name: null, avatarUrl: null, createdAt: new Date() }
+    });
+    const result = await callHandle('/admin', fakeCookies({ [SESSION_COOKIE]: 'sometoken' }));
+
+    expect(result.headers?.get('cache-control')).toBe('private, no-store');
+    expect(result.headers?.get('x-content-type-options')).toBe('nosniff');
+    expect(result.headers?.get('referrer-policy')).toBe('strict-origin-when-cross-origin');
+    expect(result.headers?.get('content-security-policy')).toContain("frame-ancestors 'none'");
+  });
+
+  it('does not expose logout as a GET endpoint', async () => {
+    const logout = await import('../routes/admin/logout/+server.js');
+    expect('GET' in logout).toBe(false);
   });
 });

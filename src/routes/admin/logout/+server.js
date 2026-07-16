@@ -11,5 +11,3 @@ export async function POST({ cookies, locals }) {
   cookies.set(SESSION_COOKIE, '', expiredCookieOptions());
   redirect(302, '/');
 }
-
-export const GET = POST;

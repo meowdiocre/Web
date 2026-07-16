@@ -1,6 +1,7 @@
 <script>
   import { SITE }      from '$lib/config/site.js';
   import Nav           from '$lib/components/Nav.svelte';
+  import SeoHead       from '$lib/components/SeoHead.svelte';
   import Footer        from '$lib/components/Footer.svelte';
   import SkipLink      from '$lib/components/SkipLink.svelte';
   import PageKicker    from '$lib/components/PageKicker.svelte';
@@ -12,20 +13,24 @@
   import PixelIcon     from '$lib/components/PixelIcon.svelte';
   import { reveal } from '$lib/motion/reveal';
   import { page } from '$app/stores';
+  import { resolvePageSeo } from '$lib/seo/post';
 
   /** @type {{ data: { entryGroups: Promise<import('$lib/server/db/queries').EntryGroup[]> | import('$lib/server/db/queries').EntryGroup[] } }} */
   let { data } = $props();
   let searchQuery = $state($page.url.searchParams.get('q') ?? '');
   let categoryFilter = $state($page.url.searchParams.get('category') ?? 'all');
+  const seo = resolvePageSeo({
+    siteUrl: SITE.url,
+    path: '/blog',
+    siteName: SITE.brand,
+    title: 'Writing',
+    description: 'Long-form essays and lab notes on Windows internals, anti-cheat, browser sandboxes, and large model behavior.',
+    imageUrl: '/rei.jpg',
+    imageAlt: `${SITE.brand} writing archive`
+  });
 </script>
 
-<svelte:head>
-  <title>Writing | {SITE.brand}</title>
-  <meta
-    name="description"
-    content="Long-form essays and lab notes on Windows internals, anti-cheat, browser sandboxes, and large model behavior."
-  />
-</svelte:head>
+<SeoHead {seo} />
 
 <SkipLink target="#journal-title" />
 

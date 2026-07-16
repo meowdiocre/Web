@@ -1,6 +1,7 @@
 <script>
   import { SITE } from '$lib/config/site.js';
   import Nav          from '$lib/components/Nav.svelte';
+  import SeoHead      from '$lib/components/SeoHead.svelte';
   import Footer       from '$lib/components/Footer.svelte';
   import SkipLink     from '$lib/components/SkipLink.svelte';
   import Polaroid     from '$lib/components/Polaroid.svelte';
@@ -8,17 +9,21 @@
   import BracketDefs  from '$lib/components/BracketDefs.svelte';
   import BtnPrimary   from '$lib/components/BtnPrimary.svelte';
   import CtaText      from '$lib/components/CtaText.svelte';
+  import { resolvePageSeo } from '$lib/seo/post';
 
   const TAGS = ['reversing', 'virtualization', 'web', 'os'];
+  const seo = resolvePageSeo({
+    siteUrl: SITE.url,
+    path: '/',
+    siteName: SITE.brand,
+    title: SITE.brand,
+    description: 'Learn the rules like an expert, so you can break them like an artist.',
+    imageUrl: '/lain.png',
+    imageAlt: `${SITE.brand} homepage`
+  });
 </script>
 
-<svelte:head>
-  <title>{SITE.brand}</title>
-  <meta
-    name="description"
-    content="Learn the rules like an expert, so you can break them like an artist"
-  />
-</svelte:head>
+<SeoHead {seo} />
 
 <SkipLink target="#hero" />
 

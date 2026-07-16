@@ -1,18 +1,20 @@
-import { createCategory, createDraft } from '$lib/server/db/admin-queries';
-import { newCategorySchema, newPostSchema } from '$lib/server/validation';
+import { createDraft } from '$lib/server/db/admin-queries';
+import { isCategorySlugTaken } from '$lib/server/db/admin-taxonomy';
+import { newPostSchema } from '$lib/server/validation';
 import { actionFailure, actionSuccess } from './action-result';
-import { resolveCategorySlug, resolveDraftSlug } from './slugs';
+import { resolveDraftSlug } from './slugs';
+
+export {
+  categoryFormValues,
+  createCategoryFromForm,
+  deleteCategoryFromForm
+} from './taxonomy-workflows';
+export type { CategoryFormState } from './taxonomy-workflows';
 
 export interface PostDraftFormState {
   title?: string;
   slug?: string;
   category?: string;
-}
-
-export interface CategoryFormState {
-  label?: string;
-  slug?: string;
-  icon?: string;
 }
 
 function field(form: FormData, name: string): string {
@@ -21,10 +23,6 @@ function field(form: FormData, name: string): string {
 
 export function draftFormValues(form: FormData): PostDraftFormState {
   return { title: field(form, 'title'), slug: field(form, 'slug'), category: field(form, 'category') };
-}
-
-export function categoryFormValues(form: FormData): CategoryFormState {
-  return { label: field(form, 'label'), slug: field(form, 'slug'), icon: field(form, 'icon') };
 }
 
 export async function createDraftFromForm(values: PostDraftFormState, author: string) {
@@ -40,6 +38,16 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
         title: String(values.title ?? ''),
         slug: String(values.slug ?? ''),
         category: String(values.category ?? '')
+      }
+    });
+  }
+
+  if (!await isCategorySlugTaken(parsed.data.category)) {
+    return actionFailure('The selected category no longer exists.', {
+      values: {
+        title: parsed.data.title,
+        slug: parsed.data.slug,
+        category: parsed.data.category
       }
     });
   }
@@ -65,45 +73,6 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
     category: parsed.data.category,
     dek: '',
     author
-  });
-
-  return actionSuccess({ row });
-}
-
-export async function createCategoryFromForm(values: CategoryFormState) {
-  const parsed = newCategorySchema.safeParse({
-    label: values.label,
-    slug: values.slug ?? '',
-    icon: values.icon
-  });
-
-  if (!parsed.success) {
-    return actionFailure('Label and icon are required. Use lowercase letters, digits, and hyphens for a custom slug.', {
-      values: {
-        label: String(values.label ?? ''),
-        slug: String(values.slug ?? ''),
-        icon: String(values.icon ?? '')
-      }
-    });
-  }
-
-  let slug: string;
-  try {
-    slug = await resolveCategorySlug(parsed.data.label, parsed.data.slug);
-  } catch (error) {
-    return actionFailure(error instanceof Error ? error.message : 'Could not create a slug for this category.', {
-      values: {
-        label: parsed.data.label,
-        slug: parsed.data.slug,
-        icon: parsed.data.icon
-      }
-    });
-  }
-
-  const row = await createCategory({
-    slug,
-    label: parsed.data.label,
-    icon: parsed.data.icon
   });
 
   return actionSuccess({ row });

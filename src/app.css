@@ -166,6 +166,13 @@ body[data-page='article'][data-theme='slate'] {
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--color-paper); outline-offset: 3px; }
 
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none !important;
+  border-color: var(--color-rose);
+}
+
 body[data-page='blog'] :focus-visible,
 body[data-page='article']:not([data-theme='slate']) :focus-visible {
   outline-color: var(--color-crimson);
@@ -182,7 +189,7 @@ body[data-page='article']:not([data-theme='slate']) :focus-visible {
 .tooltip {
   position: fixed;
   top: 0; left: 0;
-  z-index: 9999;
+  z-index: 50;
   padding: 5px 10px;
   background: var(--color-overlay);
   color: var(--color-bone);

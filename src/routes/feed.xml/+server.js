@@ -12,8 +12,8 @@ function rfc822(d) {
 export const prerender = false;
 
 /** @type {import('./$types').RequestHandler} */
-export async function GET({ url, setHeaders }) {
-  const origin = url.origin;
+export async function GET({ setHeaders }) {
+  const origin = new URL(SITE.url).origin;
   const rows = await loadFeedPosts(SITE.feed.itemCount);
 
   const lastBuild = rows[0]?.publishedAt ?? new Date();

@@ -13,10 +13,10 @@
   icon="plus"
   eyebrow="~/admin/posts/new"
   title="new post"
-  description="Create a draft and jump straight into the editor. You can finish metadata later."
+  description="Start with the essentials. The editor opens after the draft is created."
 />
 
-<div class="max-w-[640px]">
+<div class="max-w-[680px]">
   <PostDraftForm
     categories={data.categories}
     values={form?.ok === false ? form.values ?? {} : {}}
@@ -24,7 +24,6 @@
   >
     {#snippet footer()}
       <AdminButton href="/admin" icon="close" label="cancel" />
-      <AdminButton href="/admin/categories" icon="folder" label="manage categories" />
     {/snippet}
   </PostDraftForm>
 </div>

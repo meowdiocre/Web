@@ -13,6 +13,8 @@
    * @property {'button'|'submit'|'reset'} [type]
    * @property {boolean} [disabled]
    * @property {ButtonState} [state]
+   * @property {string} [loadingLabel]
+   * @property {string} [ariaLabel]
    * @property {(event: MouseEvent) => void} [onclick]
    */
 
@@ -25,6 +27,8 @@
     type = 'button',
     disabled = false,
     state = 'idle',
+    loadingLabel = 'working...',
+    ariaLabel = '',
     onclick
   } = $props();
 
@@ -45,48 +49,58 @@
   <a
     href={inactive ? undefined : href}
            class="admin-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 whitespace-nowrap
-           border border-transparent bg-transparent px-4 py-2.5 font-mono text-[11px] leading-none
-           tracking-[0.08em] no-underline transition-[background-color,border-color,color,transform]
-           duration-[120ms] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+           border border-transparent bg-transparent px-3.5 py-2.5 font-mono text-[12px] leading-none
+           tracking-[0.04em] no-underline transition-[background-color,border-color,color,transform]
+           duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
            focus-visible:outline-rose [&:active:not([aria-disabled='true'])]:translate-y-px
            aria-disabled:cursor-not-allowed aria-disabled:opacity-50 aria-disabled:active:translate-y-0
            data-[state=error]:border-crimson data-[state=error]:text-rose
            data-[state=success]:border-paper-2 data-[state=success]:text-paper-2 motion-reduce:duration-0
-           {variant === 'primary'
-             ? 'bg-crimson-deep text-paper hover:border-rose'
-             : variant === 'danger'
-               ? 'border-crimson-deep text-rose hover:bg-crimson-deep hover:text-paper'
-               : 'border-[var(--line-soft)] text-paper hover:border-rose hover:text-rose'}"
+           data-[variant=primary]:border-crimson-deep data-[variant=primary]:bg-crimson-deep
+           data-[variant=primary]:text-paper data-[variant=primary]:hover:border-rose
+           data-[variant=primary]:hover:bg-crimson data-[variant=danger]:border-crimson-deep
+           data-[variant=danger]:text-rose data-[variant=danger]:hover:bg-crimson-deep
+           data-[variant=danger]:hover:text-paper data-[variant=ghost]:border-[var(--line-soft)]
+           data-[variant=ghost]:text-paper data-[variant=ghost]:hover:border-rose
+           data-[variant=ghost]:hover:text-rose"
     data-state={state}
+    data-variant={variant}
+    data-loading-label={loadingLabel}
+    aria-label={ariaLabel || undefined}
     aria-disabled={inactive ? 'true' : undefined}
     onclick={handleClick}
   >
     <PixelIcon name={stateIcon} size={15} />
-    <span>{label}</span>
+    <span data-action-label>{label}</span>
   </a>
 {:else}
   <button
     {type}
     disabled={inactive}
            class="admin-button inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 whitespace-nowrap
-           border border-transparent bg-transparent px-4 py-2.5 font-mono text-[11px] leading-none
-           tracking-[0.08em] no-underline transition-[background-color,border-color,color,transform]
-           duration-[120ms] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
+           border border-transparent bg-transparent px-3.5 py-2.5 font-mono text-[12px] leading-none
+           tracking-[0.04em] no-underline transition-[background-color,border-color,color,transform]
+           duration-150 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2
            focus-visible:outline-rose [&:active:not(:disabled)]:translate-y-px
            disabled:cursor-not-allowed disabled:opacity-50 disabled:active:translate-y-0
            data-[state=error]:border-crimson data-[state=error]:text-rose
            data-[state=success]:border-paper-2 data-[state=success]:text-paper-2 motion-reduce:duration-0
-           {variant === 'primary'
-             ? 'bg-crimson-deep text-paper hover:border-rose'
-             : variant === 'danger'
-               ? 'border-crimson-deep text-rose hover:bg-crimson-deep hover:text-paper'
-               : 'border-[var(--line-soft)] text-paper hover:border-rose hover:text-rose'}"
+           data-[variant=primary]:border-crimson-deep data-[variant=primary]:bg-crimson-deep
+           data-[variant=primary]:text-paper data-[variant=primary]:hover:border-rose
+           data-[variant=primary]:hover:bg-crimson data-[variant=danger]:border-crimson-deep
+           data-[variant=danger]:text-rose data-[variant=danger]:hover:bg-crimson-deep
+           data-[variant=danger]:hover:text-paper data-[variant=ghost]:border-[var(--line-soft)]
+           data-[variant=ghost]:text-paper data-[variant=ghost]:hover:border-rose
+           data-[variant=ghost]:hover:text-rose"
     data-state={state}
+    data-variant={variant}
+    data-loading-label={loadingLabel}
+    aria-label={ariaLabel || undefined}
     aria-busy={state === 'loading' ? 'true' : undefined}
     onclick={handleClick}
   >
     <PixelIcon name={stateIcon} size={15} />
-    <span>{label}</span>
+    <span data-action-label>{label}</span>
   </button>
 {/if}
 

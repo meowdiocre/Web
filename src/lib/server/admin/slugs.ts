@@ -1,4 +1,5 @@
-import { isCategorySlugTaken, isSlugTaken } from '$lib/server/db/admin-queries';
+import { isCategorySlugTaken, isTagSlugTaken } from '$lib/server/db/admin-taxonomy';
+import { isSlugTaken } from '$lib/server/db/admin-queries';
 import { slugify } from '$lib/util/strings';
 
 async function resolveUniqueSlug(
@@ -46,5 +47,19 @@ export async function resolveCategorySlug(label: string, requestedSlug = ''): Pr
     (slug) => isCategorySlugTaken(slug),
     20,
     'Category slug collision. Pick a more distinctive label or slug.'
+  );
+}
+
+export async function resolveTagSlug(label: string, requestedSlug = ''): Promise<string> {
+  const baseSlug = slugify(requestedSlug || label);
+  if (!baseSlug) {
+    throw new Error('Could not derive a tag slug from that label.');
+  }
+
+  return resolveUniqueSlug(
+    baseSlug,
+    (slug) => isTagSlugTaken(slug),
+    20,
+    'Tag slug collision. Pick a more distinctive label or slug.'
   );
 }

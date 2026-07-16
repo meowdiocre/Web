@@ -68,4 +68,6 @@
 {/if}
 
 <RouteProgress />
-<TmuxKeymap />
+{#if dataPage !== 'admin'}
+  <TmuxKeymap />
+{/if}

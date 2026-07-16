@@ -22,7 +22,8 @@ export async function PATCH({ request, params, locals }) {
   }
 
   const { bodyHtml, doc } = await renderPost(payload.docJson);
-  await savePostContent(params.id, doc, bodyHtml);
+  const saved = await savePostContent(params.id, doc, bodyHtml);
+  if (!saved) error(404, 'Post not found.');
 
   return json({ ok: true, bytes: bodyHtml.length, doc });
 }

@@ -26,7 +26,7 @@
   } = $props();
 </script>
 
-<form method="POST" action={action} class="grid gap-5">
+<form method="POST" action={action} class="grid gap-6">
   <FormAlert {message} />
 
   <Field
@@ -38,24 +38,47 @@
   />
 
   <Field
-    name="slug"
-    label="slug"
-    value={values.slug ?? ''}
-    placeholder="optional, leave blank to generate"
-    help="Use lowercase letters, digits, and hyphens."
+    name="category"
+    label="category"
+    kind="select"
+    value={values.category ?? ''}
+    options={[
+      { value: '', label: 'pick a category' },
+      ...categories.map((category) => ({ value: category.slug, label: category.label }))
+    ]}
+    required
   />
 
-  <Field name="category" label="category" kind="select" required>
-    <option value="">pick a category</option>
-    {#each categories as category (category.slug)}
-      <option value={category.slug} selected={values.category === category.slug}>
-        {category.label}
-      </option>
-    {/each}
-  </Field>
+  <a
+    href="/admin/categories"
+    class="-mt-3 w-fit font-mono text-[11px] tracking-[0.04em] text-muted underline decoration-[var(--line-strong)] underline-offset-4 hover:text-rose"
+  >manage categories</a>
 
-  <div class="flex items-center gap-2 flex-wrap">
-    <AdminButton type="submit" icon="plus" label={submitLabel} variant="primary" />
+  <details class="group border-t border-[var(--line-soft)] pt-4" open={Boolean(values.slug?.trim())}>
+    <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 font-mono text-[11px] tracking-[0.04em] text-muted hover:text-rose focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rose">
+      <span>custom slug</span>
+      <span class="text-[10px] group-open:hidden" aria-hidden="true">show</span>
+      <span class="hidden text-[10px] group-open:inline" aria-hidden="true">hide</span>
+    </summary>
+    <div class="mt-2">
+      <Field
+        name="slug"
+        label="slug"
+        value={values.slug ?? ''}
+        placeholder="leave blank to generate"
+        help="Use lowercase letters, digits, and hyphens."
+      />
+    </div>
+  </details>
+
+  <div class="flex flex-wrap items-center gap-2 border-t border-[var(--line-soft)] pt-4">
+    <AdminButton
+      type="submit"
+      icon="plus"
+      label={submitLabel}
+      loadingLabel="creating..."
+      variant="primary"
+    />
     {@render footer?.()}
   </div>
 </form>

@@ -1,11 +1,9 @@
 /**
  * npm run seed
  * npm run seed -- --dry-run
- * npm run seed -- --reset
  */
 
 import { drizzle } from 'drizzle-orm/postgres-js';
-import { sql } from 'drizzle-orm';
 
 import {
   categories as categoriesTable,
@@ -17,7 +15,8 @@ import { getDatabaseUrl, openSqlClient } from './lib/runtime';
 async function main() {
   const args    = new Set(process.argv.slice(2));
   const dryRun  = args.has('--dry-run');
-  const doReset = args.has('--reset');
+  const unknown = [...args].filter((arg) => arg !== '--dry-run');
+  if (unknown.length) throw new Error(`Unknown seed option: ${unknown.join(', ')}`);
 
   const url = getDatabaseUrl({ optional: dryRun });
   if (!dryRun && !url) {
@@ -46,12 +45,6 @@ async function main() {
   const db = drizzle(sqlClient);
 
   try {
-    if (doReset) {
-      // eslint-disable-next-line no-console
-      console.log('▷ resetting posts + categories');
-      await db.execute(sql`TRUNCATE TABLE ${postsTable}, ${categoriesTable} RESTART IDENTITY CASCADE`);
-    }
-
     for (const category of categories) {
       await db
         .insert(categoriesTable)
@@ -78,7 +71,13 @@ async function main() {
           publishedAt:   post.publishedAt,
           docJson:       post.docJson as any,
           bodyHtml:      post.bodyHtml,
-          footnotesJson: post.footnotesJson as any
+          footnotesJson:  post.footnotesJson as any,
+          seoTitle:       post.seoTitle,
+          seoDescription: post.seoDescription,
+          canonicalUrl:   post.canonicalUrl,
+          socialImageUrl: post.socialImageUrl,
+          socialImageAlt: post.socialImageAlt,
+          noIndex:        post.noIndex
         })
         .onConflictDoUpdate({
           target: postsTable.slug,
@@ -93,8 +92,14 @@ async function main() {
             publishedAt:   post.publishedAt,
             docJson:       post.docJson as any,
             bodyHtml:      post.bodyHtml,
-            footnotesJson: post.footnotesJson as any,
-            updatedAt:     new Date()
+            footnotesJson:  post.footnotesJson as any,
+            seoTitle:       post.seoTitle,
+            seoDescription: post.seoDescription,
+            canonicalUrl:   post.canonicalUrl,
+            socialImageUrl: post.socialImageUrl,
+            socialImageAlt: post.socialImageAlt,
+            noIndex:        post.noIndex,
+            updatedAt:      new Date()
           }
         });
     }

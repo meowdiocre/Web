@@ -48,22 +48,23 @@ vi.mock('$lib/server/db/client', () => ({
   }
 }));
 
-vi.mock('$lib/server/db/queries', () => ({
-  loadDuePosts: vi.fn()
-}));
 vi.mock('$lib/server/db/admin-queries', () => ({
-  publishPost: vi.fn()
+  publishDuePosts: vi.fn()
+}));
+vi.mock('$lib/server/db/admin-taxonomy', () => ({
+  getPostTagSlugs: vi.fn()
 }));
 vi.mock('$lib/server/publish', async () => {
   const real = await vi.importActual<typeof import('$lib/server/publish')>('$lib/server/publish');
   return {
     ...real,
-    revalidatePaths: vi.fn().mockResolvedValue(undefined)
+    revalidatePaths: vi.fn().mockResolvedValue(undefined),
+    revalidateTaxonomyChange: vi.fn().mockResolvedValue(undefined)
   };
 });
 
-const queries = await import('$lib/server/db/queries');
 const admin   = await import('$lib/server/db/admin-queries');
+const taxonomy = await import('$lib/server/db/admin-taxonomy');
 const publish = await import('$lib/server/publish');
 
 function authedRequest() {
@@ -89,39 +90,39 @@ describe('cron auth', () => {
 describe('cron publish path', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('flips each due post and revalidates their routes', async () => {
+  it('atomically flips due posts and revalidates their routes', async () => {
     const due = [
       { id: 'p1', slug: 'a-slug', category: 'reverse' },
       { id: 'p2', slug: 'b-slug', category: 'windows' }
     ];
-    (queries.loadDuePosts as any).mockResolvedValue(due);
-    (admin.publishPost as any).mockImplementation(async (id: string) => ({ slug: due.find((d) => d.id === id)!.slug }));
+    (admin.publishDuePosts as any).mockResolvedValue(due);
+    (taxonomy.getPostTagSlugs as any).mockImplementation(async (id: string) => id === 'p1' ? ['security'] : ['windows']);
 
     const { GET } = await import('../routes/admin/api/cron/publish/+server.js');
     const res = await GET(authedRequest());
 
-    expect(admin.publishPost).toHaveBeenCalledTimes(2);
-    expect((admin.publishPost as any).mock.calls.map((c: any[]) => c[0])).toEqual(['p1', 'p2']);
+    expect(admin.publishDuePosts).toHaveBeenCalledOnce();
+    expect(admin.publishDuePosts).toHaveBeenCalledWith(expect.any(Date));
 
-    expect(publish.revalidatePaths).toHaveBeenCalledTimes(1);
-    const paths = (publish.revalidatePaths as any).mock.calls[0][0] as string[];
-    expect(paths).toContain('/blog');
-    expect(paths).toContain('/feed.xml');
-    expect(paths).toContain('/blog/reverse/a-slug');
-    expect(paths).toContain('/blog/windows/b-slug');
+    expect(publish.revalidateTaxonomyChange).toHaveBeenCalledWith({
+      posts: [
+        { slug: 'a-slug', status: 'published', category: 'reverse', tagSlugs: ['security'] },
+        { slug: 'b-slug', status: 'published', category: 'windows', tagSlugs: ['windows'] }
+      ]
+    });
 
     const body = await res.json();
     expect(body).toMatchObject({ ok: true, flipped: 2, slugs: ['a-slug', 'b-slug'] });
   });
 
   it('short-circuits with flipped 0 when nothing is due', async () => {
-    (queries.loadDuePosts as any).mockResolvedValue([]);
+    (admin.publishDuePosts as any).mockResolvedValue([]);
     const { GET } = await import('../routes/admin/api/cron/publish/+server.js');
 
     const res = await GET(authedRequest());
     const body = await res.json();
     expect(body).toEqual({ ok: true, flipped: 0 });
-    expect(admin.publishPost).not.toHaveBeenCalled();
-    expect(publish.revalidatePaths).not.toHaveBeenCalled();
+    expect(admin.publishDuePosts).toHaveBeenCalledOnce();
+    expect(publish.revalidateTaxonomyChange).not.toHaveBeenCalled();
   });
 });
