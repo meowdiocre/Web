@@ -3,7 +3,7 @@ export const SITE = Object.freeze({
   url:             'https://www.meowdiocre.net',
   session:         'meowdiocre',
   host:            'CPUID(1).ECX[31]',
-  email:           'meowdiocre@proton.me',
+  email:           'personal@meowdiocre.net',
   github:          'meowdiocre',
   discord:         'meowdiocre',
   copyrightYear:   new Date().getFullYear(),

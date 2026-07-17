@@ -198,4 +198,4 @@ npx drizzle-kit check
 
 ## Contributing
 
-Read [CONTRIBUTING.md](./CONTRIBUTING.md), [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md), and [docs/CODE_STYLE.md](./docs/CODE_STYLE.md) before submitting changes.
+Read [CONTRIBUTING.md](./CONTRIBUTING.md), [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md), [SECURITY.md](./SECURITY.md), and [docs/CODE_STYLE.md](./docs/CODE_STYLE.md) before submitting changes.
