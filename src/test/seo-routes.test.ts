@@ -37,6 +37,7 @@ describe('SEO routes', () => {
     expect(response.status).toBe(200);
     expect(response.headers.get('content-type')).toContain('application/xml');
     expect(xml).toContain('<loc>https://www.meowdiocre.net/</loc>');
+    expect(xml).toContain('<loc>https://www.meowdiocre.net/blog/graph</loc>');
     expect(xml).toContain('<loc>https://www.meowdiocre.net/blog/reverse/example</loc>');
     expect(xml).toContain('<loc>https://www.meowdiocre.net/blog/tag/security</loc>');
     expect(xml).toContain('<lastmod>2026-01-03T04:05:06.000Z</lastmod>');

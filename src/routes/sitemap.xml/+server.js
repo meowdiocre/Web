@@ -6,7 +6,7 @@ import { loadSitemapPosts } from '$lib/server/db/queries';
 /** @type {import('./$types').RequestHandler} */
 export async function GET() {
   const [posts, tags] = await Promise.all([loadSitemapPosts(), loadSitemapTags()]);
-  const staticPaths = ['/', '/blog', '/about'];
+  const staticPaths = ['/', '/blog', '/blog/graph', '/about'];
   const urls = [
     ...staticPaths.map((path) => `  <url><loc>${new URL(path, SITE.url)}</loc></url>`),
     ...posts.filter((post) => !post.noIndex).map((post) => {

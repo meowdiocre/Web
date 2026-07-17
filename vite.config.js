@@ -4,6 +4,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
-  optimizeDeps: { include: ['motion'] },
+  optimizeDeps: { include: ['motion', 'd3-force'] },
   server: { port: 5173 }
 });

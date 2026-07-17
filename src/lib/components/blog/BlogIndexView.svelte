@@ -2,6 +2,7 @@
   import BlogSearchBar from './BlogSearchBar.svelte';
   import BlogCategoryFilters from './BlogCategoryFilters.svelte';
   import BlogEntryFeed from './BlogEntryFeed.svelte';
+  import PixelIcon from '$lib/components/PixelIcon.svelte';
   import { reveal } from '$lib/motion/reveal';
   import {
     buildCategorySummaries,
@@ -73,6 +74,15 @@
 
 <section class="px-[var(--gutter)] pt-2.5" aria-label="Filter entries">
   <div class="mx-auto grid max-w-[880px] gap-2.5" use:reveal={{ y: 12 }}>
+    <a
+      class="group inline-flex min-h-11 w-fit items-center gap-2 justify-self-end border-b border-paper-ink-strong font-mono text-[11px] text-paper-ink-strong transition-colors duration-150 hover:border-crimson-deep hover:text-crimson-deep max-[600px]:justify-self-start max-[600px]:text-[12px]"
+      href="/blog/graph"
+    >
+      <PixelIcon name="git-branch" size={14} />
+      explore knowledge graph
+      <PixelIcon name="arrow-right" size={12} class="transition-transform duration-150 group-hover:translate-x-0.5" />
+    </a>
+
     <BlogSearchBar
       bind:query
       resultCount={filteredCount}
