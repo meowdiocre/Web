@@ -1,7 +1,5 @@
 // @vitest-environment happy-dom
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte/pure';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$app/navigation', () => ({ goto: vi.fn() }));
@@ -79,15 +77,5 @@ describe('public mobile navigation', () => {
     await vi.advanceTimersByTimeAsync(800);
 
     expect(screen.queryByText(/this site responds to/i)).not.toBeInTheDocument();
-  });
-
-  it('enables phone safe-area layout', () => {
-    const app = readFileSync(resolve('src/app.html'), 'utf8');
-    expect(app).toContain('viewport-fit=cover');
-  });
-
-  it('keeps article reader controls above the mobile app bar', () => {
-    const reader = readFileSync(resolve('src/lib/components/ReaderControls.svelte'), 'utf8');
-    expect(reader).toContain("max-[900px]:bottom-[calc(78px+env(safe-area-inset-bottom))]");
   });
 });

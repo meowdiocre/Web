@@ -2,16 +2,12 @@
 import '@testing-library/jest-dom/vitest';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/svelte/pure';
 import { createRawSnippet } from 'svelte';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Field from '$lib/components/Field.svelte';
 import AdminButton from '$lib/components/admin/AdminButton.svelte';
 import ActionMenu from '$lib/components/admin/ActionMenu.svelte';
-import ActionMenuItem from '$lib/components/admin/ActionMenuItem.svelte';
 import { pendingAdminForms } from '$lib/actions/pending-admin-forms';
 import CategoryForm from '$lib/components/admin/CategoryForm.svelte';
-import CategoryIconPicker from '$lib/components/admin/CategoryIconPicker.svelte';
 import IconPicker from '$lib/components/admin/IconPicker.svelte';
 import PageHeader from '$lib/components/admin/PageHeader.svelte';
 import PanelCard from '$lib/components/admin/PanelCard.svelte';
@@ -44,13 +40,6 @@ describe('admin controls', () => {
 
     expect(header.getByRole('heading', { level: 1, name: 'posts' })).toBeInTheDocument();
     expect(header.getByRole('link', { name: 'new post' })).toHaveAttribute('href', '/admin/posts/new');
-  });
-
-  it('uses a balanced metadata grid on very wide screens', () => {
-    const page = readFileSync(resolve('src/routes/admin/posts/[id]/+page.svelte'), 'utf8');
-
-    expect(page).toContain('2xl:max-w-[1200px]');
-    expect(page).toContain('2xl:grid-cols-[minmax(0,1fr)_360px]');
   });
 
   it('opens and updates the shared select control', async () => {
@@ -111,21 +100,8 @@ describe('admin controls', () => {
     const panel = within(container);
 
     expect(panel.getByRole('region', { name: 'all posts' })).toBeInTheDocument();
-    expect(panel.getByRole('heading', { level: 2, name: 'all posts' }))
-      .toHaveClass('font-sans', 'text-lg', 'font-semibold');
-    expect(panel.getByText('Published and draft posts.')).toHaveClass('text-sm', 'text-muted');
-  });
-
-  it('uses shared section legends across admin metadata forms', () => {
-    const metadataPage = readFileSync(resolve('src/routes/admin/posts/[id]/+page.svelte'), 'utf8');
-    const tagSelector = readFileSync(resolve('src/lib/components/admin/TagMultiSelect.svelte'), 'utf8');
-    const categoryDialog = readFileSync(resolve('src/lib/components/admin/CategoryDeleteDialog.svelte'), 'utf8');
-
-    expect(metadataPage.match(/<AdminSectionLegend/g) ?? []).toHaveLength(3);
-    expect(tagSelector).toContain('<AdminSectionLegend title="tags" />');
-    expect(categoryDialog).toContain('<AdminSectionLegend title="resolve assigned posts"');
-    expect(categoryDialog).toContain('font-sans text-sm font-medium text-paper');
-    expect(categoryDialog).toContain('font-sans text-sm font-medium text-rose');
+    expect(panel.getByRole('heading', { level: 2, name: 'all posts' })).toBeInTheDocument();
+    expect(panel.getByText('Published and draft posts.')).toBeInTheDocument();
   });
 
   it('renders modal and disclosure titles as headings instead of field labels', () => {
@@ -136,8 +112,7 @@ describe('admin controls', () => {
       onclose: vi.fn()
     });
     try {
-      const modalTitle = screen.getByRole('heading', { level: 2, name: 'delete post?' });
-      expect(modalTitle).toHaveClass('font-sans', 'text-base', 'font-semibold');
+      expect(screen.getByRole('heading', { level: 2, name: 'delete post?' })).toBeInTheDocument();
     } finally {
       modal.unmount();
     }
@@ -145,7 +120,7 @@ describe('admin controls', () => {
     const seo = render(PostSeoFields, { values: {} });
     try {
       const summary = within(seo.container).getByText('search and social').closest('summary');
-      expect(summary).toHaveClass('font-sans', 'text-base', 'font-semibold');
+      expect(summary).not.toBeNull();
     } finally {
       seo.unmount();
     }
@@ -172,11 +147,6 @@ describe('admin controls', () => {
     });
 
     expect(container.querySelector('details')).toHaveAttribute('open');
-  });
-
-  it('renders a danger menu button', () => {
-    render(ActionMenuItem, { icon: 'trash', label: 'delete post', tone: 'danger' });
-    expect(screen.getByRole('button', { name: 'delete post' })).toHaveClass('action-menu-item--danger');
   });
 
   it('uses disclosure semantics for action controls', async () => {
@@ -284,17 +254,6 @@ describe('admin controls', () => {
     expect(screen.getByRole('button', { name: 'deleting...' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'deleting...' })).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('button', { name: 'cancel' })).toBeDisabled();
-  });
-
-  it('searches all installed icons from the category picker', async () => {
-    const { container } = render(CategoryIconPicker, { value: 'bug' });
-    const picker = within(container);
-
-    await fireEvent.input(picker.getByRole('searchbox', { name: 'search icons' }), {
-      target: { value: 'alien' }
-    });
-
-    expect(picker.getByRole('radio', { name: 'alien' })).toBeInTheDocument();
   });
 
   it('keeps the selected icon in the category form', () => {

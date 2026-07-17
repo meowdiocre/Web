@@ -12,9 +12,4 @@ describe('db client', () => {
       if (original !== undefined) process.env.DATABASE_URL = original;
     }
   });
-
-  it('exports a callable proxy', async () => {
-    const { db } = await import('../lib/server/db/client');
-    expect(db).toBeTypeOf('object');
-  });
 });

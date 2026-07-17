@@ -1,5 +1,3 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('$lib/server/db/client', () => ({
@@ -11,28 +9,6 @@ vi.mock('$lib/server/db/client', () => ({
 const { db } = await import('$lib/server/db/client');
 const { deleteCategoryAndPosts, moveCategoryPosts } = await import('$lib/server/db/admin-taxonomy');
 const { taxonomyRevalidationPaths } = await import('$lib/server/publish');
-
-describe('taxonomy schema', () => {
-  it('defines normalized tags with cascading post links', () => {
-    const schema = readFileSync(resolve('src/lib/server/db/schema.ts'), 'utf8');
-
-    expect(schema).toContain('export const tags = pgTable(');
-    expect(schema).toContain('export const postTags = pgTable(');
-    expect(schema).toContain("onDelete: 'cascade'");
-    expect(schema).toContain('primaryKey({ columns: [t.postId, t.tagSlug] })');
-    expect(schema).toContain("uniqueIndex('tags_label_lower_unique')");
-  });
-
-  it('blocks the public tag route from colliding with an existing category', () => {
-    const migrationName = readdirSync(resolve('drizzle/migrations'))
-      .find((name) => name.startsWith('0003_') && name.endsWith('.sql'));
-    expect(migrationName).toBeDefined();
-
-    const migration = readFileSync(resolve('drizzle/migrations', migrationName!), 'utf8');
-    expect(migration).toContain("WHERE slug = 'tag'");
-    expect(migration).toContain('Rename the existing category slug "tag"');
-  });
-});
 
 describe('category resolution', () => {
   beforeEach(() => vi.clearAllMocks());

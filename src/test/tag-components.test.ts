@@ -4,14 +4,14 @@ import { render, screen, within } from '@testing-library/svelte/pure';
 import { fireEvent } from '@testing-library/svelte/pure';
 import { describe, expect, it, vi } from 'vitest';
 import CategoryList from '$lib/components/admin/CategoryList.svelte';
+import CategoryDeleteDialog from '$lib/components/admin/CategoryDeleteDialog.svelte';
+import TagList from '$lib/components/admin/TagList.svelte';
+import TagMultiSelect from '$lib/components/admin/TagMultiSelect.svelte';
+import ArticleTags from '$lib/components/article/ArticleTags.svelte';
 
 describe('category deletion dialog', () => {
-  it('offers move and permanent-delete choices for a used category', async () => {
-    const module = await import('$lib/components/admin/CategoryDeleteDialog.svelte').catch(() => null);
-    expect(module).not.toBeNull();
-    if (!module) return;
-
-    const { container } = render(module.default, {
+  it('offers move and permanent-delete choices for a used category', () => {
+    const { container } = render(CategoryDeleteDialog, {
       open: true,
       category: { slug: 'web', label: 'Web', postCount: 3 },
       categories: [
@@ -42,12 +42,8 @@ describe('category deletion dialog', () => {
 
 describe('tag admin controls', () => {
   it('renders immutable tag slugs, counts, and row actions', async () => {
-    const module = await import('$lib/components/admin/TagList.svelte').catch(() => null);
-    expect(module).not.toBeNull();
-    if (!module) return;
-
     const ondelete = vi.fn();
-    const { container } = render(module.default, {
+    const { container } = render(TagList, {
       tags: [{ slug: 'svelte', label: 'Svelte', postCount: 4 }],
       ondelete
     });
@@ -61,11 +57,7 @@ describe('tag admin controls', () => {
   });
 
   it('searches and submits multiple selected tags', async () => {
-    const module = await import('$lib/components/admin/TagMultiSelect.svelte').catch(() => null);
-    expect(module).not.toBeNull();
-    if (!module) return;
-
-    const { container } = render(module.default, {
+    const { container } = render(TagMultiSelect, {
       tags: [
         { slug: 'svelte', label: 'Svelte' },
         { slug: 'security', label: 'Security' }
@@ -87,12 +79,8 @@ describe('tag admin controls', () => {
 });
 
 describe('public article tags', () => {
-  it('links each tag to its public archive', async () => {
-    const module = await import('$lib/components/article/ArticleTags.svelte').catch(() => null);
-    expect(module).not.toBeNull();
-    if (!module) return;
-
-    const { container } = render(module.default, {
+  it('links each tag to its public archive', () => {
+    const { container } = render(ArticleTags, {
       tags: [
         { slug: 'security', label: 'Security' },
         { slug: 'svelte', label: 'Svelte' }

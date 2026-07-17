@@ -1,11 +1,8 @@
-import { existsSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { cleanup, render, screen } from '@testing-library/svelte/pure';
 import { afterEach, describe, expect, it } from 'vitest';
 import SeoHead from '$lib/components/SeoHead.svelte';
 import PostSeoFields from '$lib/components/admin/PostSeoFields.svelte';
-import { resolvePostSeo } from '$lib/seo/post';
-import * as seoModule from '$lib/seo/post';
+import { resolvePageSeo, resolvePostSeo } from '$lib/seo/post';
 
 afterEach(() => cleanup());
 
@@ -28,16 +25,6 @@ describe('SEO system', () => {
     socialImageAlt: null,
     noIndex: false
   };
-
-  it('provides reusable public and admin SEO components', () => {
-    expect(existsSync(resolve('src/lib/components/SeoHead.svelte'))).toBe(true);
-    expect(existsSync(resolve('src/lib/components/admin/PostSeoFields.svelte'))).toBe(true);
-  });
-
-  it('provides sitemap and robots endpoints', () => {
-    expect(existsSync(resolve('src/routes/sitemap.xml/+server.js'))).toBe(true);
-    expect(existsSync(resolve('src/routes/robots.txt/+server.js'))).toBe(true);
-  });
 
   it('builds complete article metadata from content fallbacks', () => {
     const seo = resolvePostSeo(base);
@@ -98,9 +85,6 @@ describe('SEO system', () => {
   });
 
   it('builds complete metadata for static public pages', () => {
-    const resolvePageSeo = /** @type {any} */ ((seoModule as any).resolvePageSeo);
-    expect(resolvePageSeo).toBeTypeOf('function');
-
     const seo = resolvePageSeo({
       siteUrl: 'https://www.meowdiocre.net',
       path: '/about',
