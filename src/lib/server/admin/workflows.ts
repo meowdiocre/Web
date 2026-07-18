@@ -1,5 +1,14 @@
-import { createDraft } from '$lib/server/db/admin-queries';
-import { isCategorySlugTaken } from '$lib/server/db/admin-taxonomy';
+import {
+  createDraft,
+  createImportedDraft,
+  isSlugTaken
+} from '$lib/server/db/admin-queries';
+import {
+  isCategorySlugTaken,
+  listTags
+} from '$lib/server/db/admin-taxonomy';
+import { parsePostFileUpload } from '$lib/server/post-file';
+import { renderPost } from '$lib/server/render-post';
 import { newPostSchema } from '$lib/server/validation';
 import { actionFailure, actionSuccess } from './action-result';
 import { resolveDraftSlug } from './slugs';
@@ -76,4 +85,50 @@ export async function createDraftFromForm(values: PostDraftFormState, author: st
   });
 
   return actionSuccess({ row });
+}
+
+export async function importDraftFromFile(value: unknown) {
+  let imported;
+  try {
+    imported = await parsePostFileUpload(value);
+  } catch (error) {
+    return actionFailure(error instanceof Error ? error.message : 'Could not read the post file.', {
+      action: 'import'
+    });
+  }
+
+  const [categoryExists, availableTags, slugTaken] = await Promise.all([
+    isCategorySlugTaken(imported.metadata.category),
+    listTags(),
+    isSlugTaken(imported.metadata.slug)
+  ]);
+
+  if (!categoryExists) {
+    return actionFailure('The category "' + imported.metadata.category + '" does not exist.', {
+      action: 'import'
+    });
+  }
+
+  const availableTagSlugs = new Set(availableTags.map((tag) => tag.slug));
+  const unknownTags = imported.metadata.tagSlugs.filter((slug) => !availableTagSlugs.has(slug));
+  if (unknownTags.length > 0) {
+    return actionFailure('Unknown tags: ' + unknownTags.join(', ') + '.', {
+      action: 'import'
+    });
+  }
+
+  if (slugTaken) {
+    return actionFailure('The slug "' + imported.metadata.slug + '" is already in use.', {
+      action: 'import'
+    });
+  }
+
+  const rendered = await renderPost(imported.doc);
+  const row = await createImportedDraft({
+    ...imported.metadata,
+    doc: rendered.doc,
+    bodyHtml: rendered.bodyHtml
+  });
+
+  return actionSuccess({ action: 'import', row });
 }

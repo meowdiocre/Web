@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { and, desc, eq, lte, ne, sql } from 'drizzle-orm';
 import { db } from './client';
 import { categories, posts, postTags } from './schema';
@@ -108,6 +109,62 @@ export async function createDraft(input: CreateDraftInput) {
     .values(asInsert(values))
     .returning({ id: posts.id, slug: posts.slug });
   return row;
+}
+
+export interface CreateImportedDraftInput {
+  slug: string;
+  titlePre: string;
+  titleEm: string;
+  titlePost: string;
+  category: string;
+  tagSlugs: string[];
+  dek: string;
+  author: string;
+  coverImageUrl: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  canonicalUrl: string | null;
+  socialImageUrl: string | null;
+  socialImageAlt: string | null;
+  noIndex: boolean;
+  doc: Doc;
+  bodyHtml: string;
+}
+
+export async function createImportedDraft(input: CreateImportedDraftInput) {
+  const id = randomUUID();
+  const insertPost = db.insert(posts).values(asInsert({
+    id,
+    slug: input.slug,
+    titlePre: input.titlePre,
+    titleEm: input.titleEm,
+    titlePost: input.titlePost,
+    category: input.category,
+    dek: input.dek,
+    author: input.author,
+    status: 'draft',
+    coverImageUrl: input.coverImageUrl,
+    seoTitle: input.seoTitle,
+    seoDescription: input.seoDescription,
+    canonicalUrl: input.canonicalUrl,
+    socialImageUrl: input.socialImageUrl,
+    socialImageAlt: input.socialImageAlt,
+    noIndex: input.noIndex,
+    docJson: input.doc,
+    bodyHtml: input.bodyHtml,
+    footnotesJson: []
+  }));
+
+  if (input.tagSlugs.length > 0) {
+    const insertTags = db.insert(postTags).values(
+      input.tagSlugs.map((tagSlug) => ({ postId: id, tagSlug }))
+    );
+    await db.batch([insertPost, insertTags]);
+  } else {
+    await db.batch([insertPost]);
+  }
+
+  return { id, slug: input.slug };
 }
 
 export interface UpdateMetadataInput {

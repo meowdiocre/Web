@@ -15,7 +15,11 @@ export interface SidenoteNode {
   attrs: { ref: string; bodyHtml: string };
 }
 
-export type InlineNode = TextNode | SidenoteNode;
+export interface HardBreakNode {
+  type: 'hardBreak';
+}
+
+export type InlineNode = TextNode | SidenoteNode | HardBreakNode;
 
 export interface ParagraphNode {
   type: 'paragraph';
@@ -30,7 +34,7 @@ export interface HeadingNode {
 
 export interface ListItemNode {
   type: 'listItem';
-  content: ParagraphNode[];
+  content: BlockNode[];
 }
 
 export interface BulletListNode  { type: 'bulletList';  content: ListItemNode[]; }
@@ -61,15 +65,26 @@ export interface ImageNode {
   attrs: { src: string; alt?: string; title?: string | null; width?: number | null; height?: number | null };
 }
 
+export interface BlockquoteNode {
+  type: 'blockquote';
+  content: BlockNode[];
+}
+
+export interface HorizontalRuleNode {
+  type: 'horizontalRule';
+}
+
 export type BlockNode =
   | ParagraphNode
   | HeadingNode
   | BulletListNode
   | OrderedListNode
+  | BlockquoteNode
   | PullQuoteNode
   | CodeBlockNode
   | EndSlugNode
-  | ImageNode;
+  | ImageNode
+  | HorizontalRuleNode;
 
 export interface Doc {
   type: 'doc';
@@ -93,6 +108,7 @@ function isMark(value: unknown): value is Mark {
 
 function isInlineNode(value: unknown): value is InlineNode {
   if (!isObject(value)) return false;
+  if (value.type === 'hardBreak') return true;
   if (value.type === 'sidenote') {
     return isObject(value.attrs)
       && typeof value.attrs.ref === 'string'
@@ -113,7 +129,7 @@ function isListItem(value: unknown): value is ListItemNode {
   return isObject(value)
     && value.type === 'listItem'
     && Array.isArray(value.content)
-    && value.content.every(isParagraph);
+    && value.content.every(isBlockNode);
 }
 
 function isDimension(value: unknown): value is number | null | undefined {
@@ -133,6 +149,10 @@ function isBlockNode(value: unknown): value is BlockNode {
     case 'bulletList':
     case 'orderedList':
       return Array.isArray(value.content) && value.content.every(isListItem);
+    case 'blockquote':
+      return Array.isArray(value.content) && value.content.every(isBlockNode);
+    case 'horizontalRule':
+      return true;
     case 'pullQuote':
     case 'endSlug':
       return isObject(value.attrs) && typeof value.attrs.text === 'string';

@@ -47,6 +47,7 @@ function sanitizeInlineHtml(value: string): string {
 }
 
 function renderInlineNode(node: InlineNode): string {
+  if (node.type === 'hardBreak') return '<br />';
   if (node.type === 'sidenote') {
     const ref      = escapeHtml(node.attrs.ref ?? '');
     const bodyHtml = sanitizeInlineHtml(node.attrs.bodyHtml ?? '');
@@ -78,8 +79,10 @@ function renderInline(content: InlineNode[] | undefined): string {
 }
 
 function renderListItem(item: ListItemNode): string {
-  const inner = (item.content ?? []).map((p) => renderInline(p.content)).join('');
-  return `<li>${inner}</li>`;
+  const inner = (item.content ?? []).map((node) => (
+    node.type === 'paragraph' ? renderInline(node.content) : renderBlock(node)
+  )).join('');
+  return '<li>' + inner + '</li>';
 }
 
 function renderBlock(node: BlockNode): string {
@@ -94,6 +97,10 @@ function renderBlock(node: BlockNode): string {
       return `<ul>${(node.content ?? []).map(renderListItem).join('')}</ul>`;
     case 'orderedList':
       return `<ol>${(node.content ?? []).map(renderListItem).join('')}</ol>`;
+    case 'blockquote':
+      return '<blockquote>' + (node.content ?? []).map(renderBlock).join('') + '</blockquote>';
+    case 'horizontalRule':
+      return '<hr />';
     case 'pullQuote':
       return `<blockquote class="pull">${escapeHtml(node.attrs.text)}</blockquote>`;
     case 'codeBlock': {
@@ -115,7 +122,10 @@ function renderBlock(node: BlockNode): string {
       const title = node.attrs.title  ? ` title="${escapeAttr(node.attrs.title)}"` : '';
       const w     = Number.isInteger(node.attrs.width)  ? ` width="${node.attrs.width}"`   : '';
       const h     = Number.isInteger(node.attrs.height) ? ` height="${node.attrs.height}"` : '';
-      return `<figure class="essay-image"><img src="${src}" alt="${alt}"${title}${w}${h} loading="lazy" /></figure>`;
+      const caption = node.attrs.title
+        ? '<span class="figure-cap">' + escapeHtml(node.attrs.title) + '</span>'
+        : '';
+      return '<figure class="essay-image"><img src="' + src + '" alt="' + alt + '"' + title + w + h + ' loading="lazy" />' + caption + '</figure>';
     }
     default:
       return '';
